@@ -48,8 +48,8 @@ class GameState:
 
             agent_min_x = each_agent.get_min_x_boundary()
             agent_min_y = each_agent.get_min_y_boundary()
-            agent_max_x = each_agent.pos_x
-            agent_max_y = each_agent.pos_y
+            agent_max_x = each_agent.get_max_x_boundary()
+            agent_max_y = each_agent.get_max_y_boundary()
 
             for row in temp_board:
                 if row >= agent_min_x and row <= agent_max_x:

@@ -18,6 +18,7 @@ class InitialBlankBoardTest(unittest.TestCase):
         self.assertEqual(5, g1.min_enemy_spawn_x_distance)
 
 
+
     #Case where enemy agent spawns in the same pos as player
     # assuming enemy agent and player agent have size (1,1)
     def test_min_enemy_spawn_distance_error(self):
