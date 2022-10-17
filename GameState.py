@@ -35,7 +35,7 @@ class GameState:
 
     #NO logic for being outside of board, enemies shoudl be able to
     # board should not
-    def instate_agents_to_board_initial(self):
+    def instate_agents_to_board_initial(self) -> None:
         if len(self.agent_list) < 1:
             raise RuntimeError("Gamestate does not have any agents to instate on board")
 
@@ -48,24 +48,25 @@ class GameState:
             # agent index needed to update board
             each_agent = self.agent_list[agent_index]
 
-            agent_min_x = each_agent.get_min_x_boundary()
-            agent_min_y = each_agent.get_min_y_boundary()
-            agent_max_x = each_agent.get_max_x_boundary()
-            agent_max_y = each_agent.get_max_y_boundary()
+            agent_min_x = each_agent.get_min_col_boundary()
+            agent_max_x = each_agent.get_max_col_boundary()
+            agent_min_y = each_agent.get_min_row_boundary()
+            agent_max_y = each_agent.get_max_row_boundary()
 
-            for row_index in range(len(temp_board)):
+            for row_index in range(len(self.board)):
                 current_row = temp_board[row_index]
-                if row_index >= agent_min_x and row_index <= agent_max_x:
+                if row_index >= agent_min_y and row_index <= agent_max_y:
                     for col_index in range(len(current_row)):
-                        if col_index >= agent_min_y and col_index <= agent_max_y:
-                            #TODO add logic to differentiate between enemy and bullet agents
-                            #player is always 1
-                            #enemy is always greater than 1, how to deal with bullets?
-                            # TODO add collision logic
+                        if col_index >= agent_min_x and col_index <= agent_max_x:
                             temp_board[row_index][col_index] = agent_index + 1
+
+
 
         #update board
         self.board = temp_board
+
+    def get_board(self):
+        return self.board
 
 
 
@@ -92,7 +93,7 @@ class GameState:
         if len(self.agent_list) != 0:
             return False
         else:
-            player_agent = Agent(agent.agent_len_x,agent.agent_len_y,agent.pos_x,agent.pos_y)
+            player_agent = Agent(agent.agent_length, agent.agent_height, agent.lowest_row, agent.least_col)
             self.agent_list.append(player_agent)
             return True
 
@@ -122,9 +123,9 @@ class GameState:
         # at minimum like 5 spaces away to the right on the x axis
 
         #furthest most right part of the ship
-        min_x_dist_to_spawn = player.pos_x + self.min_enemy_spawn_x_distance
+        min_x_dist_to_spawn = player.lowest_row + self.min_enemy_spawn_x_distance
 
-        if agent.get_min_x_boundary() < min_x_dist_to_spawn:
+        if agent.get_min_col_boundary() < min_x_dist_to_spawn:
             return False
         else:
             self.agent_list.append(agent)
@@ -154,5 +155,8 @@ class GameState:
             board_str += list_row_str[i] + "\n"
 
         return board_str
+
+    # def get_successor_state(self, agent_index: int, agent_action):
+
 
 
