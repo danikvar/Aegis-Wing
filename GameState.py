@@ -1,9 +1,16 @@
 from Agent import Agent
-class GameState():
+
+
+class GameState:
 
     def __init__(
-            self,board_len = 10, board_height = 10, max_enemies_at_one_time=1,
-            max_turn_length=100, player_lives=3):
+            self,board_len: int = 10, board_height: int = 10, max_enemies_at_one_time: int =1,
+            max_turn_length: int =100, player_lives: int =3, min_enemy_spawn_x_distance: int = 5):
+
+        if min_enemy_spawn_x_distance < 1:
+            error_context = f'argument min_enemy_spawn_x_distance: {min_enemy_spawn_x_distance} cannot be less than 1'
+            raise ValueError(error_context)
+
         self.board_len = board_len
         self.board_height = board_height
         self.max_enemies_at_one_time = max_enemies_at_one_time
@@ -12,6 +19,7 @@ class GameState():
         self.player_lives_left = player_lives
         self.board = self.initialize_board()
         self.agent_list = []
+        self.min_enemy_spawn_x_distance = min_enemy_spawn_x_distance
 
     # set up board
     def initialize_board(self) -> list:
@@ -25,8 +33,50 @@ class GameState():
         return board_2d_array
 
 
+    def instate_agents_to_board_initial(self):
+        if len(self.agent_list) < 1:
+            raise RuntimeError("Gamestate does not have any agents to instate on board")
+
+        if len(self.agent_list) == 1:
+            raise RuntimeWarning("Gamestate ONLY has a player agent")
+
+        temp_board = self.initialize_board()
+
+        for agent_index in range (0,len(self.agent_list)):
+            # agent index needed to update board
+            each_agent = self.agent_list[agent_index]
+
+            agent_min_x = each_agent.get_min_x_boundary()
+            agent_min_y = each_agent.get_min_y_boundary()
+            agent_max_x = each_agent.pos_x
+            agent_max_y = each_agent.pos_y
+
+            for row in temp_board:
+                if row >= agent_min_x and row <= agent_max_x:
+                    for col in temp_board:
+                        if col >= agent_min_y and col <= agent_max_y:
+                            #TODO add logic to differentiate between enemy and bullet agents
+                            #player is always 1
+                            #enemy is always greater than 1, how to deal with bullets?
+                            # TODO add collision logic
+                            temp_board[row][col] = agent_index + 1
+
+        #update board
+        self.board = temp_board
+
+
+
+
     def get_board_dimensions(self) -> tuple:
         return (self.board_len,self.board_height)
+
+    def get_all_agents(self) -> list:
+        if len(self.agent_list) < 1:
+            raise RuntimeError("No agents in gamestate, please add agents before calling get_all_agents ")
+
+        if len(self.agent_list) == 1:
+            raise RuntimeWarning("Player agent is the only agent in the gamestate")
+        return self.agent_list
 
     def add_player_agent(self, agent: Agent) -> bool:
         '''
@@ -44,6 +94,9 @@ class GameState():
             return True
 
     def get_player_agent(self) -> Agent:
+        if len(self.agent_list) < 1:
+            raise RuntimeError('Gamestate does not have a player agent,'
+                               'add_player_agent first then run again')
         #force agent player to be first index value in list
         return self.agent_list[0]
 
@@ -58,16 +111,50 @@ class GameState():
         if len(self.agent_list) < 1:
             return False
         player = self.get_player_agent()
+
+        #TODO hwo to handle if you want enemies coming away from board
+
+
         # enemy cannot overlap player and should probably start off
         # at minimum like 5 spaces away to the right on the x axis
 
         #furthest most right part of the ship
-        min_x_dist_to_spawn = player.pos_x + 5
+        min_x_dist_to_spawn = player.pos_x + self.min_enemy_spawn_x_distance
 
         if agent.get_min_x_boundary() < min_x_dist_to_spawn:
             return False
         else:
             self.agent_list.append(agent)
             return True
+
+    def get_board_as_string(self):
+
+        #helper function to make format look nices
+        def add_horiz_lines(str_in, row_len):
+            modded_str = str_in
+
+            for i in range(row_len):
+                modded_str += " ___"
+
+            return modded_str
+
+
+        board_str = ""
+
+
+        for row in range(len(self.board)):
+            temp = "|"
+            temp += "\u0332" + " "
+            current_row_list = self.board[row]
+            for col in range(len(current_row_list)):
+                temp += "\u0332" + (str(current_row_list[col]))
+                temp += "\u0332" + " "
+                temp += "|"
+                if col < len(current_row_list) - 1:
+                    temp += "\u0332" + " "
+                else:
+                    temp += "\n"
+                    board_str += temp
+        return board_str
 
 
