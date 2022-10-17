@@ -33,12 +33,14 @@ class GameState:
         return board_2d_array
 
 
+    #NO logic for being outside of board, enemies shoudl be able to
+    # board should not
     def instate_agents_to_board_initial(self):
         if len(self.agent_list) < 1:
             raise RuntimeError("Gamestate does not have any agents to instate on board")
 
-        if len(self.agent_list) == 1:
-            raise RuntimeWarning("Gamestate ONLY has a player agent")
+        #if len(self.agent_list) == 1:
+            #raise RuntimeWarning("Gamestate ONLY has a player agent")
 
         temp_board = self.initialize_board()
 
@@ -51,15 +53,16 @@ class GameState:
             agent_max_x = each_agent.get_max_x_boundary()
             agent_max_y = each_agent.get_max_y_boundary()
 
-            for row in temp_board:
-                if row >= agent_min_x and row <= agent_max_x:
-                    for col in temp_board:
-                        if col >= agent_min_y and col <= agent_max_y:
+            for row_index in range(len(temp_board)):
+                current_row = temp_board[row_index]
+                if row_index >= agent_min_x and row_index <= agent_max_x:
+                    for col_index in range(len(current_row)):
+                        if col_index >= agent_min_y and col_index <= agent_max_y:
                             #TODO add logic to differentiate between enemy and bullet agents
                             #player is always 1
                             #enemy is always greater than 1, how to deal with bullets?
                             # TODO add collision logic
-                            temp_board[row][col] = agent_index + 1
+                            temp_board[row_index][col_index] = agent_index + 1
 
         #update board
         self.board = temp_board
@@ -129,15 +132,7 @@ class GameState:
 
     def get_board_as_string(self):
 
-        #helper function to make format look nices
-        def add_horiz_lines(str_in, row_len):
-            modded_str = str_in
-
-            for i in range(row_len):
-                modded_str += " ___"
-
-            return modded_str
-
+        list_row_str = []
 
         board_str = ""
 
@@ -153,8 +148,11 @@ class GameState:
                 if col < len(current_row_list) - 1:
                     temp += "\u0332" + " "
                 else:
-                    temp += "\n"
-                    board_str += temp
+                    list_row_str.append(temp)
+
+        for i in range(-1, -len(list_row_str) - 1, -1):
+            board_str += list_row_str[i] + "\n"
+
         return board_str
 
 

@@ -7,9 +7,9 @@ This class defines shared methods between all agents.
 class Agent:
     def __init__(self, agent_len_x=1, agent_len_y=1, pos_x=0, pos_y=0):
         if agent_len_x < 1:
-            raise ValueError("Agent size length must be greater than 1")
+            raise ValueError("Agent size length must be >= 1")
         if agent_len_y < 1:
-            raise ValueError("Agent size height must be grater than 1")
+            raise ValueError("Agent size height must be >= 1")
 
         if pos_x < 0:
             raise ValueError('Agent cannot start at any x position less than 0, (leftmost limit)')
@@ -36,6 +36,10 @@ class Agent:
     def get_agent_size(self) -> tuple:
         return (self.agent_len_x, self.agent_len_y)
 
+
+    def get_min_x_boundary(self):
+        return self.pos_x
+
     def get_max_x_boundary(self):
         if self.agent_len_x == 1:
             return self.pos_x
@@ -54,7 +58,10 @@ class Agent:
         return self.pos_y
 
     def get_max_y_boundary(self):
-        return self.pos_y + self.agent_len_y
+        if self.agent_len_y == 1:
+            return self.pos_y
+        else:
+            return self.pos_y + self.agent_len_y - 1
 
     def get_y_boundaries(self) -> tuple:
         return (self.pos_y, self.get_max_y_boundary())
