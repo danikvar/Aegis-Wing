@@ -5,7 +5,7 @@ class GameState:
 
     def __init__(
             self,board_len: int = 10, board_height: int = 10, max_enemies_at_one_time: int =1,
-            max_turn_length: int =100, player_lives: int =3, min_enemy_spawn_x_distance: int = 5):
+            max_turn_length: int = 100, player_lives: int =3, min_enemy_spawn_x_distance: int = 5):
 
         if min_enemy_spawn_x_distance < 1:
             error_context = f'argument min_enemy_spawn_x_distance: {min_enemy_spawn_x_distance} cannot be less than 1'
@@ -115,9 +115,6 @@ class GameState:
         if len(self.agent_list) < 1:
             return False
         player = self.get_player_agent()
-
-        #TODO hwo to handle if you want enemies coming away from board
-
 
         # enemy cannot overlap player and should probably start off
         # at minimum like 5 spaces away to the right on the x axis
