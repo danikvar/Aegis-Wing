@@ -37,14 +37,14 @@ class TestPlayerAgent(unittest.TestCase):
         self.assertTrue(self.p1.isPlayer())
 
     def testCopyAgent(self):
-        copyAgent = self.p1.copyAgent()
+        copyAgent = self.p1.copy_agent()
 
         # check identity/i.e. deep copy
         self.assertFalse(self.p1 is copyAgent)
 
     def testTakeAction(self):
         #this is deep copy with new agent moves
-        agentAfterAction = self.p1.takeAction(Actions.RIGHT)
+        agentAfterAction = self.p1.take_action(Actions.RIGHT)
 
         self.assertEqual((0,0), self.p1.get_col_boundaries())
         self.assertEqual((1,1), agentAfterAction.get_col_boundaries())

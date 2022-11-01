@@ -1,5 +1,5 @@
 from Actions import Actions
-from AgentAbstractClass import AgentAbstractClass
+from AgentAbstractClass import AgentAbstractClass, PlayerAgent
 from AgentInterface import AgentInterface
 from newVersion.GameBoard import GameBoard
 
@@ -13,22 +13,23 @@ class NewGameState:
         - amount of enemies on screen at any one time
         - agents
     '''
-    def __init__(self,board_len: int = 10, board_height: int = 10,
+    def __init__(self, board_len: int = 10, board_height: int = 10,
                  max_enemies_at_one_time: int =1,
-                 max_turn_length: int = 100, player_lives: int =1):
+                 turns_left: int = 100, player_lives: int =1):
         '''
         Constuctor for the gameState
         :param board_len: {int} length of the board
         :param board_height: {int} height of the board
         :param max_enemies_at_one_time: {int} amount of enemies allows at any one turn
-        :param max_turn_length: {int} turns until the game ends
+        :param turns_left: {int} turns until the game ends
         :param player_lives: {int} how many lives a player has
         '''
-        self.turns_left = max_turn_length
+        self.turns_left = turns_left
         self.gameBoard = GameBoard(board_len, board_height)
         self.max_enemies_at_any_given_time = max_enemies_at_one_time
         self.current_player_lives = player_lives
-        self.current_agents = []
+        self.current_agents = [] #list of AgentInterface Objects
+        self.bullet_agents = []
         self.current_projectiles = []
         self.isPlayerAdded = False
 
@@ -73,15 +74,106 @@ class NewGameState:
                     print("WARNING: Cannot exceed enemy agent limit, agent not added")
                     return False
 
+    def isWin(self) -> bool:
+        #you win game if player still has lives and timer has reached 0
+        if self.current_player_lives > 0 and self.turns_left == 0:
+            return True
+        return False
+
+    def isGameOver(self) -> bool:
+        if self.current_player_lives == 0:
+            return True
+        else:
+            return False
+
+    def checkPlayerAgentClashes(self):
+        """
+        Checks for if player clashes with enemy agents
+        Enemies allows to overlap with each other.
+        Call in generateSuccessor
+        :return: {None}
+        """
+        # agent crashing logic, check if player is overlapping with enemy agents
+        player_agent: AgentInterface = self.current_agents[0]
+        list_enemy_agents = self.current_agents[1:]
+
+        for i in range(len(list_enemy_agents)):
+            enemy_agent: AgentInterface = list_enemy_agents[i]
+
+            # if overlapping, player and agent lose health
+            #TODO maybe just have them blow up? Already happens since player hp = 1
+            if (player_agent.is_overlapping_other_agent(enemy_agent)):
+                player_agent.set_hp(player_agent.get_hp() - 1)
+                enemy_agent.set_hp(enemy_agent.get_hp() - 1)
+
+    def updateAgentsList(self):
+        """
+        update the agents list. If player health = 0, remove them
+        If enemy agent health = 0 remove them
+        If enemy agent_max_col < board_col_min remove them.
+        Call this in generateSuccessor
+        :return: {None}
+        """
+        board_min_col = self.gameBoard.min_col
+        agent_indexes_to_be_popped = []
+
+        for i in range(self.current_agents):
+            already_popped = False
+            each_agent: AgentInterface = self.current_agents[i]
+            # check if agent is dead
+            if each_agent.is_dead() == True:
+                agent_indexes_to_be_popped.append(i)
+                already_popped = True
+
+            if already_popped == True:
+                continue
+            else:
+                # if enemy max col beyond board min boundary,
+                # don't need to check for player because state.getAllLegalActions(0) will tell you
+                # this already
+                if each_agent.get_max_col_boundary() < board_min_col:
+                    agent_indexes_to_be_popped.append(i)
+
+        subtract_by = 0
+
+        for each_index in agent_indexes_to_be_popped:
+
+            # if player agent died
+            if self.current_agents[each_index].isPlayer() == True:
+                self.current_player_lives -= 1
+                if self.current_player_lives > 0:
+                    # if more lives left than player agent gets restarted at initial point
+                    self.current_agents[each_index] = PlayerAgent()
+                    continue
+
+            if each_index == 0:
+                self.current_agents.pop(each_index)
+                subtract_by = 1
+            else:
+                value_to_pop = each_index - subtract_by
+                self.current_agents.pop(value_to_pop)
+                subtract_by = each_index
 
     def update_board(self):
         '''
         Updates the gameBoard attribute with positions of each agent
         :return:
         '''
+        #TODO update with bullet and agent logic
+
+        #agent crashing logic, check if player is overlapping with enemy agents
+        player_agent = self.current_agents[0]
+        list_enemy_agents = self.current_agents[1:]
+
         pass
 
     def isValidAgent(self, agent: AgentInterface) -> bool:
+        """
+        Helper method to getAllLegalActions and addAgent. Checks if
+        the agent position is valid within the board.
+        :param agent: {AgentInterface}
+        :return: {bool} True if agent position is valid, false otherwise
+        """
 
         #TODO how to deal if agent moves to a position where another agent kills it?
         board_min_x,board_max_x, board_min_y, board_max_y = self.gameBoard.getBoardBoundaries()
@@ -113,6 +205,11 @@ class NewGameState:
                 return True
 
     def getAllLegalActions(self, agentIndex: int) -> list:
+        """
+        Gets all legals actions of an agent at agentIndex
+        :param agentIndex: {int} index of agent in agent list
+        :return: {list} a list of legal actions an agent can perform
+        """
         agentTakingAction: AgentInterface = self.current_agents[agentIndex]
 
         all_actions = agentTakingAction.get_all_possible_raw_actions()
@@ -120,7 +217,7 @@ class NewGameState:
 
         for eachAction in all_actions:
             # if action is valid add it to legal actions list
-            if self.isValidAgent(agentTakingAction.takeAction(eachAction)):
+            if self.isValidAgent(agentTakingAction.take_action(eachAction)):
                 legal_actions.append(eachAction)
 
         return legal_actions

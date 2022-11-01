@@ -62,7 +62,7 @@ class AgentSuperClassTest(unittest.TestCase):
         self.assertEquals(10, a2.get_hp())
         a1.set_hp(0)
         self.assertEquals(0,a1.get_hp())
-        self.assertTrue(a1.isDead()) # if hp = 0 then they are dead
+        self.assertTrue(a1.is_dead()) # if hp = 0 then they are dead
 
     def testSetPos(self):
         a1.set_position(2,5)

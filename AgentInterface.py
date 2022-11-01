@@ -97,6 +97,7 @@ class AgentInterface:
         Returns the amount of hp an agent has
         :return: {int} hp of the agent
         """
+        raise NotImplementedError
 
     def set_hp(self, new_hp: int)->None:
         """
@@ -104,27 +105,39 @@ class AgentInterface:
         :param new_hp: {int} the new hp of the agent
         :return: None
         """
+        raise NotImplementedError
 
-    def isDead(self) -> bool:
+    def is_dead(self) -> bool:
         """
         Returns true if current hp = 0, otherwise false
         :return: {bool} true if hp = 0, else false
         """
+        raise NotImplementedError
 
-    def copyAgent(self):
+    def copy_agent(self):
         """
         Returns a deepcopy of the agent
         :return: {AgentInterface} a copy of the current agent
         """
+        raise NotImplementedError
 
 
-    def takeAction(self,action: Actions):
+    def take_action(self, action: Actions):
         """
         Returns a copy of the current agent with the same length and width
         but with a new position caused by an action
         :param action: {Actions} the action that causes an agent to change position
         :return:
         """
+        raise NotImplementedError
+
+    def is_overlapping_other_agent(self, agent):
+        """
+        Checks if current agent is overlapping with another agent
+        :param agent: {AgentInterface}
+        :return: {bool} True if agent overlaps other agent, false otherwise
+        """
+        raise NotImplementedError
 
 
 

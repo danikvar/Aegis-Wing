@@ -1,3 +1,5 @@
+from AgentInterface import AgentInterface
+
 
 class GameBoard:
     '''
@@ -40,6 +42,25 @@ class GameBoard:
         :return: {quadruple} (min x, max_x, min_y,max_y)
         """
         return (self.min_col, self.board_max_y_boundary, self.min_row, self.board_max_y_boundary)
+
+    def populate_board(self, agentIndex: int, agent: AgentInterface):
+        """
+        Add numbers that represent agents on board. Does not check
+        if agents are beyond board or if agents clash. This is done by gameState class.
+        :param agentIndex: {int} index value of agent
+        :return: {None}
+        """
+        if agentIndex == 0:
+            raise ValueError("0 represents empty space, agentIndex passed cannot be 0, must be 1 for player for ex.")
+
+        agent_row_min, agent_row_max = agent.get_row_boundaries()
+        agent_col_min, agent_col_max = agent.get_col_boundaries()
+
+        for eachRow in self.board_array:
+            if eachRow >= agent_row_min and eachRow <= agent_row_max:
+                for eachCol in eachRow:
+                    if eachCol >= agent_col_min and eachCol <= agent_col_max:
+                        self.board_array[eachRow][eachCol] = agentIndex
 
 
     def setUpBlankBoard(self) -> list:

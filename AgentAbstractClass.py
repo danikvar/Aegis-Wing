@@ -122,7 +122,7 @@ class AgentAbstractClass(AgentInterface):
     def get_hp(self) -> int:
         return self.hp
 
-    def isDead(self) -> bool:
+    def is_dead(self) -> bool:
         if self.hp < 1:
             return True
         return False
@@ -144,6 +144,35 @@ class AgentAbstractClass(AgentInterface):
             self.set_position(self.lowest_row, self.least_col + 1)
         #TODO maybe have a has fired attribute??
 
+    def is_overlapping_other_agent(self, other_agent: AgentInterface) -> bool:
+        current_agent_row_min = self.get_min_row_boundary()
+        current_agent_row_max = self.get_max_row_boundary()
+        current_agent_col_min = self.get_min_col_boundary()
+        current_agent_col_max = self.get_max_col_boundary()
+
+        other_agent_row_min = other_agent.get_min_row_boundary()
+        other_agent_row_max = other_agent.get_max_row_boundary()
+        other_agent_col_min = other_agent.get_min_col_boundary()
+        other_agent_col_max = other_agent.get_max_col_boundary()
+
+        #check if current agent min row overlaps with other agent
+        if (current_agent_row_min >= other_agent_row_min
+                and current_agent_row_min <= other_agent_row_max):
+            #check if current agent max row overlaps with other agent
+            if (current_agent_row_max >= other_agent_row_min
+                and current_agent_row_max <= other_agent_row_max):
+                # check if current agent col min overlaps
+                if (current_agent_col_min >= other_agent_col_min
+                        and current_agent_col_min <= other_agent_col_max):
+                    return True
+                # check if current agent col max overlaps
+                elif (current_agent_col_min >= other_agent_col_min
+                        and current_agent_col_min <= other_agent_col_max):
+                    return True
+                else:
+                    # agents don't overlap
+                    return False
+
 
 
 
@@ -162,23 +191,28 @@ class PlayerAgent(AgentAbstractClass):
         """
         return [Actions.UP, Actions.LEFT, Actions.RIGHT, Actions.DOWN, Actions.STOP, Actions.FIRE]
 
-    def isPlayer(self):
+    def isPlayer(self) -> bool:
         """
         Since this is a player agent it should return True
         :return: {bool} true
         """
         return True
 
-    def copyAgent(self):
+    def copy_agent(self):
+        """
+        Creates a deep copy of the player agent. This is a helper method
+        to takeAction method
+        :return:
+        """
         return PlayerAgent(self.agent_length,self.agent_height,self.lowest_row, self.least_col)
 
-    def takeAction(self,action: Actions):
-        agentCopy = self.copyAgent()
+    def take_action(self, action: Actions):
+        agentCopy = self.copy_agent()
         agentCopy.performAction(action)
         return agentCopy
 
 
-
+#TODO write tests for this
 class SimpleGoLeftAgent(AgentAbstractClass):
     def __init__(self, lowest_row, least_col):
         super().__init__(1, 1, lowest_row, least_col)
@@ -188,4 +222,11 @@ class SimpleGoLeftAgent(AgentAbstractClass):
 
     def isPlayer(self):
         return False
+
+    def copy_agent(self):
+        return SimpleGoLeftAgent(self.lowest_row, self.least_col)
+
+    def take_action(self, action: Actions):
+        agent_copy = self.copy_agent()
+        agent_copy.performAction(action)
 

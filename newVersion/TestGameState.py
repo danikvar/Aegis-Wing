@@ -111,14 +111,24 @@ class TestGameState(unittest.TestCase):
         valid_p1 = PlayerAgent()
         self.gamestateInit.addAgent(valid_p1)
         p1_legal_actions = self.gamestateInit.getAllLegalActions(0)
-        # from 0,0 player can move up, right, stop or fire = 4 actions
+        # from 0,0 (bottom left corner) player can move up, right, stop or fire = 4 actions
         self.assertEquals(4, len(p1_legal_actions))
         self.assertEquals(
             [Actions.UP, Actions.RIGHT, Actions.STOP, Actions.FIRE],
             p1_legal_actions)
 
-        gameState2 = NewGameState()
-        valid_p2 = PlayerAgent()
+        gameState3 = NewGameState()
+        # from (9,9) top right corner player can move left, down, stop , or fire
+        valid_p2 = PlayerAgent(1,1,9,9)
+        gameState3.addAgent(valid_p2)
+        p2_legal_actions = gameState3.getAllLegalActions(0)
+        gameState3.getAllLegalActions(0)
+        self.assertEquals(4,len(p2_legal_actions))
+        self.assertEquals([Actions.LEFT, Actions.DOWN, Actions.STOP,Actions.FIRE],
+                          p2_legal_actions)
+
+        #TODO test player and enemy getLegalActions
+
 
 
 
