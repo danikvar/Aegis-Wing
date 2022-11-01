@@ -1,0 +1,59 @@
+import unittest
+
+from Actions import Actions
+from AgentAbstractClass import PlayerAgent
+
+class TestPlayerAgent(unittest.TestCase):
+    def setUp(self) -> None:
+        self.p1 = PlayerAgent()
+
+    def testGetAllRawActions(self):
+        action_count = 0
+        UP = Actions.UP
+        DOWN = Actions.DOWN
+        LEFT = Actions.LEFT
+        RIGHT = Actions.RIGHT
+        STOP = Actions.STOP
+        FIRE = Actions.FIRE
+
+        list_actions_raw = self.p1.get_all_possible_raw_actions()
+        for eachAction in list_actions_raw:
+            if eachAction == UP:
+                action_count += 1
+            elif eachAction == DOWN:
+                action_count += 1
+            elif eachAction == LEFT:
+                action_count += 1
+            elif eachAction == RIGHT:
+                action_count += 1
+            elif eachAction == STOP:
+                action_count += 1
+            elif eachAction == FIRE:
+                action_count += 1
+
+        self.assertEqual(6,action_count)
+
+    def testIsPlayer(self):
+        self.assertTrue(self.p1.isPlayer())
+
+    def testCopyAgent(self):
+        copyAgent = self.p1.copyAgent()
+
+        # check identity/i.e. deep copy
+        self.assertFalse(self.p1 is copyAgent)
+
+    def testTakeAction(self):
+        #this is deep copy with new agent moves
+        agentAfterAction = self.p1.takeAction(Actions.RIGHT)
+
+        self.assertEqual((0,0), self.p1.get_col_boundaries())
+        self.assertEqual((1,1), agentAfterAction.get_col_boundaries())
+
+def main():
+    unittest.main(verbosity=3)
+
+if __name__ == '__main__':
+    main()
+
+
+

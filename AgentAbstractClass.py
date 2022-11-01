@@ -3,14 +3,17 @@ The agent superclass.
 This class defines shared methods between all agents.
 """
 from Actions import Actions
+from AgentInterface import AgentInterface
 
-class Agent:
-   '''
-   This is the abstract class for all agents. It has the
-   methods and attributes common to all agents
-   '''
 
-    def __init__(self, agent_length=1, agent_height=1, lowest_row=0, least_col=0):
+class AgentAbstractClass(AgentInterface):
+    """
+    This is the abstract class for all agents. It has the
+    methods and attributes common to all agents and implements
+    the AgentInterface.
+    """
+
+    def __init__(self, agent_length=1, agent_height=1, lowest_row=0, least_col=0, hp=1):
         '''
         Create a new Agent. Warning this code does not reinforce
         whether agents can be outside of board. We need to allow it
@@ -33,8 +36,7 @@ class Agent:
         self.lowest_row = lowest_row
         # position of lowest side
         self.least_col = least_col
-        # if player agent set to True
-        self.isPlayer = False
+        self.hp = 1 # default hp is 1
 
     def get_position(self) -> tuple:
         '''
@@ -66,7 +68,7 @@ class Agent:
         Returns True if player agent, otherwise false
         :return: {bool} Returns True if player agent, otherwise false
         '''
-        return self.isPlayer
+        return False
 
 
     def get_min_col_boundary(self):
@@ -77,10 +79,10 @@ class Agent:
         return self.least_col
 
     def get_max_col_boundary(self):
-        '''
+        """
         Returns the maximum col/x value of the agent
         :return: {int} the maximum col/x value of the agent
-        '''
+        """
         if self.agent_length == 1:
             return self.least_col
         else:
@@ -90,16 +92,22 @@ class Agent:
             # 2 + 3 = 5, 5 is empty space
             return self.least_col + self.agent_length - 1
 
-    def get_min_row_boundary(self) -> int:
-        return self.lowest_row
-
     def get_col_boundaries(self) -> tuple:
+        """
+        Returns the column/x boundaries of the agent as a tuple
+        :return: {tuple} (agent_x_min, agent_c_max)
+        """
         return (self.least_col, self.get_max_col_boundary())
 
     def get_min_row_boundary(self) -> int:
+        """
+        Returns the
+        :return:
+        """
+
         return self.lowest_row
 
-    def get_max_row_boundary(self):
+    def get_max_row_boundary(self) -> int:
         if self.agent_height == 1:
             return self.lowest_row
         else:
@@ -108,36 +116,76 @@ class Agent:
     def get_row_boundaries(self) -> tuple:
         return (self.lowest_row, self.get_max_row_boundary())
 
+    def set_hp(self, new_hp: int) ->None:
+        self.hp = new_hp
 
-    # TODO create agent subclass for player, enemy, and bullet
+    def get_hp(self) -> int:
+        return self.hp
 
-class PlayerAgent(Agent):
+    def isDead(self) -> bool:
+        if self.hp < 1:
+            return True
+        return False
+
+    def performAction(self,action: Actions) -> None:
+        """
+        Helper method to takeAction method that will be defined
+        by subclasses
+        :param action: {Actions} action taken
+        :return: None
+        """
+        if action == Actions.UP: #moving up so going up one row
+            self.set_position(self.lowest_row + 1, self.least_col)
+        elif action == Actions.DOWN:
+            self.set_position(self.lowest_row - 1, self.least_col)
+        elif action == Actions.LEFT: # move left so move back one col, y - 1
+            self.set_position(self.lowest_row, self.least_col - 1)
+        elif action == Actions.RIGHT:
+            self.set_position(self.lowest_row, self.least_col + 1)
+        #TODO maybe have a has fired attribute??
+
+
+
+
+
+class PlayerAgent(AgentAbstractClass):
     def __init__(self, agent_length = 1, agent_height = 1, lowest_row = 0, least_col = 0):
         super().__init__(agent_length, agent_height, lowest_row, least_col)
         self.isInvulnerable = False
         self.turnsUntilInvulnerabilityOver = 0
         self.crossedLeftBounds = False
-        self.isPlayer = True
-
-
-    def set_position(self, lowest_row: int, least_col: int):
-        # if you agent finally on board
-        if (self.crossedLeftBounds):
-            if (lowest_row < 0 or least_col < 0):
-                raise RuntimeError("Agent cannot go off board")
 
     def get_all_possible_raw_actions(self) -> list:
+        """
+        The player agent should be able to perform all actions
+        :return: {list(Action)}
+        """
         return [Actions.UP, Actions.LEFT, Actions.RIGHT, Actions.DOWN, Actions.STOP, Actions.FIRE]
 
-    def isPlayerAgent(self):
+    def isPlayer(self):
+        """
+        Since this is a player agent it should return True
+        :return: {bool} true
+        """
         return True
 
-    #TODO write this, maybe make an action class and action sequence class
-    def takeLegalAction(self, movement: Actions):
-        if movement == Actions.UP: #if moving up
-            #check if moving up will cause player to go beyond upper boundary
+    def copyAgent(self):
+        return PlayerAgent(self.agent_length,self.agent_height,self.lowest_row, self.least_col)
 
-            self.lowest_row = self.lowest_row + 1
-        elif movement == Actions.DOWN:
-            self.lowest_row = self.lowest_row - 1
+    def takeAction(self,action: Actions):
+        agentCopy = self.copyAgent()
+        agentCopy.performAction(action)
+        return agentCopy
+
+
+
+class SimpleGoLeftAgent(AgentAbstractClass):
+    def __init__(self, lowest_row, least_col):
+        super().__init__(1, 1, lowest_row, least_col)
+
+    def get_all_possible_raw_actions(self) -> list:
+        return [Actions.LEFT]
+
+    def isPlayer(self):
+        return False
 

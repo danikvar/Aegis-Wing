@@ -1,11 +1,11 @@
 import unittest
 from GameState import GameState
-from Agent import Agent
+from AgentAbstractClass import AgentAbstractClass
 
 #initialize variables
 g1 = GameState()
 g2 = GameState()
-g2.add_player_agent(Agent())
+g2.add_player_agent(AgentAbstractClass())
 class InitialBlankBoardTest(unittest.TestCase):
 
     #test default constructor values

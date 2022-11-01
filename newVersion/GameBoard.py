@@ -25,14 +25,21 @@ class GameBoard:
 
         self.board_length = board_length #
         self.board_height = board_height
-        self.min_x = minimum_x # least column value
-        self.min_y = minimum_y  # least row value
+        self.min_col = minimum_x # least column value
+        self.min_row = minimum_y  # least row value
 
         # storing board as a 2D array, each row starts at x = 0
         # so if board is 10 units long, then x = {0,1,2...9}
-        self.board_max_x_boundary = self.min_x + board_length - 1
-        self.board_max_y_boundary = self.min_y + board_height - 1
+        self.board_max_x_boundary = self.min_col + board_length - 1
+        self.board_max_y_boundary = self.min_row + board_height - 1
         self.board_array = self.setUpBlankBoard()
+
+    def getBoardBoundaries(self):
+        """
+        Get the board's inclusive boundaries
+        :return: {quadruple} (min x, max_x, min_y,max_y)
+        """
+        return (self.min_col, self.board_max_y_boundary, self.min_row, self.board_max_y_boundary)
 
 
     def setUpBlankBoard(self) -> list:

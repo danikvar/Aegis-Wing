@@ -1,6 +1,6 @@
 import unittest
 from GameState import GameState
-from Agent import PlayerAgent
+from AgentAbstractClass import PlayerAgentAbstractClass
 
 #set to false to disable printing board to terminal
 display = True
@@ -11,7 +11,7 @@ class TestBoardWithPlayer(unittest.TestCase):
         self.current_game_state = GameState()
 
     def test_init_agent_pos(self):
-        player = PlayerAgent()
+        player = PlayerAgentAbstractClass()
 
         self.current_game_state.add_player_agent(player)
         agent_x = player.lowest_row
@@ -32,7 +32,7 @@ class TestBoardWithPlayer(unittest.TestCase):
             print(self.current_game_state.get_board_as_string())
 
     def test_start_agent_at_diff_pos_within_boundaries(self):
-        player = PlayerAgent(lowest_row=2, least_col=5)
+        player = PlayerAgentAbstractClass(lowest_row=2, least_col=5)
 
         self.current_game_state.add_player_agent(player)
 
@@ -63,7 +63,7 @@ class TestBoardWithPlayer(unittest.TestCase):
             print(self.current_game_state.get_board_as_string())
 
     def test_start_agent_bigger_len_within_boundaries(self):
-        player = PlayerAgent(agent_length=3, lowest_row=2, least_col=5)
+        player = PlayerAgentAbstractClass(agent_length=3, lowest_row=2, least_col=5)
         self.current_game_state.add_player_agent(player)
         self.current_game_state.instate_agents_to_board_initial()
 
@@ -94,7 +94,7 @@ class TestBoardWithPlayer(unittest.TestCase):
             print(self.current_game_state.get_board_as_string())
 
     def test_start_agent_bigger_height_within_boundaries(self):
-        player = PlayerAgent(agent_height=2, lowest_row=5, least_col=7)
+        player = PlayerAgentAbstractClass(agent_height=2, lowest_row=5, least_col=7)
 
         self.current_game_state.add_player_agent(player)
         self.current_game_state.instate_agents_to_board_initial()

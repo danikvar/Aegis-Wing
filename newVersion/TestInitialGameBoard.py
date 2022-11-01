@@ -9,12 +9,13 @@ class InitialGameBoardTest(unittest.TestCase):
     def setUp(self) -> None:
         self.board = GameBoard(10,8) #10 rows, 8 columns
         self.board_2 = GameBoard(8,4,12,10)
+
     # test default constructor values
     def test_default_constructor(self):
         self.assertEqual(10, self.board.board_length)
         self.assertEqual(8,self.board.board_height)
-        self.assertEqual(0, self.board.min_x)
-        self.assertEqual(0,self.board.min_y)
+        self.assertEqual(0, self.board.min_col)
+        self.assertEqual(0, self.board.min_row)
         self.assertEqual(9, self.board.board_max_x_boundary) # column boundary
         self.assertEqual(7, self.board.board_max_y_boundary) # row boundary
 
@@ -22,8 +23,8 @@ class InitialGameBoardTest(unittest.TestCase):
     def test_valid_constructor_values(self):
         self.assertEqual(8, self.board_2.board_length)
         self.assertEqual(4, self.board_2.board_height)
-        self.assertEqual(12, self.board_2.min_x)
-        self.assertEqual(10, self.board_2.min_y)
+        self.assertEqual(12, self.board_2.min_col)
+        self.assertEqual(10, self.board_2.min_row)
         self.assertEqual(19, self.board_2.board_max_x_boundary)  # column boundary
         self.assertEqual(13, self.board_2.board_max_y_boundary)  # row boundary
 
@@ -75,12 +76,12 @@ class InitialGameBoardTest(unittest.TestCase):
             error_counter += 1
 
         try:
-            GameBoard(-1,2) # edge case: board length < 0
+            GameBoard(-1,2) # board length < 0
         except ValueError:
             error_counter += 1
 
         try:
-            GameBoard(2,-1) # edge case: board height < 0
+            GameBoard(2,-1) # board height < 0
         except ValueError:
             error_counter += 1
 

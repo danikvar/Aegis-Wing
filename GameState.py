@@ -1,4 +1,4 @@
-from Agent import Agent
+from AgentAbstractClass import AgentAbstractClass
 
 
 class GameState:
@@ -82,7 +82,7 @@ class GameState:
             raise RuntimeWarning("Player agent is the only agent in the gamestate")
         return self.agent_list
 
-    def add_player_agent(self, agent: Agent) -> bool:
+    def add_player_agent(self, agent: AgentAbstractClass) -> bool:
         '''
         Adds a player agent to a list of agents. Player must be the first
         element added to maintain make sure get_player_agent_function actually
@@ -93,18 +93,18 @@ class GameState:
         if len(self.agent_list) != 0:
             return False
         else:
-            player_agent = Agent(agent.agent_length, agent.agent_height, agent.lowest_row, agent.least_col)
+            player_agent = AgentAbstractClass(agent.agent_length, agent.agent_height, agent.lowest_row, agent.least_col)
             self.agent_list.append(player_agent)
             return True
 
-    def get_player_agent(self) -> Agent:
+    def get_player_agent(self) -> AgentAbstractClass:
         if len(self.agent_list) < 1:
             raise RuntimeError('Gamestate does not have a player agent,'
                                'add_player_agent first then run again')
         #force agent player to be first index value in list
         return self.agent_list[0]
 
-    def add_enemy_agent(self, agent: Agent):
+    def add_enemy_agent(self, agent: AgentAbstractClass):
         '''
         Adds an enemy agent to a list of agents.
         Player agent must already have been added otherwise this will fail
