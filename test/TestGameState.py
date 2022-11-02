@@ -187,7 +187,7 @@ class TestGameState(unittest.TestCase):
     def test_agent_clash_with_enemy_index_2(self):
         # This also tests updateAgentsList
         # set to true to print board to terminal/console for visual aid
-        print_board = False
+        print_board = True
 
         # player and agent on same space, should both lose 1 hp and die
         player = PlayerAgent(1, 1, 4, 4)
@@ -208,6 +208,8 @@ class TestGameState(unittest.TestCase):
 
         #enemy 1 still exists though
         self.assertEqual(1, len(state.current_agents))
+        self.assertEquals(2,state.gameBoard.board_array[5][6])
+        #neither enemy_2 or player should occupy this position
         self.assertEqual(0, state.gameBoard.board_array[4][4])
 
         if print_board:
@@ -279,6 +281,7 @@ class TestGameState(unittest.TestCase):
             print("Player moves down (row - 1), so new position:\n\tx = 4, y = 4")
             print(newState.gameBoard)
             print("-" * 40 + "\n")
+            print("/****** END OF test_generate_successor_state_player_moves_valid *****/\n")
 
         #TODO repeat test but with larger player length and height
 
@@ -355,8 +358,78 @@ class TestGameState(unittest.TestCase):
             print("Player can NOT move down (i.e cannot col + 1), so new position:\n\tx = 9, y = 9")
             print(newState.gameBoard)
             print("-" * 40 + "\n")
+            print("/****** END OF test_generate_successor_state_player_invalid_moves *****/\n")
 
         #TODO maybe make test with diff board_height and lenght too?
+
+    def test_gen_successor_state_enemy_incoming_and_outbound(self):
+        # set to true to print board to terminal/console for visual aid
+        print_board = True
+
+        state = self.gamestateInit
+
+        #make a player and add it
+        player = PlayerAgent(1, 1, 0, 0)
+        state.addAgent(player)
+
+        #enemy start off by being off screen, so coming in from the right
+        enemy_1 = SimpleGoLeftAgent(7,10)
+        #this should be allowed
+        state.addAgent(enemy_1)
+        #initial state so need to update board to reflect added agents
+        state.update_board()
+
+        #check agent list
+        self.assertEquals(2,len(state.current_agents))
+
+        if (print_board):
+            print("Enemy initially coming in from right side off screen, only player can be seen at 0,0")
+            print(state.gameBoard)
+            print("-" * 40 + "\n")
+
+        # simple left agent only goes left
+        newState = state.generateSuccessorState(1,LEFT)
+        self.assertEquals(2, newState.gameBoard.board_array[7][9])
+
+        if (print_board):
+            print("Enemy coming from offscreen should now be able to be seen at x=9,y=7")
+            print(newState.gameBoard)
+            print("-" * 40 + "\n")
+
+        # #manually move enemy to near board min col boundary
+        # #TODO this does not work? Maybe should generate new gamestates??
+        # enemy_1.set_position(7,0)
+        # newState.update_board()
+        # self.assertEquals(2, len(newState.current_agents))
+
+        for i in range(9):
+            newState = newState.generateSuccessorState(1,LEFT)
+
+        if print_board:
+            print("Manually moving enemy to near min col boundary\nx=0,y=7")
+            print(newState.gameBoard)
+            print("-" * 40 + "\n")
+
+        #now have enemy exit board
+        newState.generateSuccessorState(1,LEFT)
+        self.assertEquals(1,len(newState.current_agents))
+        #TODO tell team that first [] is row i.e. y value
+        #check that where enemy was is empty again
+        self.assertEquals(0, newState.gameBoard.board_array[7][0])
+
+        if print_board:
+            print("Enemy has moved off board after LEFT action, \nshould no longer be visible at x=0,y=7")
+            print(newState.gameBoard)
+            print("-" * 40 + "\n")
+            print("/****** END OF test_gen_successor_state_enemy_incoming_and_outbound *****/\n")
+
+
+
+
+
+
+
+
 
 def main():
     unittest.main(verbosity=3)

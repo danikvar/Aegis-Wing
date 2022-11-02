@@ -21,20 +21,18 @@ class AgentSuperClass(AgentInterface):
         :param agent_length: {int} length of agent (cannot be < 1)
         :param agent_height: {int} height of agent (cannot be > 1)
         :param lowest_row: {int} position of the lowest "y" or row value for an agent
-        :param least_col: {int} position of the lowest "x" or column value for the agent
+        :param least_col: {int} position of the least (furthest left) "x" or column value for the agent
         '''
         if agent_length < 1:
             raise ValueError("Agent size length must be >= 1")
         if agent_height < 1:
             raise ValueError("Agent size height must be >= 1")
 
-        # possible case where enemies start at edge of board or even behind it?
-        self.crossedStartingBounds = False
         self.agent_length = agent_length
         self.agent_height = agent_height
-        # position of least left
-        self.lowest_row = lowest_row
         # position of lowest side
+        self.lowest_row = lowest_row
+        # position of furthest left side
         self.least_col = least_col
         self.hp = 1 # default hp is 1
 
@@ -63,22 +61,21 @@ class AgentSuperClass(AgentInterface):
         '''
         return (self.agent_length, self.agent_height)
 
-    def isPlayer(self):
+    def isPlayer(self) -> bool:
         '''
         Returns True if player agent, otherwise false
         :return: {bool} Returns True if player agent, otherwise false
         '''
         return False
 
-
-    def get_min_col_boundary(self):
+    def get_min_col_boundary(self) -> int:
         '''
         Gets the minimum col/x value of the agent
         :return: {int} the minimum col/x value of the agent
         '''
         return self.least_col
 
-    def get_max_col_boundary(self):
+    def get_max_col_boundary(self) -> int:
         """
         Returns the maximum col/x value of the agent
         :return: {int} the maximum col/x value of the agent
@@ -166,8 +163,8 @@ class AgentSuperClass(AgentInterface):
                         and current_agent_col_min <= other_agent_col_max):
                     return True
                 # check if current agent col max overlaps
-                elif (current_agent_col_min >= other_agent_col_min
-                        and current_agent_col_min <= other_agent_col_max):
+                elif (current_agent_col_max >= other_agent_col_min
+                        and current_agent_col_max <= other_agent_col_max):
                     return True
                 else:
                     # agents don't overlap
@@ -230,7 +227,8 @@ class SimpleGoLeftAgent(AgentSuperClass):
         # check if action is valid
         if action in self.get_all_possible_raw_actions():
             agent_copy = self.copy_agent()
-            return agent_copy.performAction(action)
+            agent_copy.performAction(action)
+            return agent_copy
         else:
             return self
 

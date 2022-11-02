@@ -36,21 +36,21 @@ class AgentInterface:
         """
         raise NotImplementedError
 
-    def isPlayer(self):
+    def isPlayer(self) -> bool:
         """
         Returns True if player agent, otherwise false
         :return: {bool} Returns True if player agent, otherwise false
         """
         raise NotImplementedError
 
-    def get_min_col_boundary(self):
+    def get_min_col_boundary(self) -> int:
         """
         Gets the minimum col/x value of the agent
         :return: {int} the minimum col/x value of the agent
         """
         raise NotImplementedError
 
-    def get_max_col_boundary(self):
+    def get_max_col_boundary(self) -> int:
         """
         Returns the maximum col/x value of the agent
         :return: {int} the maximum col/x value of the agent
@@ -63,7 +63,7 @@ class AgentInterface:
         """
         raise NotImplementedError
 
-    def get_max_row_boundary(self):
+    def get_max_row_boundary(self) -> int:
         """
         Gets the maximum row/y value of the agent
         :return: {int} the maximum row/y value of the agent

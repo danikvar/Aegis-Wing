@@ -6,11 +6,11 @@ from newVersion.GameBoard import GameBoard
 
 gameBoard = GameBoard(10,10)
 
-class InitialGameBoardTest(unittest.TestCase):
+class TestGameBoard(unittest.TestCase):
 
     def setUp(self) -> None:
         self.board = GameBoard(10,8) #10 columns, 8 rows
-        self.board_2 = GameBoard(8,4,12,10)
+        self.board_2 = GameBoard(8,4,12,10) #8 columns, 10 rows, min row = 12, max_col = 10
 
     # test default constructor values
     def test_default_constructor(self):
@@ -90,8 +90,8 @@ class InitialGameBoardTest(unittest.TestCase):
         self.assertEqual(4, error_counter)
 
     def test_populate_board(self):
-        #set to true to printboard
-        print_board = True
+        # set to true to print board to terminal/console for visual aid
+        print_board = False
 
         # default position is bottom left corner
         player = PlayerAgent()

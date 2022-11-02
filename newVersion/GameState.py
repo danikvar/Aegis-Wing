@@ -215,9 +215,9 @@ class GameState:
         #enemies are allowed to go beyond left boundary (beyond board min col/y)
         # and come in from right boundary (beyond board max col/y)
         if isAgentPlayer == False:
-            if agent_min_y < board_min_y:
+            if agent_min_x < board_min_x:
                 return False
-            if agent_max_y > board_max_y:
+            if agent_max_x > board_max_x:
                 return False
             else:
                 return True

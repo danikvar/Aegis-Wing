@@ -64,7 +64,7 @@ class GameBoard:
                             self.board_array[eachRowIndex][eachColIndex] = 1
                         if agent.isPlayer() == False:
                             if agentIndex == 1: #1 should be reserved for player
-                                self.board_array[eachRowIndex][eachColIndex] = 2
+                                self.board_array[eachRowIndex][eachColIndex] = 2 #force value to be 2
                             else:
                                 self.board_array[eachRowIndex][eachColIndex] = agentIndex
 
