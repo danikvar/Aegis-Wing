@@ -1,6 +1,7 @@
 from Model.Agents.Actions import Actions
 from Model.Agents.AgentInterface import AgentInterface
 from Model.Agents.AgentSuperClass import AgentSuperClass
+from Model.Agents.PlayerAgent import PlayerAgent
 from Model.GameBoard import GameBoard
 
 class GameState:
@@ -98,7 +99,7 @@ class GameState:
         """
         Checks for if player clashes with enemy agents and adjusts
         hp of objects accordingly
-        Enemies allows to overlap with each other.
+        Enemies allowed to overlap with each other.
         Call in generateSuccessor
         :return: {None}
         """
@@ -149,16 +150,17 @@ class GameState:
 
         for each_index in agent_indexes_to_be_popped:
             value_to_pop = each_index - subtract_by
-
+            current_agent: AgentInterface = self.current_agents[value_to_pop]
             # if player agent died
-            if self.current_agents[value_to_pop].isPlayer() == True:
-                if (self.current_agents[value_to_pop].is_dead()):
+            if current_agent.isPlayer() == True:
+                if (current_agent.is_dead()):
                     self.current_player_lives -= 1
                     if self.current_player_lives > 0:
                         self.isPlayerAdded = False
                         # if more lives left than player agent gets restarted at initial point
                         #player should always be first index i.e. 0
-                        self.current_agents[0] = PlayerAgent()
+                        player: PlayerAgent = self.current_agents[0]
+                        self.current_agents[0] = player.respawnPlayer()
                         continue
 
             if value_to_pop == 0:
@@ -256,7 +258,6 @@ class GameState:
         self.updateAgentsList()
         #update the board representation
         self.update_board()
-        self.decrement_turn()
 
         return self
 

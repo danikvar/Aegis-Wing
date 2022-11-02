@@ -41,7 +41,7 @@ class GameBoard:
         Get the board's inclusive boundaries
         :return: {quadruple} (min x, max_x, min_y,max_y)
         """
-        return (self.min_col, self.board_max_y_boundary, self.min_row, self.board_max_y_boundary)
+        return (self.min_col, self.board_max_x_boundary, self.min_row, self.board_max_y_boundary)
 
     def populate_board(self, agentIndex: int, agent: AgentInterface):
         """

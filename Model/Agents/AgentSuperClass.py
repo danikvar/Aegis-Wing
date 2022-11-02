@@ -35,6 +35,7 @@ class AgentSuperClass(AgentInterface):
         # position of furthest left side
         self.least_col = least_col
         self.hp = 1 # default hp is 1
+        self.hasAlreadyMoved = False
 
     def get_position(self) -> tuple:
         '''
@@ -169,3 +170,8 @@ class AgentSuperClass(AgentInterface):
                 else:
                     # agents don't overlap
                     return False
+
+    #TODO write tests, also haven't really incorporated this
+    # maybe use in checkAgentClashes???
+    def hasMoved(self) -> bool:
+        return self.hasAlreadyMoved

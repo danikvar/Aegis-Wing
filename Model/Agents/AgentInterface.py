@@ -139,14 +139,24 @@ class AgentInterface:
         """
         raise NotImplementedError
 
-    def autoPickAction(self):
+    #TODO write tests
+    def autoPickAction(self) -> Actions:
         """
         The agent will choose an action based off of user defined
         algorithm.
         :return: {None}
         """
-        #TODO Perhaps include a behavior parameter??
+        #TODO Perhaps include a behavior parameter or let behavior be
+        # defined in class??
         raise NotImplementedError
+
+    #TODO write tests
+    def hasMoved(self)-> bool:
+        """
+        Returns true if action was already taken, false otherwise
+        :return: {bool} True if already took actions, false otherwise
+        """
+
 
 
 

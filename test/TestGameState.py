@@ -16,11 +16,20 @@ FIRE = Actions.FIRE
 
 class TestGameState(unittest.TestCase):
     def setUp(self) -> None:
+        """
+        Sets up variables to use. These variables are
+        reset prior to every test
+        :return: None
+        """
         self.gamestateInit = GameState()
         self.gameState_2 = GameState()
 
     # test default values
     def test_default_values(self) -> None:
+        """
+        Test default GameState constructor values
+        :return: None
+        """
         g = self.gamestateInit
         self.assertEquals(0,len(g.current_agents))
         self.assertFalse(g.isPlayerAdded)
@@ -28,12 +37,27 @@ class TestGameState(unittest.TestCase):
         self.assertEquals(1, g.max_enemies_at_any_given_time)
 
     #testing trying to add player agent in valid position
-    def test_is_valid_agent_player(self):
+    def test_is_valid_agent_player(self) -> None:
+        """
+        Testing isValidAgent method with a player with a
+        valid location (i.e. inside the GameBoard)
+        :return:
+        """
         temp_p = PlayerAgent(1,1,4,5)
         isValid = self.gamestateInit.isValidAgent(temp_p)
         self.assertTrue(isValid)
 
     def test_is_valid_enemy_agents(self):
+        """
+        Testing Valid and InValid enemy agent locations via isValidAgent method.
+        Valid:
+        - Beyond col minimum boundary of board (represent exiting board)
+        - Beyond col maximum of board (represent spawning into board)
+        Invalid:
+        - Beyond row maximum (should not be able to go "above" the board)
+        - Beyond row minimum (should not be able to go "below" the board)
+        :return: None
+        """
         board_min_col_boundary = self.gamestateInit.gameBoard.min_col
         board_max_x_boundary = self.gamestateInit.gameBoard.board_max_x_boundary
         board_min_row_boundary = self.gamestateInit.gameBoard.min_row
@@ -67,6 +91,15 @@ class TestGameState(unittest.TestCase):
 
     #testing trying to add player agent who is out of bounds
     def test_not_valid_agent_player(self):
+        """
+        Testing invalid player agent locations via isValidAgent method.
+        Invalid cases:
+        - Above board
+        - Below Board
+        - To the right of board (beyond max col)
+        - To the left of board (beyond min col)
+        :return:
+        """
         board_min_col_boundary = self.gamestateInit.gameBoard.min_col
         board_max_x_boundary = self.gamestateInit.gameBoard.board_max_x_boundary
         board_min_row_boundary = self.gamestateInit.gameBoard.min_row
@@ -98,13 +131,22 @@ class TestGameState(unittest.TestCase):
 
 
     def test_add_valid_player(self) -> None:
+        """
+        Testing adding valid player agent to gamestate via
+        addAgent method
+        :return: None
+        """
         p1 = PlayerAgent()
         self.gameState_2.addAgent(p1)
         self.assertTrue(self.gameState_2.isPlayerAdded)
         self.assertEquals(1, len(self.gameState_2.current_agents))
 
-    # should not be able to add a second player agent
     def test_adding_2_players(self):
+        """
+        Testing trying to add 2 players to gamestate.
+        This is not allowed.
+        :return:
+        """
         p1 = PlayerAgent()
         self.gameState_2.addAgent(p1)
         player_2 = PlayerAgent()
@@ -112,6 +154,11 @@ class TestGameState(unittest.TestCase):
         self.assertEquals(1,len(self.gameState_2.current_agents) )
 
     def testGetAllLegalActionsPlayer(self):
+        """
+        Testing getting all legal actions of a player agent via
+        getAllLegalActions method.
+        :return: None
+        """
         valid_p1 = PlayerAgent()
         self.gamestateInit.addAgent(valid_p1)
         p1_legal_actions = self.gamestateInit.getAllLegalActions(0)
@@ -134,6 +181,16 @@ class TestGameState(unittest.TestCase):
         #TODO test player and enemy getLegalActions together
 
     def testCheckPlayerAgentClashes_no_clash_simple(self):
+        """
+        Testing to see if player clashes with enemy agent via
+        checkPlayerAgentClashes.
+        In this case player and agent are near each other but
+        do not overlap. There should be no clash and
+        amount of agents should remain the same.
+
+        Set print_board variable to True for visual aid
+        :return: None
+        """
         # set to true to print board to terminal/console for visual aid
         print_board = False
 
@@ -159,6 +216,16 @@ class TestGameState(unittest.TestCase):
         #TODO test agent clash but if enemy moved beyond min col boundary, should be allowed and should remove from agent list
 
     def test_check_clash_player_vs_simple(self):
+        """
+        Testing to see if player clashes with enemy agent via
+        checkPlayerAgentClashes.
+        In this case player and enemy agent are in the same
+        position. Both should lose 1 hp. Since both only
+        have 1 hp, both should be removed from current agents.
+
+        Set print_board variable to True for visual aid
+        :return:
+        """
         #This also tests updateAgentsList
         # set to true to print board to terminal/console for visual aid
         print_board = False
@@ -187,6 +254,20 @@ class TestGameState(unittest.TestCase):
             print("/***** END OF test_check_clash_player_vs_simple *****/\n")
 
     def test_agent_clash_with_enemy_index_2(self):
+        """
+        Testing to see if player clashes with enemy agent via
+        checkPlayerAgentClashes.
+        In this case there are 3 agents -> 1 player and 2 enemies
+        Player (agent index=0) and Enemy 2 (agent index=2)
+        are in the same position so both should
+        lose 1 hp. Since both only have 1 hp, both should be
+        removed from current agents.
+        However, Enemy 1 (agent index = 1) should still exist.
+
+        Set print_board variable to True for visual aid
+        :return:
+
+        """
         # This also tests updateAgentsList
         # set to true to print board to terminal/console for visual aid
         print_board = False
@@ -220,6 +301,17 @@ class TestGameState(unittest.TestCase):
             print("/***** END OF test_check_clash_player_vs_simple *****/\n")
 
     def test_generate_successor_state_player_moves_valid(self):
+        """
+        Testing generateSuccessorState method.
+        This case only uses player agent in agent list
+        and uses valid actions. So player should be able to
+        move to new location.
+        This new state should contain an updated agent list
+        (i.e. agents in new position / any changes to agent hp)
+
+        Set print_board variable to True for visual aid
+        :return: None
+        """
         # set to true to print board to terminal/console for visual aid
         print_board = False
 
@@ -232,8 +324,7 @@ class TestGameState(unittest.TestCase):
         self.assertEquals(0, newState.gameBoard.board_array[4][4])
         #check new position NOT empty
         self.assertEquals(1,newState.gameBoard.board_array[4][3])
-        #turn should also decrement by
-        self.assertEquals(99, newState.turns_left)
+
 
         if (print_board):
             print("Player initial position:\n\tx= 4, y = 4")
@@ -246,8 +337,6 @@ class TestGameState(unittest.TestCase):
         self.assertEquals(0, newState.gameBoard.board_array[4][3])
         #check new position NOT empty on board
         self.assertEquals(1,newState.gameBoard.board_array[5][3])
-        # turn should also decrement by
-        self.assertEquals(98, newState.turns_left)
 
         if (print_board):
             print("Player initial position:\n\tx= 3, y = 4")
@@ -261,8 +350,6 @@ class TestGameState(unittest.TestCase):
         self.assertEquals(0, newState.gameBoard.board_array[5][3])
         # check new position NOT empty on board
         self.assertEquals(1, newState.gameBoard.board_array[4][3])
-        # turn should also decrement by
-        self.assertEquals(97, newState.turns_left)
 
         if (print_board):
             print("Player initial position:\n\tx= 3, y = 5")
@@ -275,8 +362,6 @@ class TestGameState(unittest.TestCase):
         self.assertEquals(0, newState.gameBoard.board_array[4][3])
         # check new position NOT empty on board
         self.assertEquals(1, newState.gameBoard.board_array[4][4])
-        # turn should also decrement by
-        self.assertEquals(96, newState.turns_left)
 
         if (print_board):
             print("Player initial position:\n\tx= 3, y = 4")
@@ -289,6 +374,18 @@ class TestGameState(unittest.TestCase):
 
 
     def test_generate_successor_state_player_invalid_moves(self):
+        """
+        Testing generateSuccessorState method.
+        This case only uses player agent in agent list
+        and uses invalid actions. So player should just
+        end up in the same position as initial.
+
+        This new state should contain an updated agent list
+        (i.e. agents in new position / any changes to agent hp)
+
+        Set print_board variable to True for visual aid
+        :return:
+        """
         # set to true to print board to terminal/console for visual aid
         print_board = False
 
@@ -303,8 +400,6 @@ class TestGameState(unittest.TestCase):
         #check surrounding position = 0
         self.assertEquals(0, newState.gameBoard.board_array[1][0])
         self.assertEquals(0, newState.gameBoard.board_array[0][1])
-        #check turn decrement
-        self.assertEquals(99,newState.turns_left)
 
         if (print_board):
             print("Player initial position:\n\tx= 0, y = 0")
@@ -318,8 +413,6 @@ class TestGameState(unittest.TestCase):
         # check surrounding position = 0
         self.assertEquals(0, newState.gameBoard.board_array[1][0])
         self.assertEquals(0, newState.gameBoard.board_array[0][1])
-        # check turn decrement
-        self.assertEquals(98, newState.turns_left)
 
         if (print_board):
             print("Player initial position:\n\tx= 0, y = 0")
@@ -337,8 +430,6 @@ class TestGameState(unittest.TestCase):
         # check surrounding position = 0
         self.assertEquals(0, newState.gameBoard.board_array[8][9])
         self.assertEquals(0, newState.gameBoard.board_array[9][8])
-        # check turn decrement
-        self.assertEquals(97, newState.turns_left)
 
         if (print_board):
             print("Player initial position:\n\tx= 9, y = 9")
@@ -352,8 +443,6 @@ class TestGameState(unittest.TestCase):
         # check surrounding position = 0
         self.assertEquals(0, newState.gameBoard.board_array[8][9])
         self.assertEquals(0, newState.gameBoard.board_array[9][8])
-        # check turn decrement
-        self.assertEquals(96, newState.turns_left)
 
         if (print_board):
             print("Player initial position:\n\tx= 9, y = 9")
@@ -365,6 +454,23 @@ class TestGameState(unittest.TestCase):
         #TODO maybe make test with diff board_height and lenght too?
 
     def test_gen_successor_state_enemy_incoming_and_outbound(self):
+        """
+        Testing generateSuccessorState method.
+        This case has a single player agent
+        and a singe enemy agent (SimpleGoLeftAgent)
+        in current agents list.
+        This case is testing valid enemy agent action,
+        namely spawning in to the board (beyond board col/x max boundary)
+        and exiting board (beyond board col/x min boundary)
+        Enemy agent should be able to transition to new position.
+
+        This new state should contain an updated agent list
+        (i.e. agents in new position / any changes to agent hp,
+        any removed agents gone as well)
+
+        Set print_board variable to True for visual aid
+        :return:
+        """
         # set to true to print board to terminal/console for visual aid
         print_board = False
 
@@ -404,6 +510,7 @@ class TestGameState(unittest.TestCase):
         # newState.update_board()
         # self.assertEquals(2, len(newState.current_agents))
 
+        # move enemy agent to min col boundary of board
         for i in range(9):
             newState = newState.generateSuccessorState(1,LEFT)
 
@@ -424,13 +531,6 @@ class TestGameState(unittest.TestCase):
             print(newState.gameBoard)
             print("-" * 40 + "\n")
             print("/****** END OF test_gen_successor_state_enemy_incoming_and_outbound *****/\n")
-
-
-
-
-
-
-
 
 
 def main():

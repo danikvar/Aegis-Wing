@@ -3,11 +3,12 @@ from Model.Agents.AgentSuperClass import AgentSuperClass
 
 
 class PlayerAgent(AgentSuperClass):
-    def __init__(self, agent_length = 1, agent_height = 1, lowest_row = 0, least_col = 0):
+    def __init__(self, agent_length: int = 1, agent_height: int = 1, lowest_row: int = 0, least_col: int = 0):
         super().__init__(agent_length, agent_height, lowest_row, least_col)
         self.isInvulnerable = False
         self.turnsUntilInvulnerabilityOver = 0
-        self.crossedLeftBounds = False
+        self.spawn_x = least_col
+        self.spawn_y = lowest_row
 
     def get_all_possible_raw_actions(self) -> list:
         """
@@ -31,7 +32,12 @@ class PlayerAgent(AgentSuperClass):
         """
         return PlayerAgent(self.agent_length,self.agent_height,self.lowest_row, self.least_col)
 
+    #TODO test this method if necessary, use when player dies and has another life left
+    def respawnPlayer(self):
+        return PlayerAgent(self.agent_length,self.agent_height,self.spawn_y, self.spawn_x)
+
     def take_action(self, action: Actions):
         agentCopy = self.copy_agent()
         agentCopy.performAction(action)
+        agentCopy.hasAlreadyMoved = True
         return agentCopy

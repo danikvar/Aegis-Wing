@@ -22,6 +22,7 @@ class SimpleGoLeftAgent(AgentSuperClass):
         if action in self.get_all_possible_raw_actions():
             agent_copy = self.copy_agent()
             agent_copy.performAction(action)
+            agent_copy.hasAlreadyMoved = True
             return agent_copy
         else:
             return self
