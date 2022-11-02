@@ -227,6 +227,10 @@ class SimpleGoLeftAgent(AgentAbstractClass):
         return SimpleGoLeftAgent(self.lowest_row, self.least_col)
 
     def take_action(self, action: Actions):
-        agent_copy = self.copy_agent()
-        agent_copy.performAction(action)
+        # check if action is valid
+        if action in self.get_all_possible_raw_actions():
+            agent_copy = self.copy_agent()
+            return agent_copy.performAction(action)
+        else:
+            return self
 

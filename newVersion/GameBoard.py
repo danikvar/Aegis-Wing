@@ -34,7 +34,7 @@ class GameBoard:
         # so if board is 10 units long, then x = {0,1,2...9}
         self.board_max_x_boundary = self.min_col + board_length - 1
         self.board_max_y_boundary = self.min_row + board_height - 1
-        self.board_array = self.setUpBlankBoard()
+        self.setUpBlankBoard()
 
     def getBoardBoundaries(self):
         """
@@ -56,17 +56,22 @@ class GameBoard:
         agent_row_min, agent_row_max = agent.get_row_boundaries()
         agent_col_min, agent_col_max = agent.get_col_boundaries()
 
-        for eachRow in self.board_array:
-            if eachRow >= agent_row_min and eachRow <= agent_row_max:
-                for eachCol in eachRow:
-                    if eachCol >= agent_col_min and eachCol <= agent_col_max:
-                        self.board_array[eachRow][eachCol] = agentIndex
+        for eachRowIndex in range(len(self.board_array)):
+            if eachRowIndex >= agent_row_min and eachRowIndex <= agent_row_max:
+                for eachColIndex in range(len(self.board_array[eachRowIndex])):
+                    if eachColIndex >= agent_col_min and eachColIndex <= agent_col_max:
+                        if agent.isPlayer() == True:
+                            self.board_array[eachRowIndex][eachColIndex] = 1
+                        if agent.isPlayer() == False:
+                            if agentIndex == 1: #1 should be reserved for player
+                                self.board_array[eachRowIndex][eachColIndex] = 2
 
 
-    def setUpBlankBoard(self) -> list:
+    def setUpBlankBoard(self) -> None:
        '''
        Creates a board represented as a 2D array where all
-       values inside each inner list is 0
+       values inside each inner list is 0 and sets the .baoard_array
+       attribute to it
        :return: {list[list[int]]} A 2D array of list
        '''
 
@@ -78,13 +83,13 @@ class GameBoard:
                any_row.append(0)
            board_2d_array.append(any_row)
 
-       return board_2d_array
+       self.board_array = board_2d_array
 
     def __str__(self):
         '''
         Converts the 2D array board representation
         into a string
-        :return:
+        :return: {str} string representation of the board
         '''
 
         list_row_str = []
@@ -103,7 +108,18 @@ class GameBoard:
                 else:
                     list_row_str.append(temp)
 
+        row_counter = len(list_row_str) - 1
+
         for i in range(-1, -len(list_row_str) - 1, -1):
-            board_str += list_row_str[i] + "\n"
+            # grab backwards so string rep axis makes sense
+            board_str += str(row_counter) + " " + list_row_str[i] + "\n"
+            row_counter -= 1
+
+        # add col axis values
+        x_axis_add_on = "  "
+        for j in range(self.board_length):
+            x_axis_add_on += "  " + str(j) + " "
+
+        board_str += x_axis_add_on
 
         return board_str

@@ -15,7 +15,7 @@ class NewGameState:
     '''
     def __init__(self, board_len: int = 10, board_height: int = 10,
                  max_enemies_at_one_time: int =1,
-                 turns_left: int = 100, player_lives: int =1):
+                 turns_left: int = 100, player_lives: int = 1):
         '''
         Constuctor for the gameState
         :param board_len: {int} length of the board
@@ -74,6 +74,14 @@ class NewGameState:
                     print("WARNING: Cannot exceed enemy agent limit, agent not added")
                     return False
 
+    def decrement_turn(self):
+        self.turns_left -= 1
+
+    def set_turn(self, turns_left: int) -> None:
+        if turns_left < 0:
+            raise ValueError("turns_left cannot be less than 0")
+        self.turns_left = turns_left
+
     def isWin(self) -> bool:
         #you win game if player still has lives and timer has reached 0
         if self.current_player_lives > 0 and self.turns_left == 0:
@@ -88,7 +96,8 @@ class NewGameState:
 
     def checkPlayerAgentClashes(self):
         """
-        Checks for if player clashes with enemy agents
+        Checks for if player clashes with enemy agents and adjusts
+        hp of objects accordingly
         Enemies allows to overlap with each other.
         Call in generateSuccessor
         :return: {None}
@@ -101,7 +110,7 @@ class NewGameState:
             enemy_agent: AgentInterface = list_enemy_agents[i]
 
             # if overlapping, player and agent lose health
-            #TODO maybe just have them blow up? Already happens since player hp = 1
+            #TODO maybe just have them blow up instead of subtracting health? Already happens since player hp = 1
             if (player_agent.is_overlapping_other_agent(enemy_agent)):
                 player_agent.set_hp(player_agent.get_hp() - 1)
                 enemy_agent.set_hp(enemy_agent.get_hp() - 1)
@@ -117,15 +126,17 @@ class NewGameState:
         board_min_col = self.gameBoard.min_col
         agent_indexes_to_be_popped = []
 
-        for i in range(self.current_agents):
+        for i in range(len(self.current_agents)):
             already_popped = False
             each_agent: AgentInterface = self.current_agents[i]
             # check if agent is dead
             if each_agent.is_dead() == True:
+                # add agent index to list to be popped
                 agent_indexes_to_be_popped.append(i)
                 already_popped = True
 
             if already_popped == True:
+                # will go to next agent if agent is dead
                 continue
             else:
                 # if enemy max col beyond board min boundary,
@@ -137,17 +148,21 @@ class NewGameState:
         subtract_by = 0
 
         for each_index in agent_indexes_to_be_popped:
+            value_to_pop = each_index - subtract_by
 
             # if player agent died
-            if self.current_agents[each_index].isPlayer() == True:
-                self.current_player_lives -= 1
-                if self.current_player_lives > 0:
-                    # if more lives left than player agent gets restarted at initial point
-                    self.current_agents[each_index] = PlayerAgent()
-                    continue
+            if self.current_agents[value_to_pop].isPlayer() == True:
+                if (self.current_agents[value_to_pop].is_dead()):
+                    self.current_player_lives -= 1
+                    if self.current_player_lives > 0:
+                        self.isPlayerAdded = False
+                        # if more lives left than player agent gets restarted at initial point
+                        #player should always be first index i.e. 0
+                        self.current_agents[0] = PlayerAgent()
+                        continue
 
-            if each_index == 0:
-                self.current_agents.pop(each_index)
+            if value_to_pop == 0:
+                self.current_agents.pop(value_to_pop)
                 subtract_by = 1
             else:
                 value_to_pop = each_index - subtract_by
@@ -156,16 +171,19 @@ class NewGameState:
 
     def update_board(self):
         '''
-        Updates the gameBoard attribute with positions of each agent
+        Updates the gameBoard attribute with positions of each agent.
+        Call this method after calling
+        - checkPlayerAgentClashes
+        - updateAgentsList
         :return:
         '''
-        #TODO update with bullet and agent logic
+        #TODO update with bullet logic
 
-        #agent crashing logic, check if player is overlapping with enemy agents
-        player_agent = self.current_agents[0]
-        list_enemy_agents = self.current_agents[1:]
+        self.gameBoard.setUpBlankBoard()
 
-        pass
+        for i in range(len(self.current_agents)):
+            self.gameBoard.populate_board(i + 1, self.current_agents[i])
+
 
     def isValidAgent(self, agent: AgentInterface) -> bool:
         """
@@ -222,8 +240,25 @@ class NewGameState:
 
         return legal_actions
 
+
     def generateSuccessorState(self, agentIndex: int, action: Actions):
-        pass
+        #TODO should this return a deepcopy of gamestate or can it reuse same state?
+        # TODO does this need an already moved dict? To check if an agent has already moved?
+        current_agent: AgentInterface = self.current_agents[agentIndex]
+        all_legal_agent_actions = self.getAllLegalActions(agentIndex)
+
+        if action in all_legal_agent_actions:
+            self.current_agents[agentIndex] = current_agent.take_action(action)
+
+        #after action check if player has clashed with any enemy agents
+        self.checkPlayerAgentClashes()
+        # update the list to reflect any clashes
+        self.updateAgentsList()
+        #update the board representation
+        self.update_board()
+        self.decrement_turn()
+
+        return self
 
 
 

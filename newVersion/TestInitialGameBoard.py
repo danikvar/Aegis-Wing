@@ -1,4 +1,6 @@
 import unittest
+
+from AgentAbstractClass import PlayerAgent, SimpleGoLeftAgent
 from newVersion.GameBoard import GameBoard
 
 
@@ -58,7 +60,7 @@ class InitialGameBoardTest(unittest.TestCase):
         self.assertEqual(True, all_zeroes_default)
         self.assertEqual(True,all_zeroes_non_default)
 
-    def testRaiseValueError(self):
+    def testRaiseValueErrorConstructor(self):
         '''
         Testing if invalid inputs passed into constructor
         :return: void
@@ -86,6 +88,47 @@ class InitialGameBoardTest(unittest.TestCase):
             error_counter += 1
 
         self.assertEqual(4, error_counter)
+
+    def test_populate_board(self):
+        #set to true to printboard
+        print_board = True
+
+        # default position is bottom left corner
+        player = PlayerAgent()
+
+        #self.board has #10 rows, 8 columns,
+        #min row = 0, max_row = 9, min col = 0, max_col = 9
+        #Place enemy on top left corner
+        enemy_1 = SimpleGoLeftAgent(9,7)
+
+        #another enemy agent maybe like somewhere in the middle of the board
+        enemy_2 = SimpleGoLeftAgent(3,4)
+
+        #key is AgentInterface obj, value is what its agentIndex+1 value would be
+        dict_agents = {player: 1}
+        dict_agents[enemy_1] = 2
+        dict_agents[enemy_2] = 3
+
+        # add them to the board_array
+        self.board.populate_board(dict_agents[player],player)
+        self.board.populate_board(dict_agents[enemy_1], enemy_1)
+        self.board.populate_board(dict_agents[enemy_2], enemy_2)
+
+        #check positions
+        self.assertEqual(1, self.board.board_array[0][0])
+        self.assertEqual(2, self.board.board_array[9][7])
+        self.assertEqual(3, self.board.board_array[3][4])
+
+        if print_board:
+            print("Board from test_populate_board ")
+            print(self.board)
+
+        #TODO write test with enemies with largers lengths, heights
+        #TODO write test where enemy is beyond col boundaries, should be allowed
+
+
+
+
 
 def main():
     unittest.main(verbosity=3)
