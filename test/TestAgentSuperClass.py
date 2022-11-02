@@ -1,28 +1,38 @@
 import unittest
 
 from Actions import Actions
-from AgentAbstractClass import AgentAbstractClass
-
-a1 = AgentAbstractClass()
-a2 = AgentAbstractClass(agent_length=2, agent_height=3, lowest_row=4, least_col=6)
+from AgentSuperClass import AgentSuperClass
 
 class AgentSuperClassTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.a1 = AgentSuperClass()
+        self.a2 = AgentSuperClass(agent_length=2, agent_height=3, lowest_row=4, least_col=6)
+
     def test_default_constructor(self):
+        a1 = self.a1
+        a2 = self.a2
+
         self.assertEquals((1,1), a1.get_agent_size())
         self.assertEquals((0,0), a1.get_position())
 
     def test_custom_construct_values(self):
+        a1 = self.a1
+        a2 = self.a2
+
         self.assertEquals((4,6), a2.get_position())
         self.assertEquals((2,3), a2.get_agent_size())
 
     def test_raise_constructor_errors(self):
         with self.assertRaises(ValueError):
-            AgentAbstractClass(agent_length= 0)
+            AgentSuperClass(agent_length= 0)
 
         with self.assertRaises(ValueError):
-            AgentAbstractClass(agent_height= 0)
+            AgentSuperClass(agent_height= 0)
 
     def test_get_min_col_boundary(self):
+        a1 = self.a1
+        a2 = self.a2
+
         a1_col_min = a1.get_col_boundaries()[0]
         a2_col_min = a2.get_col_boundaries()[0]
 
@@ -33,16 +43,25 @@ class AgentSuperClassTest(unittest.TestCase):
         self.assertEquals(6, a2_col_min)
 
     def test_get_max_col_boundary(self):
+        a1 = self.a1
+        a2 = self.a2
+
         a1_max_col_b = a1.get_max_col_boundary()
         a2_max_col_b = a2.get_max_col_boundary()
         self.assertEquals(0, a1_max_col_b)
         self.assertEquals(7, a2_max_col_b)
 
     def test_get_col_boundaries(self):
+        a1 = self.a1
+        a2 = self.a2
+
         self.assertEquals((0,0), a1.get_col_boundaries())
         self.assertEquals((6,7), a2.get_col_boundaries())
 
     def test_get_min_row_boundary(self):
+        a1 = self.a1
+        a2 = self.a2
+
         a1_min_row_b = a1.lowest_row
         a2_min_row_b = a2.lowest_row
 
@@ -50,6 +69,8 @@ class AgentSuperClassTest(unittest.TestCase):
         self.assertEquals(4, a2_min_row_b)
 
     def test_get_row_boundaries(self):
+        a1 = self.a1
+        a2 = self.a2
         a1_row_bounds = a1.get_row_boundaries()
         a2_row_bounds = a2.get_row_boundaries()
 
@@ -57,6 +78,9 @@ class AgentSuperClassTest(unittest.TestCase):
         self.assertEquals((4,6), a2_row_bounds)
 
     def testSetGetHP(self):
+        a1 = self.a1
+        a2 = self.a2
+
         self.assertEquals(1,a1.get_hp())
         a2.set_hp(10)
         self.assertEquals(10, a2.get_hp())
@@ -65,6 +89,9 @@ class AgentSuperClassTest(unittest.TestCase):
         self.assertTrue(a1.is_dead()) # if hp = 0 then they are dead
 
     def testSetPos(self):
+        a1 = self.a1
+        a2 = self.a2
+
         a1.set_position(2,5)
         a1_row_bounds = a1.get_row_boundaries()
         a1_col_bounds = a1.get_col_boundaries()
@@ -81,6 +108,9 @@ class AgentSuperClassTest(unittest.TestCase):
         self.assertEquals((6,7), a2_col_bounds) # bounds of col/length
 
     def testPerformAction(self):
+        a1 = self.a1
+        a2 = self.a2
+
         UP = Actions.UP
         DOWN = Actions.DOWN
         LEFT = Actions.LEFT
@@ -98,16 +128,6 @@ class AgentSuperClassTest(unittest.TestCase):
 
         a2.performAction(LEFT)
         self.assertEquals((5, 6), a2.get_col_boundaries())
-
-
-
-
-
-
-
-
-
-
 
 def main():
     unittest.main(verbosity=3)

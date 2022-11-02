@@ -1,6 +1,6 @@
 import unittest
 
-from AgentAbstractClass import PlayerAgent, SimpleGoLeftAgent
+from AgentSuperClass import PlayerAgent, SimpleGoLeftAgent
 from newVersion.GameBoard import GameBoard
 
 
@@ -9,7 +9,7 @@ gameBoard = GameBoard(10,10)
 class InitialGameBoardTest(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.board = GameBoard(10,8) #10 rows, 8 columns
+        self.board = GameBoard(10,8) #10 columns, 8 rows
         self.board_2 = GameBoard(8,4,12,10)
 
     # test default constructor values
@@ -96,10 +96,10 @@ class InitialGameBoardTest(unittest.TestCase):
         # default position is bottom left corner
         player = PlayerAgent()
 
-        #self.board has #10 rows, 8 columns,
+        #self.board has #8 rows, 10 columns,
         #min row = 0, max_row = 9, min col = 0, max_col = 9
         #Place enemy on top left corner
-        enemy_1 = SimpleGoLeftAgent(9,7)
+        enemy_1 = SimpleGoLeftAgent(7,9)
 
         #another enemy agent maybe like somewhere in the middle of the board
         enemy_2 = SimpleGoLeftAgent(3,4)
@@ -114,14 +114,16 @@ class InitialGameBoardTest(unittest.TestCase):
         self.board.populate_board(dict_agents[enemy_1], enemy_1)
         self.board.populate_board(dict_agents[enemy_2], enemy_2)
 
-        #check positions
-        self.assertEqual(1, self.board.board_array[0][0])
-        self.assertEqual(2, self.board.board_array[9][7])
-        self.assertEqual(3, self.board.board_array[3][4])
-
         if print_board:
             print("Board from test_populate_board ")
             print(self.board)
+
+        #check positions
+        self.assertEqual(1, self.board.board_array[0][0])
+        self.assertEqual(2, self.board.board_array[7][9])
+        self.assertEqual(3, self.board.board_array[3][4])
+
+
 
         #TODO write test with enemies with largers lengths, heights
         #TODO write test where enemy is beyond col boundaries, should be allowed

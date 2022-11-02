@@ -1,9 +1,9 @@
 from Actions import Actions
-from AgentAbstractClass import AgentAbstractClass, PlayerAgent
+from AgentSuperClass import AgentSuperClass, PlayerAgent
 from AgentInterface import AgentInterface
 from newVersion.GameBoard import GameBoard
 
-class NewGameState:
+class GameState:
     '''
     This class represents any given state during the game
     It keeps track of:
@@ -34,7 +34,7 @@ class NewGameState:
         self.isPlayerAdded = False
 
 
-    def addAgent(self, agent: AgentAbstractClass) -> bool:
+    def addAgent(self, agent: AgentSuperClass) -> bool:
         '''
         Adds an agent to the list of current agents. Player agent
         MUST be first agent added. This does not care about agent

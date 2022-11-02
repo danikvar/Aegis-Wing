@@ -1,7 +1,14 @@
 import unittest
 
 from Actions import Actions
-from AgentAbstractClass import PlayerAgent
+from AgentSuperClass import PlayerAgent
+
+UP = Actions.UP
+DOWN = Actions.DOWN
+LEFT = Actions.LEFT
+RIGHT = Actions.RIGHT
+STOP = Actions.STOP
+FIRE = Actions.FIRE
 
 class TestPlayerAgent(unittest.TestCase):
     def setUp(self) -> None:
@@ -9,12 +16,6 @@ class TestPlayerAgent(unittest.TestCase):
 
     def testGetAllRawActions(self):
         action_count = 0
-        UP = Actions.UP
-        DOWN = Actions.DOWN
-        LEFT = Actions.LEFT
-        RIGHT = Actions.RIGHT
-        STOP = Actions.STOP
-        FIRE = Actions.FIRE
 
         list_actions_raw = self.p1.get_all_possible_raw_actions()
         for eachAction in list_actions_raw:

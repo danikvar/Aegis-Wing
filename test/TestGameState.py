@@ -2,8 +2,8 @@ import unittest
 
 from Actions import Actions
 from AgentInterface import AgentInterface
-from newVersion.NewGameState import NewGameState
-from AgentAbstractClass import PlayerAgent, AgentAbstractClass, SimpleGoLeftAgent
+from newVersion.GameState import GameState
+from AgentSuperClass import PlayerAgent, AgentSuperClass, SimpleGoLeftAgent
 
 UP = Actions.UP
 DOWN = Actions.DOWN
@@ -14,8 +14,8 @@ FIRE = Actions.FIRE
 
 class TestGameState(unittest.TestCase):
     def setUp(self) -> None:
-        self.gamestateInit = NewGameState()
-        self.gameState_2 = NewGameState()
+        self.gamestateInit = GameState()
+        self.gameState_2 = GameState()
 
     # test default values
     def test_default_values(self) -> None:
@@ -53,7 +53,7 @@ class TestGameState(unittest.TestCase):
             (board_max_y_boundary, board_max_x_boundary + 1)]
 
         for each in invalid_tuples:
-            enemy_agent = AgentAbstractClass(lowest_row=each[0], least_col=each[1])
+            enemy_agent = AgentSuperClass(lowest_row=each[0], least_col=each[1])
             agentsList.append(enemy_agent)
 
         for eachAgent in agentsList:
@@ -119,7 +119,7 @@ class TestGameState(unittest.TestCase):
             [Actions.UP, Actions.RIGHT, Actions.STOP, Actions.FIRE],
             p1_legal_actions)
 
-        gameState3 = NewGameState()
+        gameState3 = GameState()
         # from (9,9) top right corner player can move left, down, stop , or fire
         valid_p2 = PlayerAgent(1,1,9,9)
         gameState3.addAgent(valid_p2)
@@ -132,8 +132,8 @@ class TestGameState(unittest.TestCase):
         #TODO test player and enemy getLegalActions together
 
     def testCheckPlayerAgentClashes_no_clash_simple(self):
-        #set to true to print board
-        print_board = True
+        # set to true to print board to terminal/console for visual aid
+        print_board = False
 
         player = PlayerAgent(1,1,3,3)
         enemy_1 = SimpleGoLeftAgent(3,4)
@@ -195,7 +195,7 @@ class TestGameState(unittest.TestCase):
         enemy_2 = SimpleGoLeftAgent(4,4)
 
         # need to allow more than 1 enemy at a time
-        state = NewGameState(max_enemies_at_one_time=2)
+        state = GameState(max_enemies_at_one_time=2)
 
         state.addAgent(player)
         state.addAgent(enemy_1)
@@ -285,7 +285,7 @@ class TestGameState(unittest.TestCase):
 
     def test_generate_successor_state_player_invalid_moves(self):
         # set to true to print board to terminal/console for visual aid
-        print_board = False
+        print_board = True
 
         state = self.gamestateInit
         #agent in bottom corner, should not be able to move down or left
@@ -356,9 +356,7 @@ class TestGameState(unittest.TestCase):
             print(newState.gameBoard)
             print("-" * 40 + "\n")
 
-
-
-
+        #TODO maybe make test with diff board_height and lenght too?
 
 def main():
     unittest.main(verbosity=3)

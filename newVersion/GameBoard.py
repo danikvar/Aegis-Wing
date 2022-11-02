@@ -25,8 +25,8 @@ class GameBoard:
         if (board_height <= 0):
             raise ValueError("board height cannot be less than 0")
 
-        self.board_length = board_length #
-        self.board_height = board_height
+        self.board_length = board_length #amount of col
+        self.board_height = board_height # amount of rows
         self.min_col = minimum_x # least column value
         self.min_row = minimum_y  # least row value
 
@@ -65,6 +65,8 @@ class GameBoard:
                         if agent.isPlayer() == False:
                             if agentIndex == 1: #1 should be reserved for player
                                 self.board_array[eachRowIndex][eachColIndex] = 2
+                            else:
+                                self.board_array[eachRowIndex][eachColIndex] = agentIndex
 
 
     def setUpBlankBoard(self) -> None:
@@ -77,9 +79,9 @@ class GameBoard:
 
        board_2d_array = []
 
-       for i in range(0, self.board_length):
+       for i in range(0, self.board_height): # amount of rows
            any_row = []
-           for j in range(0, self.board_height):
+           for j in range(0, self.board_length): # amount of columns
                any_row.append(0)
            board_2d_array.append(any_row)
 
@@ -95,11 +97,11 @@ class GameBoard:
         list_row_str = []
         board_str = ""
 
-        for row in range(len(self.board_array)):
+        for row in range(len(self.board_array)): # amount of rows, or y values
             temp = "|"
             temp += "\u0332" + " "
             current_row_list = self.board_array[row]
-            for col in range(len(current_row_list)):
+            for col in range(len(current_row_list)): # amount of col or x's
                 temp += "\u0332" + (str(current_row_list[col]))
                 temp += "\u0332" + " "
                 temp += "|"
@@ -108,7 +110,7 @@ class GameBoard:
                 else:
                     list_row_str.append(temp)
 
-        row_counter = len(list_row_str) - 1
+        row_counter = self.board_height - 1
 
         for i in range(-1, -len(list_row_str) - 1, -1):
             # grab backwards so string rep axis makes sense

@@ -6,7 +6,7 @@ from Actions import Actions
 from AgentInterface import AgentInterface
 
 
-class AgentAbstractClass(AgentInterface):
+class AgentSuperClass(AgentInterface):
     """
     This is the abstract class for all agents. It has the
     methods and attributes common to all agents and implements
@@ -177,7 +177,7 @@ class AgentAbstractClass(AgentInterface):
 
 
 
-class PlayerAgent(AgentAbstractClass):
+class PlayerAgent(AgentSuperClass):
     def __init__(self, agent_length = 1, agent_height = 1, lowest_row = 0, least_col = 0):
         super().__init__(agent_length, agent_height, lowest_row, least_col)
         self.isInvulnerable = False
@@ -213,7 +213,7 @@ class PlayerAgent(AgentAbstractClass):
 
 
 #TODO write tests for this
-class SimpleGoLeftAgent(AgentAbstractClass):
+class SimpleGoLeftAgent(AgentSuperClass):
     def __init__(self, lowest_row, least_col):
         super().__init__(1, 1, lowest_row, least_col)
 
