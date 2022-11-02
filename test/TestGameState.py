@@ -1,9 +1,11 @@
 import unittest
 
-from Actions import Actions
-from AgentInterface import AgentInterface
-from newVersion.GameState import GameState
-from AgentSuperClass import PlayerAgent, AgentSuperClass, SimpleGoLeftAgent
+from Model.Agents.Actions import Actions
+from Model.Agents.AgentInterface import AgentInterface
+from Model.Agents.AgentSuperClass import AgentSuperClass
+from Model.Agents.PlayerAgent import PlayerAgent
+from Model.Agents.SimpleGoLeftAgent import SimpleGoLeftAgent
+from Model.GameState import GameState
 
 UP = Actions.UP
 DOWN = Actions.DOWN
@@ -187,7 +189,7 @@ class TestGameState(unittest.TestCase):
     def test_agent_clash_with_enemy_index_2(self):
         # This also tests updateAgentsList
         # set to true to print board to terminal/console for visual aid
-        print_board = True
+        print_board = False
 
         # player and agent on same space, should both lose 1 hp and die
         player = PlayerAgent(1, 1, 4, 4)
@@ -288,7 +290,7 @@ class TestGameState(unittest.TestCase):
 
     def test_generate_successor_state_player_invalid_moves(self):
         # set to true to print board to terminal/console for visual aid
-        print_board = True
+        print_board = False
 
         state = self.gamestateInit
         #agent in bottom corner, should not be able to move down or left
@@ -364,7 +366,7 @@ class TestGameState(unittest.TestCase):
 
     def test_gen_successor_state_enemy_incoming_and_outbound(self):
         # set to true to print board to terminal/console for visual aid
-        print_board = True
+        print_board = False
 
         state = self.gamestateInit
 

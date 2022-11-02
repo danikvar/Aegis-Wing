@@ -1,7 +1,7 @@
 import unittest
 
-from Actions import Actions
-from AgentSuperClass import PlayerAgent
+from Model.Agents.Actions import Actions
+from Model.Agents.PlayerAgent import PlayerAgent
 
 UP = Actions.UP
 DOWN = Actions.DOWN

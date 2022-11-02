@@ -1,7 +1,8 @@
 import unittest
 
-from AgentSuperClass import PlayerAgent, SimpleGoLeftAgent
-from newVersion.GameBoard import GameBoard
+from Model.Agents.PlayerAgent import PlayerAgent
+from Model.Agents.SimpleGoLeftAgent import SimpleGoLeftAgent
+from Model.GameBoard import GameBoard
 
 
 gameBoard = GameBoard(10,10)

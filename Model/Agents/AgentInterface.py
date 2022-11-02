@@ -1,4 +1,4 @@
-from Actions import Actions
+from Model.Agents.Actions import Actions
 
 
 class AgentInterface:
@@ -137,6 +137,15 @@ class AgentInterface:
         :param agent: {AgentInterface}
         :return: {bool} True if agent overlaps other agent, false otherwise
         """
+        raise NotImplementedError
+
+    def autoPickAction(self):
+        """
+        The agent will choose an action based off of user defined
+        algorithm.
+        :return: {None}
+        """
+        #TODO Perhaps include a behavior parameter??
         raise NotImplementedError
 
 

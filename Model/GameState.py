@@ -1,7 +1,7 @@
-from Actions import Actions
-from AgentSuperClass import AgentSuperClass, PlayerAgent
-from AgentInterface import AgentInterface
-from newVersion.GameBoard import GameBoard
+from Model.Agents.Actions import Actions
+from Model.Agents.AgentInterface import AgentInterface
+from Model.Agents.AgentSuperClass import AgentSuperClass
+from Model.GameBoard import GameBoard
 
 class GameState:
     '''

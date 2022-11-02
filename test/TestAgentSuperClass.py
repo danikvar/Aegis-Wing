@@ -1,7 +1,8 @@
 import unittest
 
-from Actions import Actions
-from AgentSuperClass import AgentSuperClass
+from Model.Agents.Actions import Actions
+from Model.Agents.AgentSuperClass import AgentSuperClass
+
 
 class AgentSuperClassTest(unittest.TestCase):
     def setUp(self) -> None:

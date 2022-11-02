@@ -1,4 +1,4 @@
-from AgentInterface import AgentInterface
+from Model.Agents.AgentInterface import AgentInterface
 
 
 class GameBoard:
