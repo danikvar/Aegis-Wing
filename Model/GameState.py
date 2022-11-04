@@ -85,12 +85,18 @@ class GameState:
 
     def isWin(self) -> bool:
         #you win game if player still has lives and timer has reached 0
-        if self.current_player_lives > 0 and self.turns_left == 0:
+        if self.current_player_lives > 0 and self.isGameOver():
             return True
         return False
 
+    def isLose(self):
+        if (self.current_player_lives <= 0):
+            return True
+        else:
+            return False
+
     def isGameOver(self) -> bool:
-        if self.current_player_lives == 0:
+        if self.turns_left <= 0:
             return True
         else:
             return False
@@ -242,24 +248,50 @@ class GameState:
 
         return legal_actions
 
+    #TODO write test
+    def deepCopy(self):
+        copy = GameState()
+        copy.isPlayerAdded = False
+        copy.gameBoard = self.gameBoard #game board only used for rendering and boundaries, its ok to shallow copy
+        copy.current_player_lives = self.current_player_lives
+        copy.turns_left = self.turns_left
+        copy.max_enemies_at_any_given_time = self.max_enemies_at_any_given_time
+        #TODO NOTE does not copy bullet_agents, or current projectiles
+
+        #copy agents over
+        for each in self.current_agents:
+            each_agent: AgentInterface = each
+            copy.addAgent(each_agent.copy())
+        #copy bullets over??
+
+        return copy
+
 
     def generateSuccessorState(self, agentIndex: int, action: Actions):
-        #TODO should this return a deepcopy of gamestate or can it reuse same state?
+
         # TODO does this need an already moved dict? To check if an agent has already moved?
-        current_agent: AgentInterface = self.current_agents[agentIndex]
-        all_legal_agent_actions = self.getAllLegalActions(agentIndex)
+        successor_state = self.deepCopy()
+        current_agent: AgentInterface = successor_state.current_agents[agentIndex]
+        all_legal_agent_actions = successor_state.getAllLegalActions(agentIndex)
 
         if action in all_legal_agent_actions:
-            self.current_agents[agentIndex] = current_agent.take_action(action)
+            successor_state.current_agents[agentIndex] = current_agent.take_action(action)
 
         #after action check if player has clashed with any enemy agents
-        self.checkPlayerAgentClashes()
+        successor_state.checkPlayerAgentClashes()
         # update the list to reflect any clashes
-        self.updateAgentsList()
+        successor_state.updateAgentsList()
         #update the board representation
-        self.update_board()
+        successor_state.update_board()
 
-        return self
+        return successor_state
+
+    #TODO write test
+    def reset_agents_move_status(self):
+        for each_index in range(len(self.current_agents)):
+            each_agent: AgentInterface = self.current_agents[each_index]
+            each_agent.resetMoveStatus()
+
 
 
 

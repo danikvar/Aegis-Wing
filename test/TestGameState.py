@@ -387,7 +387,7 @@ class TestGameState(unittest.TestCase):
         :return:
         """
         # set to true to print board to terminal/console for visual aid
-        print_board = False
+        print_board = True
 
         state = self.gamestateInit
         #agent in bottom corner, should not be able to move down or left
@@ -424,7 +424,7 @@ class TestGameState(unittest.TestCase):
         player_agent: AgentInterface = newState.current_agents[0]
         player_agent.set_position(9,9)
 
-        newState = state.generateSuccessorState(0, UP)
+        newState = newState.generateSuccessorState(0, UP)
         # check current position is 1
         self.assertEquals(1, newState.gameBoard.board_array[9][9])
         # check surrounding position = 0
@@ -437,8 +437,8 @@ class TestGameState(unittest.TestCase):
             print(newState.gameBoard)
             print("-" * 40 + "\n")
 
-        newState = state.generateSuccessorState(0, RIGHT)
-        # check current position is 1
+        newState = newState.generateSuccessorState(0, RIGHT)
+        # check curret position is 1
         self.assertEquals(1, newState.gameBoard.board_array[9][9])
         # check surrounding position = 0
         self.assertEquals(0, newState.gameBoard.board_array[8][9])
@@ -520,7 +520,7 @@ class TestGameState(unittest.TestCase):
             print("-" * 40 + "\n")
 
         #now have enemy exit board
-        newState.generateSuccessorState(1,LEFT)
+        newState = newState.generateSuccessorState(1,LEFT)
         self.assertEquals(1,len(newState.current_agents))
         #TODO tell team that first [] is row i.e. y value
         #check that where enemy was is empty again

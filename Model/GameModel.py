@@ -34,6 +34,9 @@ class GameModel:
     def set_enemy_picker(self,enemy_picker: EnemyPicker):
         self.enemy_picker = enemy_picker
 
+    def update_gamestate(self):
+        pass
+
     #TODO maybe this needs like a controller and a spawn behavior param?
     def playGame(self):
         pass

@@ -12,10 +12,8 @@ class SimpleTurtleView:
         self.lowest_y_cord_value = None
         self.max_y_cord_value = None
 
-        #default player color
-        self.player_color = "black"
-
-        self.list_enemy_turtles = []
+        self.turtle_ships = []
+        self.turtle_dict = {}
 
     def set_coord_values(self,min_x: int, max_x: int, min_y: int, max_y: int):
         self.lowest_x_cord_value = min_x
@@ -35,14 +33,24 @@ class SimpleTurtleView:
             turtle_color = "red"
 
         t = turtle_module.Turtle()
+        t.hideturtle()
         t.shape("square")
         t.color(turtle_color)
         t.penup()
+        t.shapesize(2,3,1)
         t.speed(0)
         t.setpos(x_pos,y_pos)
+        t.showturtle()
+
 
     def set_up_turtles(self, list_agents):
-        self.list_enemy_turtles = []
+        #clears registry as well so clears onkey press
+        self.window.clear() # delete all turtles, maybe add a delay for movement?
+
+        #for turtle in self.window.turtles():
+            #turtle.reset()
+
+        self.turtle_ships = []
 
         for i in range(len(list_agents)):
             each_enemy : AgentInterface = list_agents[i]
@@ -69,16 +77,16 @@ class SimpleTurtleView:
                     if y_range > 0:
                         for y_range_value in range(y_low, y_high + 1):
                             enemy_turtle = self.produce_turtle(x_range_value, y_range_value, is_player_turtle)
-                            self.list_enemy_turtles.append(enemy_turtle)
+                            self.turtle_ships.append(enemy_turtle)
                     else:
                         enemy_turtle = self.produce_turtle(x_range_value, y_low, is_player_turtle)
-                        self.list_enemy_turtles.append(enemy_turtle)
+                        self.turtle_ships.append(enemy_turtle)
             else:
                 # if enemy only 1 unit long
                 if y_range > 0:
                     for y_range_value in range(y_low, y_high + 1):
                         enemy_turtle = self.produce_turtle(x_low, y_range_value, is_player_turtle)
-                        self.list_enemy_turtles.append(enemy_turtle)
+                        self.turtle_ships.append(enemy_turtle)
                 else:
                     enemy_turtle = self.produce_turtle(x_low,y_low, is_player_turtle)
-                    self.list_enemy_turtles.append(enemy_turtle)
+                    self.turtle_ships.append(enemy_turtle)

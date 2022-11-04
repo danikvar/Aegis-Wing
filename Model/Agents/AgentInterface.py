@@ -114,7 +114,7 @@ class AgentInterface:
         """
         raise NotImplementedError
 
-    def copy_agent(self):
+    def copy(self):
         """
         Returns a deepcopy of the agent
         :return: {AgentInterface} a copy of the current agent
@@ -156,6 +156,13 @@ class AgentInterface:
         Returns true if action was already taken, false otherwise
         :return: {bool} True if already took actions, false otherwise
         """
+        raise NotImplementedError
+
+    def resetMoveStatus(self) -> None:
+        raise NotImplementedError
+
+    def getId(self):
+        raise NotImplementedError
 
 
 

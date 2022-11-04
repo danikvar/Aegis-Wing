@@ -9,6 +9,7 @@ def main():
     #default values
     gameModel = GameModel()
     controller = SimplePlayerController(view, gameModel)
+    controller.go()
     
 if __name__ == "__main__":
     main()

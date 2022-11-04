@@ -38,9 +38,9 @@ class TestPlayerAgent(unittest.TestCase):
         self.assertTrue(self.p1.isPlayer())
 
     def testCopyAgent(self):
-        copyAgent = self.p1.copy_agent()
+        copyAgent = self.p1.copy()
 
-        # check identity/i.e. deep copy
+        # check identity, not a shallow copy
         self.assertFalse(self.p1 is copyAgent)
 
     def testTakeAction(self):

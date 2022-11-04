@@ -175,3 +175,6 @@ class AgentSuperClass(AgentInterface):
     # maybe use in checkAgentClashes???
     def hasMoved(self) -> bool:
         return self.hasAlreadyMoved
+
+    def resetMoveStatus(self) -> None:
+        self.hasAlreadyMoved = False
