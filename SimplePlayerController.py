@@ -1,3 +1,5 @@
+import time
+
 from Model.Agents.Actions import Actions
 from Model.Agents.AgentInterface import AgentInterface
 from Model.Agents.PlayerAgent import PlayerAgent
@@ -22,7 +24,6 @@ class SimplePlayerController:
         self.model.gameState.addAgent(enemy_2)
         self.model.gameState.addAgent(enemy_3)
 
-        all_agents = self.model.gameState.current_agents
         self.player_action = Actions.STOP
         self.state = self.model.gameState
 
@@ -55,12 +56,11 @@ class SimplePlayerController:
 
         self.state.reset_agents_move_status()
         self.view.set_up_turtles(self.state.current_agents)
-
         self.re_register_actions()
 
     def re_register_actions(self):
         """
-        This is needed because turtle.clear is called meaning onkey registers
+        This is needed because turtle.Screen.clear is called meaning onkey registers
         need to be registered again
         :return:
         """
@@ -105,16 +105,7 @@ class SimplePlayerController:
     def go(self):
 
         screen = self.view.window
-
-
-        #screen.onkey(player_up, "Up")
-        #screen.onkey(player_down, "Down")
-        #screen.onkey(player_left, "Left")
-
-        screen.onkeypress(self.player_right, "Right")
-        screen.onkeyrelease(self.player_up, "Up")
-        screen.listen()
-        screen.onkeypress(self.printSomethign, "Down")
+        self.re_register_actions()
 
         screen.mainloop()
 
