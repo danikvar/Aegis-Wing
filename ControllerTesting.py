@@ -4,7 +4,10 @@ from SimpleTurtleView import SimpleTurtleView
 
 
 def main():
-    pass
+    """
+    Example of gameplay
+    :return:
+    """
     view = SimpleTurtleView()
     #default values
     gameModel = GameModel()

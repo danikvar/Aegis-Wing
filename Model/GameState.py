@@ -201,7 +201,6 @@ class GameState:
         :return: {bool} True if agent position is valid, false otherwise
         """
 
-        #TODO how to deal if agent moves to a position where another agent kills it?
         board_min_x,board_max_x, board_min_y, board_max_y = self.gameBoard.getBoardBoundaries()
         agent_min_x, agent_max_x = agent.get_row_boundaries() # x is up or down so row bounds
         agent_min_y, agent_max_y = agent.get_col_boundaries() # y is left or right so col bounds
@@ -269,7 +268,6 @@ class GameState:
 
     def generateSuccessorState(self, agentIndex: int, action: Actions):
 
-        # TODO does this need an already moved dict? To check if an agent has already moved?
         successor_state = self.deepCopy()
         current_agent: AgentInterface = successor_state.current_agents[agentIndex]
         all_legal_agent_actions = successor_state.getAllLegalActions(agentIndex)

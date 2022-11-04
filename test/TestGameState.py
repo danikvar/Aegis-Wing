@@ -213,7 +213,6 @@ class TestGameState(unittest.TestCase):
             print(state.gameBoard)
             print("/****** END OF testCheckPlayerAgentClashes_no_clash_simple *****/\n")
 
-        #TODO test agent clash but if enemy moved beyond min col boundary, should be allowed and should remove from agent list
 
     def test_check_clash_player_vs_simple(self):
         """
@@ -387,7 +386,7 @@ class TestGameState(unittest.TestCase):
         :return:
         """
         # set to true to print board to terminal/console for visual aid
-        print_board = True
+        print_board = False
 
         state = self.gamestateInit
         #agent in bottom corner, should not be able to move down or left
@@ -504,11 +503,6 @@ class TestGameState(unittest.TestCase):
             print(newState.gameBoard)
             print("-" * 40 + "\n")
 
-        # #manually move enemy to near board min col boundary
-        # #TODO this does not work? Maybe should generate new gamestates??
-        # enemy_1.set_position(7,0)
-        # newState.update_board()
-        # self.assertEquals(2, len(newState.current_agents))
 
         # move enemy agent to min col boundary of board
         for i in range(9):

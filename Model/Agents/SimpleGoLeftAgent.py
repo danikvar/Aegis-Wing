@@ -23,17 +23,21 @@ class SimpleGoLeftAgent(AgentSuperClass):
         copy.id = self.id
         return copy
 
-    def take_action(self, action: Actions):
-        # check if action is valid
-        if action in self.get_all_possible_raw_actions():
-            agent_copy = self.copy()
-            agent_copy.performAction(action)
-            agent_copy.hasAlreadyMoved = True
-            return agent_copy
-        else:
-            return self
+    # def take_action(self, action: Actions):
+    #     # check if action is valid
+    #     if action in self.get_all_possible_raw_actions():
+    #         agent_copy = self.copy()
+    #         agent_copy.performAction(action)
+    #         agent_copy.hasAlreadyMoved = True
+    #         return agent_copy
+    #     else:
+    #         return self
 
-    def autoPickAction(self):
+    def autoPickAction(self) -> Actions:
+        """
+        Picks one of potentially many pre-defined actions.
+        :return:
+        """
         return self.get_all_possible_raw_actions()[0]
 
     def getId(self):

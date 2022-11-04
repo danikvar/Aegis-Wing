@@ -34,7 +34,7 @@ class AgentSuperClass(AgentInterface):
         self.lowest_row = lowest_row
         # position of furthest left side
         self.least_col = least_col
-        self.hp = 1 # default hp is 1
+        self.hp = hp # default hp is 1
         self.hasAlreadyMoved = False
 
     def get_position(self) -> tuple:
@@ -64,7 +64,7 @@ class AgentSuperClass(AgentInterface):
 
     def isPlayer(self) -> bool:
         '''
-        Returns True if player agent, otherwise false
+        Returns True if player agent, otherwise false. Only player agent needs to override this method
         :return: {bool} Returns True if player agent, otherwise false
         '''
         return False
@@ -178,3 +178,12 @@ class AgentSuperClass(AgentInterface):
 
     def resetMoveStatus(self) -> None:
         self.hasAlreadyMoved = False
+
+    def take_action(self, action: Actions):
+        if action in self.get_all_possible_raw_actions():
+            agent_copy = self.copy()
+            agent_copy.performAction(action)
+            agent_copy.hasAlreadyMoved = True
+            return agent_copy
+        else:
+            return self
