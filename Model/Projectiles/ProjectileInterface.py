@@ -1,6 +1,7 @@
-from Agents.Actions import Actions
+from Projectiles.Directions import Directions
+from Agents.AgentInterface import AgentInterface
 
-class AgentInterface:
+class ProjectileInterface:
 
     '''
     This interface mandates all methods that must be
@@ -8,6 +9,13 @@ class AgentInterface:
     by the subtype. Most of these methods will be defined
     in the AgentSuperClass
     '''
+    
+    def isPlayerBullet(self) -> bool:
+        """
+        Returns True if projectile was fired from Player Agent, otherwise false
+        :return: {bool} True if projectile was fired from Player Agent, otherwise false
+        """
+        raise NotImplementedError
 
     def get_position(self) -> tuple:
         """
@@ -28,17 +36,26 @@ class AgentInterface:
         """
         raise NotImplementedError
 
-    def get_agent_size(self) -> tuple:
+    def get_projectile_size(self) -> tuple:
         """
         Returns the size of the agent as a tuple
         :return: {tuple} (agent length, agent_height)
         """
         raise NotImplementedError
 
-    def isPlayer(self) -> bool:
+    def changeSpeed(self, speed: int) -> None:
         """
-        Returns True if player agent, otherwise false
-        :return: {bool} Returns True if player agent, otherwise false
+        Changes the number of spaces that the projectile moves each turn.
+        Will be used if we want to create complex projectiles
+        :return: 
+        """
+        raise NotImplementedError
+        
+    def changeDirection(self, direction: Directions) -> None:
+        """
+        Changes the direction that the projectile moves each turn.
+        Will be used if we want to create complex projectiles
+        :return: 
         """
         raise NotImplementedError
 
@@ -84,16 +101,10 @@ class AgentInterface:
         """
         raise NotImplementedError
 
-    def get_all_possible_raw_actions(self) -> list:
-        """
-        Returns a list of Actions that an agent can perform
-        :return: {list(Action)}
-        """
-        raise NotImplementedError
 
     def get_hp(self)-> int:
         """
-        Returns the amount of hp an agent has
+        Returns the amount of hp an agent has 
         :return: {int} hp of the agent
         """
         raise NotImplementedError
@@ -121,32 +132,21 @@ class AgentInterface:
         raise NotImplementedError
 
 
-    def take_action(self, action: Actions):
+    def take_action(self, action: Directions):
         """
         Returns a copy of the current agent with the same length and width
         but with a new position caused by an action
-        :param action: {Actions} the action that causes an agent to change position
+        :param action: {Directions} the action that causes an agent to change position
         :return:
         """
         raise NotImplementedError
 
-    def is_overlapping_other_agent(self, agent):
+    def is_overlapping_agent(self, agent: AgentInterface):
         """
         Checks if current agent is overlapping with another agent
         :param agent: {AgentInterface}
         :return: {bool} True if agent overlaps other agent, false otherwise
         """
-        raise NotImplementedError
-
-    #TODO write tests
-    def autoPickAction(self) -> Actions:
-        """
-        The agent will choose an action based off of user defined
-        algorithm.
-        :return: {None}
-        """
-        #TODO Perhaps include a behavior parameter or let behavior be
-        # defined in class??
         raise NotImplementedError
 
     #TODO write tests
@@ -162,7 +162,3 @@ class AgentInterface:
 
     def getId(self):
         raise NotImplementedError
-
-
-
-
