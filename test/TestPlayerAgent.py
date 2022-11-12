@@ -50,6 +50,16 @@ class TestPlayerAgent(unittest.TestCase):
         self.assertEqual((0,0), self.p1.get_col_boundaries())
         self.assertEqual((1,1), agentAfterAction.get_col_boundaries())
 
+    def test_take_action_player_agent(self):
+        #TODO Ramzi_iter1 show team
+        player = PlayerAgent(1, 1, 5, 5)
+        # returns a copy with action taken
+        after_action = player.take_action(Actions.UP)
+
+        self.assertFalse(player == after_action)  # checking deepcopy working
+        self.assertFalse(player.hasMoved())
+        self.assertTrue(after_action.hasMoved())
+
 def main():
     unittest.main(verbosity=3)
 

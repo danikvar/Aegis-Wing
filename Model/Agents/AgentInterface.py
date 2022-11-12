@@ -1,6 +1,5 @@
 from Model.Agents.Actions import Actions
 
-
 class AgentInterface:
 
     '''

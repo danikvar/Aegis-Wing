@@ -178,7 +178,217 @@ class TestGameState(unittest.TestCase):
         self.assertEquals([Actions.LEFT, Actions.DOWN, Actions.STOP,Actions.FIRE],
                           p2_legal_actions)
 
+        #from center of board move anywhere
+        gameState4 = GameState()
+        valid_p3 = PlayerAgent(1, 1, 5, 5)
+        gameState4.addAgent(valid_p3)
+        p3_legal_actions = gameState4.getAllLegalActions(0)
+        gameState4.getAllLegalActions(0)
+        self.assertEquals(6, len(p3_legal_actions))
+        self.assertEquals([Actions.UP, Actions.LEFT, Actions.RIGHT, Actions.DOWN, Actions.STOP, Actions.FIRE],
+                          p3_legal_actions)
+
+
+
+    def test_player_enemy_legal_actions_together_far_away(self):
+        """
+        Testing getting all legal actions of a player and a SimpleGoLeftAgent
+        Default heights and lengths for player.
+        Enemy and player far apart.
+        :return: None
+        """
+        #TODO Ramzi_iter_1 show team
+
+        #set to true to see board
+        print_board = False
+
+        valid_p1 = PlayerAgent()
+        valid_enemy_1 = SimpleGoLeftAgent(9,9)
+        self.gamestateInit.addAgent(valid_p1)
+        self.gamestateInit.addAgent(valid_enemy_1)
+        self.assertEquals(2,len(self.gamestateInit.current_agents))
+
+        p1_legal_actions = self.gamestateInit.getAllLegalActions(0)
+        # from 0,0 (bottom left corner) player can move up, right, stop or fire = 4 actions
+        self.assertEquals(4, len(p1_legal_actions))
+        self.assertEquals(
+            [Actions.UP, Actions.RIGHT, Actions.STOP, Actions.FIRE],
+            p1_legal_actions)
+
+        enemy_1_legal_actions = self.gamestateInit.getAllLegalActions(1)
+        self.assertEquals(1,len(enemy_1_legal_actions))
+        self.assertEquals([Actions.LEFT], enemy_1_legal_actions)
+
+        if print_board:
+            self.gamestateInit.update_board()
+            print(self.gamestateInit.gameBoard)
+
+        gameState3 = GameState()
+        valid_p2 = PlayerAgent(1, 1, 5, 5)
+        gameState3.addAgent(valid_p2)
+        valid_e2 = SimpleGoLeftAgent(9,9)
+        gameState3.addAgent(valid_e2)
+        p2_legal_actions = gameState3.getAllLegalActions(0)
+        e2_legal_actions = self.gamestateInit.getAllLegalActions(1)
+
+        self.assertEquals(1, len(e2_legal_actions))
+        self.assertEquals([Actions.LEFT], e2_legal_actions)
+
+        self.assertEquals(6, len(p2_legal_actions))
+        self.assertEquals([Actions.UP, Actions.LEFT, Actions.RIGHT, Actions.DOWN, Actions.STOP, Actions.FIRE],
+                          p2_legal_actions)
+
+        if print_board:
+            gameState3.update_board()
+            print(gameState3.gameBoard)
+
+    def test_player_enemy_legal_actions_together_close_to_each_other(self):
+        """
+        Testing getting all legal actions of a player and a SimpleGoLeftAgent
+        Default heights and lengths for player.
+        Enemy and player next to each other
+        :return: None
+        """
+        # TODO Ramzi_iter_1 show team
+
+        # set to true to see board
+        print_board = True
+
+        valid_p1 = PlayerAgent(1,1,5,5)
+        valid_enemy_1 = SimpleGoLeftAgent(5, 6)
+        self.gamestateInit.addAgent(valid_p1)
+        self.gamestateInit.addAgent(valid_enemy_1)
+        self.assertEquals(2, len(self.gamestateInit.current_agents))
+
+        p1_legal_actions = self.gamestateInit.getAllLegalActions(0)
+        # from 0,0 (bottom left corner) player can move up, right, stop or fire = 4 actions
+        self.assertEquals(6, len(p1_legal_actions))
+        self.assertEquals(
+            [Actions.UP, Actions.LEFT, Actions.RIGHT, Actions.DOWN, Actions.STOP, Actions.FIRE],
+            p1_legal_actions)
+
+        enemy_1_legal_actions = self.gamestateInit.getAllLegalActions(1)
+        self.assertEquals(1, len(enemy_1_legal_actions))
+        self.assertEquals([Actions.LEFT], enemy_1_legal_actions)
+
+        if print_board:
+            self.gamestateInit.update_board()
+            print(self.gamestateInit.gameBoard)
+
+
+
         #TODO test player and enemy getLegalActions together
+
+    def testGetAllLegalActionsPlayerLargerHeight(self):
+        """
+        Testing getting all legal actions of a player agent via
+        getAllLegalActions method. Player has height = 2
+        :return: None
+        """
+        #TODO Ramzi_iter_1 show team
+
+        # set to true to print board
+        print_board = False
+
+        valid_p1 = PlayerAgent(1,2,8,0)
+        self.gamestateInit.addAgent(valid_p1)
+        p1_legal_actions = self.gamestateInit.getAllLegalActions(0)
+        # from 8,0 (top left corner) player can move right, down, stop or fire = 4 actions
+        self.assertEquals(4, len(p1_legal_actions))
+        self.assertEquals(
+            [Actions.RIGHT, Actions.DOWN, Actions.STOP, Actions.FIRE],
+            p1_legal_actions)
+
+        if (print_board):
+            self.gamestateInit.update_board()
+            print(self.gamestateInit.gameBoard)
+
+        gameState3 = GameState()
+        # player at row = 8 with height = 2
+        # should not be able to move up
+        # from (8,9) top right corner player can move left, down, stop , or fire
+        valid_p2 = PlayerAgent(1, 2, 8, 9)
+        gameState3.addAgent(valid_p2)
+        p2_legal_actions = gameState3.getAllLegalActions(0)
+        gameState3.getAllLegalActions(0)
+        self.assertEquals(4, len(p2_legal_actions))
+        self.assertEquals([Actions.LEFT, Actions.DOWN, Actions.STOP, Actions.FIRE],
+                          p2_legal_actions)
+
+        if (print_board):
+            gameState3.update_board()
+            print(gameState3.gameBoard)
+
+        gameState4 = GameState()
+        # player at row = 8 with height = 2
+        # should not be able to move up
+        # from (8,9) top right corner player can move left, down, stop , or fire
+        valid_p3 = PlayerAgent(1, 2, 5, 5)
+        gameState4.addAgent(valid_p3)
+        p3_legal_actions = gameState4.getAllLegalActions(0)
+        gameState4.getAllLegalActions(0)
+        self.assertEquals(6, len(p3_legal_actions))
+        self.assertEquals([Actions.UP, Actions.LEFT, Actions.RIGHT, Actions.DOWN, Actions.STOP, Actions.FIRE],
+                          p3_legal_actions)
+
+        if (print_board):
+            gameState4.update_board()
+            print(gameState4.gameBoard)
+
+    def testGetAllLegalActionsPlayerLargerLength(self):
+        """
+        Testing getting all legal actions of a player agent via
+        getAllLegalActions method. Player has height = 2
+        :return: None
+        """
+        #TODO RAmzi_iter_1 show team
+        # set to true to print board
+        print_board = True
+
+        valid_p1 = PlayerAgent(2, 1, 9, 0)
+        self.gamestateInit.addAgent(valid_p1)
+        p1_legal_actions = self.gamestateInit.getAllLegalActions(0)
+        # from 8,0 (top left corner) player can move right, down, stop or fire = 4 actions
+        self.assertEquals(4, len(p1_legal_actions))
+        self.assertEquals(
+            [Actions.RIGHT, Actions.DOWN, Actions.STOP, Actions.FIRE],
+            p1_legal_actions)
+
+        if (print_board):
+            self.gamestateInit.update_board()
+            print(self.gamestateInit.gameBoard)
+
+        gameState3 = GameState()
+        # player at row = 8 with height = 2
+        # should not be able to move up
+        # from (8,9) top right corner player can move left, down, stop , or fire
+        valid_p2 = PlayerAgent(2, 1, 9, 8)
+        gameState3.addAgent(valid_p2)
+        p2_legal_actions = gameState3.getAllLegalActions(0)
+        gameState3.getAllLegalActions(0)
+        self.assertEquals(4, len(p2_legal_actions))
+        self.assertEquals([Actions.LEFT, Actions.DOWN, Actions.STOP, Actions.FIRE],
+                          p2_legal_actions)
+        # set to true to print board
+        if (print_board):
+            gameState3.update_board()
+            print(gameState3.gameBoard)
+
+        gameState4 = GameState()
+        # player at row = 8 with height = 2
+        # should not be able to move up
+        # from (8,9) top right corner player can move left, down, stop , or fire
+        valid_p3 = PlayerAgent(2, 1, 5, 5)
+        gameState4.addAgent(valid_p3)
+        p3_legal_actions = gameState4.getAllLegalActions(0)
+        gameState4.getAllLegalActions(0)
+        self.assertEquals(6, len(p3_legal_actions))
+        self.assertEquals([Actions.UP, Actions.LEFT, Actions.RIGHT, Actions.DOWN, Actions.STOP, Actions.FIRE],
+                          p3_legal_actions)
+
+        if (print_board):
+            gameState4.update_board()
+            print(gameState4.gameBoard)
 
     def testCheckPlayerAgentClashes_no_clash_simple(self):
         """

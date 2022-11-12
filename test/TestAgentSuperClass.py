@@ -2,6 +2,7 @@ import unittest
 
 from Model.Agents.Actions import Actions
 from Model.Agents.AgentSuperClass import AgentSuperClass
+from Model.Agents.PlayerAgent import PlayerAgent
 
 
 class AgentSuperClassTest(unittest.TestCase):
@@ -129,6 +130,8 @@ class AgentSuperClassTest(unittest.TestCase):
 
         a2.performAction(LEFT)
         self.assertEquals((5, 6), a2.get_col_boundaries())
+
+
 
 def main():
     unittest.main(verbosity=3)
