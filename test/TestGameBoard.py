@@ -12,6 +12,8 @@ class TestGameBoard(unittest.TestCase):
     def setUp(self) -> None:
         self.board = GameBoard(10,8) #10 columns, 8 rows
         self.board_2 = GameBoard(8,4,12,10) #8 columns, 10 rows, min row = 12, max_col = 10
+        self.board_3 = GameBoard(10, 10) #10 columns, 10 rows
+        self.board_4 = GameBoard(12, 12, 1, 1)  # 10 columns, 10 rows
 
     # test default constructor values
     def test_default_constructor(self):
@@ -92,7 +94,7 @@ class TestGameBoard(unittest.TestCase):
 
     def test_populate_board(self):
         # set to true to print board to terminal/console for visual aid
-        print_board = False
+        print_board = True
 
         # default position is bottom left corner
         player = PlayerAgent()
@@ -129,9 +131,164 @@ class TestGameBoard(unittest.TestCase):
         #TODO write test with enemies with largers lengths, heights
         #TODO write test where enemy is beyond col boundaries, should be allowed
 
+    """
+    Test player within bounds
+    """
+    def test_player_within_boundary(self):
+        # set to true to print board to terminal/console for visual aid
+        print_board = True
+
+        # default position is bottom left corner
+        player = PlayerAgent(1, 1, 0, 0)
+        player_2 = PlayerAgent(2, 3, 5, 5)
+        player_3 = PlayerAgent(2, 1, 0, 8)
+        player_4 = PlayerAgent(1, 2, 8, 0)
+
+        # key is AgentInterface obj, value is what its agentIndex+1 value would be
+        dict_agents = {player: 1}
+        dict_agents[player_2] = 2
+        dict_agents[player_3] = 1
+        dict_agents[player_4] = 3
+
+        # add them to the board_array
+        self.board_3.populate_board(dict_agents[player], player)
+        self.board_3.populate_board(dict_agents[player_2], player_2)
+        self.board_3.populate_board(dict_agents[player_3], player_3)
+        self.board_3.populate_board(dict_agents[player_4], player_4)
+
+        if print_board:
+            print("Board from test_populate_board ")
+            print(self.board_3)
+
+        # check positions
+        self.assertEqual(1, self.board_3.board_array[0][0])
+        self.assertEqual(1, self.board_3.board_array[5][5])
+        self.assertEqual(1, self.board_3.board_array[0][8])
+        self.assertEqual(1, self.board_3.board_array[8][0])
+
+    """
+    Test player outside bounds
+    """
+    def test_player_outside_boundary(self):
+        # set to true to print board to terminal/console for visual aid
+        print_board = True
+
+        # default position is bottom left corner
+        player = PlayerAgent(2, 2, -1, -1)
+        player_2 = PlayerAgent(2, 2, 10, 10)
+        player_3 = PlayerAgent(1, 100, -50, 3)
+        player_4 = PlayerAgent(100, 1, 6, -50)
+
+        # key is AgentInterface obj, value is what its agentIndex+1 value would be
+        dict_agents = {player: 1}
+        dict_agents[player_2] = 2
+        dict_agents[player_3] = 1
+        dict_agents[player_4] = 3
+
+        # add them to the board_array
+        self.board_3.populate_board(dict_agents[player], player)
+        self.board_3.populate_board(dict_agents[player_2], player_2)
+        self.board_3.populate_board(dict_agents[player_3], player_3)
+        self.board_3.populate_board(dict_agents[player_4], player_4)
+
+        if print_board:
+            print("Board from test_populate_board ")
+            print(self.board_3)
+            print()
+
+        # check positions
+        self.assertEqual(1, self.board_3.board_array[0][0])
+
+        try:
+            self.assertEqual(1, self.board_3.board_array[10][10])
+        except Exception as e:
+            print(e)
+
+        self.assertEqual(1, self.board_3.board_array[0][3])
+        self.assertEqual(1, self.board_3.board_array[6][0])
 
 
+    """
+    Test enemy within bounds
+    """
+    def test_enemy_within_boundary(self):
+        # set to true to print board to terminal/console for visual aid
+        print_board = True
 
+        # default position is bottom left corner
+        enemy_1 = SimpleGoLeftAgent(0, 0)
+        enemy_2 = SimpleGoLeftAgent(9, 9)
+        enemy_3 = SimpleGoLeftAgent(5, 5)
+
+        # key is AgentInterface obj, value is what its agentIndex+1 value would be
+        dict_agents = {enemy_1: 2}
+        dict_agents[enemy_2] = 3
+        dict_agents[enemy_3] = 5
+
+        # add them to the board_array
+        self.board_3.populate_board(dict_agents[enemy_1], enemy_1)
+        self.board_3.populate_board(dict_agents[enemy_2], enemy_2)
+        self.board_3.populate_board(dict_agents[enemy_3], enemy_3)
+
+        if print_board:
+            print("Board from test_populate_board ")
+            print(self.board_3)
+
+        # check positions
+        self.assertEqual(2, self.board_3.board_array[0][0])
+        self.assertEqual(3, self.board_3.board_array[9][9])
+        self.assertEqual(5, self.board_3.board_array[5][5])
+
+
+    """
+    Test enemy outside bounds
+    """
+    def test_enemy_outside_boundary(self):
+        # set to true to print board to terminal/console for visual aid
+        print_board = True
+
+        # default position is bottom left corner
+        enemy_1 = SimpleGoLeftAgent(-1, -1)
+        enemy_2 = SimpleGoLeftAgent(10, 10)
+        enemy_3 = SimpleGoLeftAgent(9, -1)
+        enemy_4 = SimpleGoLeftAgent(0, 10)
+
+        # key is AgentInterface obj, value is what its agentIndex+1 value would be
+        dict_agents = {enemy_1: 2}
+        dict_agents[enemy_2] = 3
+        dict_agents[enemy_3] = 4
+        dict_agents[enemy_4] = 5
+
+        # add them to the board_array
+        self.board_3.populate_board(dict_agents[enemy_1], enemy_1)
+        self.board_3.populate_board(dict_agents[enemy_2], enemy_2)
+        self.board_3.populate_board(dict_agents[enemy_3], enemy_3)
+        self.board_3.populate_board(dict_agents[enemy_4], enemy_4)
+
+        if print_board:
+            print("Board from test_populate_board ")
+            print(self.board_3)
+
+        # check positions
+        try:
+            self.assertEqual(2, self.board_3.board_array[-1][-1])
+        except Exception as e:
+            print(e)
+
+        try:
+            self.assertEqual(3, self.board_3.board_array[10][10])
+        except Exception as e:
+            print(e)
+
+        try:
+            self.assertEqual(4, self.board_3.board_array[9][-1])
+        except Exception as e:
+            print(e)
+
+        try:
+            self.assertEqual(5, self.board_3.board_array[0][10])
+        except Exception as e:
+            print(e)
 
 def main():
     unittest.main(verbosity=3)

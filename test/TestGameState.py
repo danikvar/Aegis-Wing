@@ -31,10 +31,10 @@ class TestGameState(unittest.TestCase):
         :return: None
         """
         g = self.gamestateInit
-        self.assertEquals(0,len(g.current_agents))
+        self.assertEqual(0,len(g.current_agents))
         self.assertFalse(g.isPlayerAdded)
-        self.assertEquals(100, g.turns_left)
-        self.assertEquals(1, g.max_enemies_at_any_given_time)
+        self.assertEqual(100, g.turns_left)
+        self.assertEqual(1, g.max_enemies_at_any_given_time)
 
     #testing trying to add player agent in valid position
     def test_is_valid_agent_player(self) -> None:
