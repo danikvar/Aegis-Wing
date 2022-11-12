@@ -85,6 +85,8 @@ class TestSimpleGoLeftAgent(unittest.TestCase):
         enemy_1 = SimpleGoLeftAgent(5,5)
         after_action = enemy_1.take_action(Actions.LEFT)
 
+        self.assertEquals((5,4), after_action.get_position())
+
         #should return deepcopy
         self.assertFalse(enemy_1 == after_action)
 

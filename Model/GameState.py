@@ -192,6 +192,13 @@ class GameState:
         for i in range(len(self.current_agents)):
             self.gameBoard.populate_board(i + 1, self.current_agents[i])
 
+        #for loop for bullet list
+        #if bullet is player bullet
+        #   board value = -1
+        #else
+        #   board value = -2
+        #.populateboard(board_value, bulletAgent)
+
 
     def isValidAgent(self, agent: AgentInterface) -> bool:
         """

@@ -288,7 +288,7 @@ class TestGameState(unittest.TestCase):
         #TODO Ramzi_iter_1 show team
 
         # set to true to print board
-        print_board = False
+        print_board =True
 
         valid_p1 = PlayerAgent(1,2,8,0)
         self.gamestateInit.addAgent(valid_p1)
