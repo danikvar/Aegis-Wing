@@ -77,15 +77,16 @@ class GameBoard:
        :return: {list[list[int]]} A 2D array of list
        '''
 
-       board_2d_array = []
-
-       for i in range(0, self.board_height): # amount of rows
-           any_row = []
-           for j in range(0, self.board_length): # amount of columns
-               any_row.append(0)
-           board_2d_array.append(any_row)
-
-       self.board_array = board_2d_array
+        board_2d_array = []
+        
+        for i in range(0, self.board_height): # amount of rows
+            any_row = []
+            for j in range(0, self.board_length): # amount of columns
+                any_row.append(0)
+                
+            board_2d_array.append(any_row)
+        
+        self.board_array = board_2d_array
 
     def __str__(self):
         '''
