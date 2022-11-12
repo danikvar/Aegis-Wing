@@ -236,7 +236,7 @@ class TestGameStateGameExamples(unittest.TestCase):
                 break
 
         self.assertEquals(0, state.gameBoard.board_array[0][0])
-
+#ramzi merged
 def main():
     unittest.main(verbosity=3)
 
