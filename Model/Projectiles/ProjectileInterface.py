@@ -1,5 +1,6 @@
-from Projectiles.Directions import Directions
-from Agents.AgentInterface import AgentInterface
+from Model.Agents.AgentInterface import AgentInterface
+from Model.Agents.Directions import Directions
+
 
 class ProjectileInterface:
 

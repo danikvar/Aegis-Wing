@@ -1,4 +1,5 @@
-from Agents.Actions import Actions
+from Model.Agents.Actions import Actions
+
 
 class AgentInterface:
 

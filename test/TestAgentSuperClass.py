@@ -3,9 +3,10 @@ import unittest
 from Model.Agents.Actions import Actions
 from Model.Agents.AgentSuperClass import AgentSuperClass
 
-#
+
 class AgentSuperClassTest(unittest.TestCase):
     def setUp(self) -> None:
+
         self.a1 = AgentSuperClass()
         self.a2 = AgentSuperClass(agent_length=2, agent_height=3, lowest_row=4, least_col=6)
 

@@ -1,7 +1,7 @@
 import uuid
 
-from Projectiles.Directions import Directions
-from Projectiles.ProjectileSuperClass import ProjectileSuperClass
+from Model.Agents.Directions import Directions
+from Model.Projectiles.ProjectileSuperClass import ProjectileSuperClass
 
 
 class SimpleAgentBullet(ProjectileSuperClass):
@@ -14,11 +14,11 @@ class SimpleAgentBullet(ProjectileSuperClass):
       
         self.statPos(currentAgent)
         self.currentAgent = currentAgent
-        self.direction = startDir(currentAgent)
+        self.direction = self.startDir(currentAgent)
         self.id = uuid.uuid4()
 
     def isPlayerBullet(self):
-        return currentAgent.isPlayer()
+        return self.currentAgent.isPlayer()
     
     def startDir(self, currentAgent):
         if currentAgent.isPlayer():
