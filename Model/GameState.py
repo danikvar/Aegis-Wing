@@ -33,7 +33,6 @@ class GameState:
         self.max_enemies_at_any_given_time = max_enemies_at_one_time
         self.current_player_lives = player_lives
         self.current_agents = [] #list of AgentInterface Objects
-        self.bullet_agents = []
         self.current_projectiles = []
         self.isPlayerAdded = False
 
@@ -88,7 +87,7 @@ class GameState:
         :return: {bool} True if successfully added, false otherwise
         '''
 
-        # empty agent list
+        # empty agent list This code was just copied and does nothing for logic of the game
         if len(self.current_agents) == 0:
             # enforce that player agent is first element, so don't add enemies first
             if agent.isPlayer == False:
