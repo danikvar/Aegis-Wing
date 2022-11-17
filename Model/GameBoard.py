@@ -70,12 +70,12 @@ class GameBoard:
 
 
     def setUpBlankBoard(self) -> None:
-       '''
-       Creates a board represented as a 2D array where all
-       values inside each inner list is 0 and sets the .baoard_array
-       attribute to it
-       :return: {list[list[int]]} A 2D array of list
-       '''
+        '''
+        Creates a board represented as a 2D array where all
+        values inside each inner list is 0 and sets the .baoard_array
+        attribute to it
+        :return: {list[list[int]]} A 2D array of list
+        '''
 
         board_2d_array = []
         
