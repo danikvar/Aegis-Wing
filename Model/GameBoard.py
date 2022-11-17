@@ -83,7 +83,7 @@ class GameBoard:
            any_row = []
            for j in range(0, self.board_length):
                any_row.append(0)
-               board_2d_array.append(any_row)
+           board_2d_array.append(any_row)
 
        self.board_array = board_2d_array
 
@@ -125,3 +125,4 @@ class GameBoard:
         board_str += x_axis_add_on
 
         return board_str
+
