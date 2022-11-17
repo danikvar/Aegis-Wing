@@ -726,10 +726,10 @@ class TestGameState(unittest.TestCase):
         #now have enemy exit board
         newState = newState.generateSuccessorState(1,LEFT)
         self.assertEquals(1,len(newState.current_agents))
-        #TODO tell team that first [] is row i.e. y value
         #check that where enemy was is empty again
-        self.assertEquals(0, newState.gameBoard.board_array[7][0])
+        self.assertEquals(0, newState.gameBoard.board_array[7][1])
 
+        print_board = True
         if print_board:
             print("Enemy has moved off board after LEFT action, \nshould no longer be visible at x=0,y=7")
             print(newState.gameBoard)
