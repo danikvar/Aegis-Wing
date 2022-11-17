@@ -5,9 +5,10 @@ This class defines shared methods between all agents.
 from Model.Agents.Actions import Actions
 from Model.Agents.AgentInterface import AgentInterface
 from Model.Agents.AgentSuperClass import AgentSuperClass
+from Model.Projectiles.ProjectileInterface import ProjectileInterface
 
 
-class ProjectileSuperClass(AgentSuperClass):
+class ProjectileSuperClass(ProjectileInterface):
     """
     This is the abstract class for all projectiles. It is extending the Agent
     super class.
@@ -37,21 +38,12 @@ class ProjectileSuperClass(AgentSuperClass):
         """
         self.direction = direction
 
-    def performAction(self,action: Actions) -> None:
-        """
-        Helper method to takeAction method that will be defined
-        by subclasses
-        :param action: {Actions} action taken
-        :return: None
-        """
-        if self.direction == Actions.UP: #moving up so going up one row
-            self.set_position(self.lowest_row + self.speed, self.least_col)
-        elif self.direction == Actions.DOWN:
-            self.set_position(self.lowest_row - self.speed, self.least_col)
-        elif self.direction == Actions.LEFT: # move left so move back one col, y - 1
-            self.set_position(self.lowest_row, self.least_col - self.speed)
-        elif self.direction == Actions.RIGHT:
-            self.set_position(self.lowest_row, self.least_col + self.speed)
-        #TODO maybe have a has fired attribute??
+    def isPlayer(self) -> bool:
+        raise RuntimeError("A Projectile type class cannot call method isPlayer, did you mean to call isPlayerBullet?")
+
+
+
+
+
 
 

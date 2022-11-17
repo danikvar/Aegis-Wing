@@ -188,3 +188,6 @@ class AgentSuperClass(AgentInterface):
             return agent_copy
         else:
             return self
+
+    def setHasMovedStatus(self, hasMoved: bool) -> None:
+        self.hasAlreadyMoved = hasMoved

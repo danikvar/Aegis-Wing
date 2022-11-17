@@ -164,6 +164,9 @@ class AgentInterface:
     def getId(self):
         raise NotImplementedError
 
+    def setHasMovedStatus(self, hasMoved: bool) -> None:
+        raise NotImplementedError
+
 
 
 
