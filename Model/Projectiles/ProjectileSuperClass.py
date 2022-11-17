@@ -29,7 +29,7 @@ class ProjectileSuperClass(AgentSuperClass):
         """
         self.speed = speed
         
-    def changeDirection(self, direction: Directions) -> None:
+    def changeDirection(self, direction: Actions) -> None:
         """
         Changes the direction that the projectile moves each turn.
         Will be used if we want to create complex projectiles
@@ -48,10 +48,10 @@ class ProjectileSuperClass(AgentSuperClass):
             self.set_position(self.lowest_row + self.speed, self.least_col)
         elif self.direction == Actions.DOWN:
             self.set_position(self.lowest_row - self.speed, self.least_col)
-        elif self.direction == Directions.LEFT: # move left so move back one col, y - 1
-            self.set_position(self.lowest_row, self.least_col - this.speed)
-        elif self.direction == Directions.RIGHT:
-            self.set_position(self.lowest_row, self.least_col + this.speed)
+        elif self.direction == Actions.LEFT: # move left so move back one col, y - 1
+            self.set_position(self.lowest_row, self.least_col - self.speed)
+        elif self.direction == Actions.RIGHT:
+            self.set_position(self.lowest_row, self.least_col + self.speed)
         #TODO maybe have a has fired attribute??
 
 
