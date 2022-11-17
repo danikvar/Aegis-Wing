@@ -3,6 +3,9 @@ from Model.Agents.AgentInterface import AgentInterface
 from Model.Agents.AgentSuperClass import AgentSuperClass
 from Model.Agents.PlayerAgent import PlayerAgent
 from Model.GameBoard import GameBoard
+from Model.Projectiles.ProjectileInterface import ProjectileInterface
+from Model.Projectiles.SimpleAgentBullet import SimpleAgentBullet
+
 
 class GameState:
     '''
@@ -87,9 +90,11 @@ class GameState:
 
         # empty agent list
         if len(self.current_agents) == 0:
-            print("WARNING: Player agent must be added first, no agent added")
-            return False
-            else: # adding player agent as first element
+            # enforce that player agent is first element, so don't add enemies first
+            if agent.isPlayer == False:
+                print("WARNING: Player agent must be added first, no agent added")
+                return False
+            else:  # adding player agent as first element
                 # check if player position is valid
                 if self.isValidAgent(agent):
                     self.current_agents.append(agent)
@@ -99,11 +104,11 @@ class GameState:
                     print(f"WARNING: Cannot place player is position ({agent.lowest_row, agent.least_col})")
                     return False
 
-        else: # length of list > 1 i.e. player already added
+        else:  # length of list > 1 i.e. player already added
             if agent.isPlayer() == True and self.isPlayerAdded == True:
                 print("WARNING: Player agent already added, cannot add more player agents")
                 return False
-            else: # if enemy agent, check we don't add more than allowed at one state
+            else:  # if enemy agent, check we don't add more than allowed at one state
                 current_amt_enemies = len(self.current_agents) - 1
                 if (current_amt_enemies < self.max_enemies_at_any_given_time):
                     # now we check that enemy doesn't spawn inside player agent
@@ -113,8 +118,9 @@ class GameState:
                     print("WARNING: Cannot exceed enemy agent limit, agent not added")
                     return False
 
+
     def decrement_turn(self):
-        self.turns_left -= 1
+            self.turns_left -= 1
 
     def set_turn(self, turns_left: int) -> None:
         if turns_left < 0:
@@ -319,7 +325,7 @@ class GameState:
 
         if action in all_legal_agent_actions:
             if action == Actions.FIRE:
-                newBullet = SimpleAgentBullet(
+                newBullet = SimpleAgentBullet()
                 successor_state.bullet_agents.append(newBullet)
             successor_state.current_agents[agentIndex] = current_agent.take_action(action)
 

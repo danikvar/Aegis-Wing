@@ -140,6 +140,7 @@ class AgentSuperClass(AgentInterface):
             self.set_position(self.lowest_row, self.least_col - 1)
         elif action == Actions.RIGHT:
             self.set_position(self.lowest_row, self.least_col + 1)
+
         #TODO maybe have a has fired attribute??
 
     def is_overlapping_other_agent(self, other_agent: AgentInterface) -> bool:

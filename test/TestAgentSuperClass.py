@@ -2,9 +2,8 @@ import unittest
 
 from Model.Agents.Actions import Actions
 from Model.Agents.AgentSuperClass import AgentSuperClass
-from Model.Agents.PlayerAgent import PlayerAgent
 
-
+#
 class AgentSuperClassTest(unittest.TestCase):
     def setUp(self) -> None:
         self.a1 = AgentSuperClass()
