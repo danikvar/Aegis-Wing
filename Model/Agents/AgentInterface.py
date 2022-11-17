@@ -1,4 +1,5 @@
-from Agents.Actions import Actions
+from Model.Agents.Actions import Actions
+
 
 class AgentInterface:
 
@@ -161,6 +162,9 @@ class AgentInterface:
         raise NotImplementedError
 
     def getId(self):
+        raise NotImplementedError
+
+    def setHasMovedStatus(self, hasMoved: bool) -> None:
         raise NotImplementedError
 
 

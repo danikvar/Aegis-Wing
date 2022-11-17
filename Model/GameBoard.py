@@ -1,4 +1,6 @@
 from Model.Agents.AgentInterface import AgentInterface
+from Model.Projectiles.ProjectileInterface import ProjectileInterface
+from Model.Projectiles.ProjectileSuperClass import ProjectileSuperClass
 
 
 class GameBoard:
@@ -43,7 +45,7 @@ class GameBoard:
         """
         return (self.min_col, self.board_max_x_boundary, self.min_row, self.board_max_y_boundary)
 
-    def populate_board(self, agentIndex: int, agent: AgentInterface):
+    def populate_board_with_agents(self, agentIndex: int, agent: AgentInterface):
         """
         Add numbers that represent agents on board. Does not check
         if agents are beyond board or if agents clash. This is done by gameState class.
@@ -68,6 +70,22 @@ class GameBoard:
                             else:
                                 self.board_array[eachRowIndex][eachColIndex] = agentIndex
 
+    def populate_board_with_projectiles(self, bullet: ProjectileInterface):
+        bullet_row_min, bullet_row_max = bullet.get_row_boundaries()
+        bullet_col_min, bullet_col_max = bullet.get_col_boundaries()
+
+        for eachRowIndex in range(len(self.board_array)):
+            if eachRowIndex >= bullet_row_min and eachRowIndex <= bullet_row_max:
+                for eachColIndex in range(len(self.board_array[eachRowIndex])):
+                    if eachColIndex >= bullet_col_min and eachColIndex <= bullet_col_max:
+                        if bullet.isPlayerBullet() == True:
+                            self.board_array[eachRowIndex][eachColIndex] = -1
+                        if bullet.isPlayerBullet() == False:
+                            self.board_array[eachRowIndex][eachColIndex] = -2 #force value to be 2
+
+
+
+
 
     def setUpBlankBoard(self) -> None:
         '''
@@ -77,16 +95,15 @@ class GameBoard:
         :return: {list[list[int]]} A 2D array of list
         '''
 
-        board_2d_array = []
-        
-        for i in range(0, self.board_height): # amount of rows
-            any_row = []
-            for j in range(0, self.board_length): # amount of columns
-                any_row.append(0)
-                
-            board_2d_array.append(any_row)
-        
-        self.board_array = board_2d_array
+       board_2d_array: list = []
+
+       for i in range(0, self.board_height):
+           any_row = []
+           for j in range(0, self.board_length):
+               any_row.append(0)
+           board_2d_array.append(any_row)
+
+       self.board_array = board_2d_array
 
     def __str__(self):
         '''
@@ -126,3 +143,4 @@ class GameBoard:
         board_str += x_axis_add_on
 
         return board_str
+

@@ -3,6 +3,10 @@ from Model.Agents.AgentInterface import AgentInterface
 from Model.Agents.AgentSuperClass import AgentSuperClass
 from Model.Agents.PlayerAgent import PlayerAgent
 from Model.GameBoard import GameBoard
+from Model.Projectiles.ProjectileInterface import ProjectileInterface
+from Model.Projectiles.ProjectileSuperClass import ProjectileSuperClass
+from Model.Projectiles.SimpleAgentBullet import SimpleAgentBullet
+
 
 class GameState:
     '''
@@ -30,7 +34,6 @@ class GameState:
         self.max_enemies_at_any_given_time = max_enemies_at_one_time
         self.current_player_lives = player_lives
         self.current_agents = [] #list of AgentInterface Objects
-        self.bullet_agents = []
         self.current_projectiles = []
         self.isPlayerAdded = False
 
@@ -85,11 +88,13 @@ class GameState:
         :return: {bool} True if successfully added, false otherwise
         '''
 
-        # empty agent list
+        # empty agent list This code was just copied and does nothing for logic of the game
         if len(self.current_agents) == 0:
-            print("WARNING: Player agent must be added first, no agent added")
-            return False
-            else: # adding player agent as first element
+            # enforce that player agent is first element, so don't add enemies first
+            if agent.isPlayer == False:
+                print("WARNING: Player agent must be added first, no agent added")
+                return False
+            else:  # adding player agent as first element
                 # check if player position is valid
                 if self.isValidAgent(agent):
                     self.current_agents.append(agent)
@@ -99,11 +104,11 @@ class GameState:
                     print(f"WARNING: Cannot place player is position ({agent.lowest_row, agent.least_col})")
                     return False
 
-        else: # length of list > 1 i.e. player already added
+        else:  # length of list > 1 i.e. player already added
             if agent.isPlayer() == True and self.isPlayerAdded == True:
                 print("WARNING: Player agent already added, cannot add more player agents")
                 return False
-            else: # if enemy agent, check we don't add more than allowed at one state
+            else:  # if enemy agent, check we don't add more than allowed at one state
                 current_amt_enemies = len(self.current_agents) - 1
                 if (current_amt_enemies < self.max_enemies_at_any_given_time):
                     # now we check that enemy doesn't spawn inside player agent
@@ -113,8 +118,9 @@ class GameState:
                     print("WARNING: Cannot exceed enemy agent limit, agent not added")
                     return False
 
+
     def decrement_turn(self):
-        self.turns_left -= 1
+            self.turns_left -= 1
 
     def set_turn(self, turns_left: int) -> None:
         if turns_left < 0:
@@ -139,6 +145,38 @@ class GameState:
         else:
             return False
 
+    def checkBulletAgentClashes(self):
+        for i in range(len(self.current_projectiles)):
+            each_bullet: ProjectileSuperClass = self.current_projectiles[i]
+            for j in range(len(self.current_agents)):
+                each_agent: AgentInterface = self.current_agents[j]
+                if each_bullet.get_hp() > 0 and each_bullet.didHitAgent(each_agent):
+                    each_bullet.set_hp(each_bullet.get_hp() - 1)
+                    each_agent.set_hp(each_agent.get_hp() - 1)
+
+    def haveAllAgentsMoved(self) -> bool:
+        for each in self.current_agents:
+            each_agent: AgentInterface = each
+            if each_agent.hasMoved() == False:
+                return False
+
+        return True
+
+
+    def removeBullets(self):
+        bullets_to_remove = []
+
+        for each in self.current_projectiles:
+            each_bullet: ProjectileInterface = each
+            if each_bullet.get_hp() <= 0:
+                bullets_to_remove.append(each_bullet)
+
+        for bullet in bullets_to_remove:
+            each_bullet: ProjectileInterface = bullet
+            self.current_projectiles.remove(each_bullet)
+
+
+
     def checkPlayerAgentClashes(self):
         """
         Checks for if player clashes with enemy agents and adjusts
@@ -160,6 +198,7 @@ class GameState:
                 player_agent.set_hp(player_agent.get_hp() - 1)
                 enemy_agent.set_hp(enemy_agent.get_hp() - 1)
 
+        #TODO test case where playern and enemy right next to each other then move past each other, this should cause a hit
     def updateAgentsList(self):
         """
         update the agents list. If player health = 0, remove them
@@ -228,7 +267,10 @@ class GameState:
         self.gameBoard.setUpBlankBoard()
 
         for i in range(len(self.current_agents)):
-            self.gameBoard.populate_board(i + 1, self.current_agents[i])
+            self.gameBoard.populate_board_with_agents(i + 1, self.current_agents[i])
+
+        for j in range(len(self.current_projectiles)):
+            self.gameBoard.populate_board_with_projectiles(self.current_projectiles[j])
 
         #for loop for bullet list
         #if bullet is player bullet
@@ -310,6 +352,16 @@ class GameState:
 
         return copy
 
+    def moveAllProjectiles(self):
+        for i in range(len(self.current_projectiles)):
+            current_bullet: ProjectileSuperClass = self.current_projectiles[i]
+            bullet_action = current_bullet.autoPickAction()
+            #TODO test this makes deepcopy
+            bullet_after_move = current_bullet.performAction(bullet_action)
+            #replace bullet with bullet at new position
+            self.current_projectiles[i] = bullet_after_move
+
+
 
     def generateSuccessorState(self, agentIndex: int, action: Actions):
 
@@ -319,9 +371,15 @@ class GameState:
 
         if action in all_legal_agent_actions:
             if action == Actions.FIRE:
-                newBullet = SimpleAgentBullet(
-                successor_state.bullet_agents.append(newBullet)
-            successor_state.current_agents[agentIndex] = current_agent.take_action(action)
+                newBullet = SimpleAgentBullet(current_agent)
+                successor_state.current_projectiles.append(newBullet)
+                current_agent: AgentInterface = successor_state.current_agents[agentIndex]
+                current_agent.setHasMovedStatus(True)
+            else:
+                successor_state.current_agents[agentIndex] = current_agent.take_action(action)
+
+        if successor_state.haveAllAgentsMoved() == True:
+            successor_state.checkBulletAgentClashes()
 
         #after action check if player has clashed with any enemy agents
         successor_state.checkPlayerAgentClashes()
@@ -338,8 +396,8 @@ class GameState:
             each_agent: AgentInterface = self.current_agents[each_index]
             each_agent.resetMoveStatus()
             
-        for each_index in range(len(self.bullet_agents)):
-            each_bullet: ProjectileInterface = self.bullet_agents[each_index]
+        for each_index in range(len(self.current_projectiles)):
+            each_bullet: ProjectileInterface = self.current_projectiles[each_index]
             each_bullet.resetMoveStatus()
 
 

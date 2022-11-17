@@ -252,7 +252,7 @@ class TestGameState(unittest.TestCase):
         # TODO Ramzi_iter_1 show team
 
         # set to true to see board
-        print_board = True
+        print_board = False
 
         valid_p1 = PlayerAgent(1,1,5,5)
         valid_enemy_1 = SimpleGoLeftAgent(5, 6)
@@ -288,7 +288,7 @@ class TestGameState(unittest.TestCase):
         #TODO Ramzi_iter_1 show team
 
         # set to true to print board
-        print_board =True
+        print_board = False
 
         valid_p1 = PlayerAgent(1,2,8,0)
         self.gamestateInit.addAgent(valid_p1)
@@ -596,7 +596,7 @@ class TestGameState(unittest.TestCase):
         :return:
         """
         # set to true to print board to terminal/console for visual aid
-        print_board = False
+        print_board = True
 
         state = self.gamestateInit
         #agent in bottom corner, should not be able to move down or left
@@ -726,9 +726,8 @@ class TestGameState(unittest.TestCase):
         #now have enemy exit board
         newState = newState.generateSuccessorState(1,LEFT)
         self.assertEquals(1,len(newState.current_agents))
-        #TODO tell team that first [] is row i.e. y value
         #check that where enemy was is empty again
-        self.assertEquals(0, newState.gameBoard.board_array[7][0])
+        self.assertEquals(0, newState.gameBoard.board_array[7][1])
 
         if print_board:
             print("Enemy has moved off board after LEFT action, \nshould no longer be visible at x=0,y=7")

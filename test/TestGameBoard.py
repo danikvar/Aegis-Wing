@@ -111,9 +111,9 @@ class TestGameBoard(unittest.TestCase):
         dict_agents[enemy_2] = 3
 
         # add them to the board_array
-        self.board.populate_board(dict_agents[player],player)
-        self.board.populate_board(dict_agents[enemy_1], enemy_1)
-        self.board.populate_board(dict_agents[enemy_2], enemy_2)
+        self.board.populate_board_with_agents(dict_agents[player], player)
+        self.board.populate_board_with_agents(dict_agents[enemy_1], enemy_1)
+        self.board.populate_board_with_agents(dict_agents[enemy_2], enemy_2)
 
         if print_board:
             print("Board from test_populate_board ")
