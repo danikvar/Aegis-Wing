@@ -17,7 +17,7 @@ class SimpleGoLeftAgent(AgentSuperClass):
     def isPlayer(self):
         return False
 
-    def copy(self):
+    def deepcopy(self):
         copy = SimpleGoLeftAgent(self.lowest_row, self.least_col)
         copy.hasAlreadyMoved = self.hasAlreadyMoved
         copy.id = self.id

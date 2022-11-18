@@ -114,7 +114,7 @@ class AgentInterface:
         """
         raise NotImplementedError
 
-    def copy(self):
+    def deepcopy(self):
         """
         Returns a deepcopy of the agent
         :return: {AgentInterface} a copy of the current agent

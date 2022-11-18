@@ -27,7 +27,7 @@ class PlayerAgent(AgentSuperClass):
         """
         return True
 
-    def copy(self):
+    def deepcopy(self):
         """
         Need this to be shallow copy??. This is a helper method
         to takeAction method.

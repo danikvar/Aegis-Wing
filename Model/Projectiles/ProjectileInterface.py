@@ -1,3 +1,4 @@
+from Model.Agents.Actions import Actions
 from Model.Agents.AgentInterface import AgentInterface
 from Model.Agents.AgentSuperClass import AgentSuperClass
 from Model.Agents.Directions import Directions
@@ -9,7 +10,7 @@ class ProjectileInterface(AgentSuperClass):
     This interface mandates all methods that must be
     implemented by any subtype. The methods must be defined
     by the subtype. Most of these methods will be defined
-    in the AgentSuperClass
+    in the ProjectileSuperClass.
     '''
     
     def isPlayerBullet(self) -> bool:
@@ -20,4 +21,24 @@ class ProjectileInterface(AgentSuperClass):
         raise NotImplementedError
 
     def didHitAgent(self,agent: AgentInterface) -> bool:
+        """
+        This method returns true is the bullet overlaps the agent
+        passed in as param.
+        :param agent:
+        :return:
+        """
+        raise NotImplementedError
+
+    def getSpeed(self) -> int:
+        """
+        Returns the speed of the bullet
+        :return:
+        """
+        raise NotImplementedError
+
+    def getCurrentDirection(self) -> Actions:
+        """
+        Returns the currentDirection of the bullet
+        :return:
+        """
         raise NotImplementedError

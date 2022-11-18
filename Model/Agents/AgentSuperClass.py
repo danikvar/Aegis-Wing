@@ -182,7 +182,7 @@ class AgentSuperClass(AgentInterface):
 
     def take_action(self, action: Actions):
         if action in self.get_all_possible_raw_actions():
-            agent_copy = self.copy()
+            agent_copy = self.deepcopy()
             agent_copy.performAction(action)
             agent_copy.hasAlreadyMoved = True
             return agent_copy

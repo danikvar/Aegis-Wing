@@ -11,13 +11,21 @@ from Model.Projectiles.ProjectileInterface import ProjectileInterface
 class ProjectileSuperClass(ProjectileInterface):
     """
     This is the abstract class for all projectiles. It is extending the Agent
-    super class.
+    super class and implementing the AgentInterface.
     """
 
     def __init__(self, direction: Actions, projectile_length=1, projectile_height=1, lowest_row=0, least_col=0, hp=1,
                 speed = 1):
 
         super().__init__(projectile_length, projectile_height, lowest_row, least_col, hp)
+
+        if speed <= 0:
+            raise ValueError("Speed of the prohectile cannot be less than 1")
+
+        #bullet should not be able to fire or stop, it must keep moving
+        if direction == Actions.FIRE or direction == Actions.STOP:
+            raise ValueError
+
         self.speed = speed
         self.direction = direction
 
@@ -41,6 +49,11 @@ class ProjectileSuperClass(ProjectileInterface):
     def isPlayer(self) -> bool:
         raise RuntimeError("A Projectile type class cannot call method isPlayer, did you mean to call isPlayerBullet?")
 
+    def getSpeed(self) -> int:
+        return self.speed
+
+    def getCurrentDirection(self) -> Actions:
+        return self.direction
 
 
 

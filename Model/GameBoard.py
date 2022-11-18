@@ -79,9 +79,9 @@ class GameBoard:
                 for eachColIndex in range(len(self.board_array[eachRowIndex])):
                     if eachColIndex >= bullet_col_min and eachColIndex <= bullet_col_max:
                         if bullet.isPlayerBullet() == True:
-                            self.board_array[eachRowIndex][eachColIndex] = -1
+                            self.board_array[eachRowIndex][eachColIndex] = "X"
                         if bullet.isPlayerBullet() == False:
-                            self.board_array[eachRowIndex][eachColIndex] = -2 #force value to be 2
+                            self.board_array[eachRowIndex][eachColIndex] = "B" #force value to be 2
 
 
 
@@ -120,7 +120,12 @@ class GameBoard:
             temp += "\u0332" + " "
             current_row_list = self.board_array[row]
             for col in range(len(current_row_list)): # amount of col or x's
-                temp += "\u0332" + (str(current_row_list[col]))
+                string_add = None
+                if type(current_row_list[col]) == int:
+                    string_add = str(current_row_list[col])
+                else:
+                    string_add = current_row_list[col]
+                temp += "\u0332" + (string_add)
                 temp += "\u0332" + " "
                 temp += "|"
                 if col < len(current_row_list) - 1:

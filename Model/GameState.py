@@ -347,8 +347,11 @@ class GameState:
         #copy agents over
         for each in self.current_agents:
             each_agent: AgentInterface = each
-            copy.addAgent(each_agent.copy())
-        #copy bullets over??
+            copy.addAgent(each_agent.deepcopy())
+
+        for each_b in self.current_projectiles:
+            each_bullet : ProjectileInterface = each_b
+            copy.current_projectiles.append(each_bullet.deepcopy())
 
         return copy
 
@@ -378,6 +381,7 @@ class GameState:
             else:
                 successor_state.current_agents[agentIndex] = current_agent.take_action(action)
 
+        # if all agents have moved then check for clashes
         if successor_state.haveAllAgentsMoved() == True:
             successor_state.checkBulletAgentClashes()
 
