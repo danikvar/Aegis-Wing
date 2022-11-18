@@ -3,6 +3,7 @@ import unittest
 from Model.Agents.Actions import Actions
 from Model.Agents.AgentInterface import AgentInterface
 from Model.Agents.AgentSuperClass import AgentSuperClass
+from Model.Agents.EnemyAgentBasicFireAndMove import EnemyAgentBasicFireAndMove
 from Model.Agents.PlayerAgent import PlayerAgent
 from Model.Agents.SimpleGoLeftAgent import SimpleGoLeftAgent
 from Model.GameState import GameState
@@ -734,6 +735,188 @@ class TestGameState(unittest.TestCase):
             print(newState.gameBoard)
             print("-" * 40 + "\n")
             print("/****** END OF test_gen_successor_state_enemy_incoming_and_outbound *****/\n")
+
+    def test_generateSuccessorState_edge_case_player_enemy_next_to_each_other(self):
+        # set to true to print board to terminal/console for visual aid
+        print_board = False
+
+        state = self.gamestateInit
+
+        # make a player and add it
+        player = PlayerAgent(1, 1, 5, 5)
+        state.addAgent(player)
+
+        enemy_1 = SimpleGoLeftAgent(5, 6)
+        # this should be allowed
+        state.addAgent(enemy_1)
+        # initial state so need to update board to reflect added agents
+        state.update_board()
+
+        newState = state.generateSuccessorState(0, Actions.RIGHT)
+        self.assertEquals(True, newState.isLose())
+        #newState = newState.generateSuccessorState(1,Actions.LEFT)
+        #newState.update_board()
+        #print(newState.gameBoard)
+
+
+
+    def test_generateSuccessorState_player_fires_SimpleAgentBullet_diff_speeds(self):
+        """
+        Test that a player taking the action Actions.Fire will add
+        a player bullet to the self.curent_projectiles list.
+        Speed of SimpleBulletAgent = 1
+        :return:
+        """
+        #set to true to see game board visualization
+
+        print_board = True
+        state = self.gamestateInit
+
+        # make a player and add it
+        player = PlayerAgent(1, 1, 0, 0)
+        state.addAgent(player)
+
+        newState = state.generateSuccessorState(0,Actions.FIRE)
+        newState.update_board()
+        self.assertEquals(1,len(newState.current_projectiles))
+
+        if print_board:
+            print("Key:\nPlayer = 1\nPlayer Bullet = X")
+            print(newState.gameBoard)
+
+    def test_generateSuccessorState_enemy_fires_SimpleAgentBullet_s1(self):
+        """
+        Test that an enemy taking the action Actions.Fire will add
+        a player bullet to the self.current_projectiles list.
+        Speed of SimpleBulletAgent = 1
+        :return:
+        """
+        #set to true to see game board visualization
+
+        print_board = True
+        state = self.gamestateInit
+
+        # make a player and add it
+        player = PlayerAgent(1, 1, 0, 0)
+        state.addAgent(player)
+        enemy = EnemyAgentBasicFireAndMove(5,9)
+        state.addAgent(enemy)
+
+        newState = state.generateSuccessorState(1,Actions.FIRE)
+        newState.update_board()
+        self.assertEquals(1,len(newState.current_projectiles))
+
+        if print_board:
+            print("Key:\nPlayer = 1\nEnemy > 1\nPlayer Bullet = X, Enemy Bullet = B")
+            print(newState.gameBoard)
+
+    def test_moveAllProjectiles(self):
+        """
+        Testing moving simple projectiles
+        :return:
+        """
+        print_board = True
+        state = self.gamestateInit
+
+        # make a player and add it
+        player = PlayerAgent(1, 1, 0, 0)
+        state.addAgent(player)
+        enemy = EnemyAgentBasicFireAndMove(5, 9)
+        state.addAgent(enemy)
+
+        newState = state.generateSuccessorState(0, Actions.FIRE)
+        newState = newState.generateSuccessorState(1,Actions.FIRE)
+        newState = newState.moveAllProjectiles()
+        newState.update_board()
+
+        self.assertEquals(2, len(newState.current_projectiles))
+        self.assertEquals((0,2), newState.current_projectiles[0].get_position())
+        self.assertEquals((5,7), newState.current_projectiles[1].get_position())
+
+        if print_board:
+            print(newState.gameBoard)
+
+    def test_moveProjectiles_in_gamestate(self):
+        print_board = True
+        state = self.gamestateInit
+
+        # make a player and add it
+        player = PlayerAgent(1, 1, 0, 0)
+        state.addAgent(player)
+        enemy = EnemyAgentBasicFireAndMove(5, 9)
+        state.addAgent(enemy)
+
+        newState = state.generateSuccessorState(0, Actions.FIRE)
+        newState = newState.generateSuccessorState(1, Actions.FIRE)
+        self.assertEquals((0, 1), newState.current_projectiles[0].get_position())
+        self.assertEquals((5, 8), newState.current_projectiles[1].get_position())
+        newState.reset_agents_move_status()
+
+        # the projectiles should have moved
+        newState = newState.generateSuccessorState(0,Actions.STOP)
+        self.assertEquals((0, 2), newState.current_projectiles[0].get_position())
+        self.assertEquals((5, 7), newState.current_projectiles[1].get_position())
+        newState = newState.generateSuccessorState(1,Actions.LEFT)
+
+        if print_board:
+            print(newState.gameBoard)
+
+    def test_checkBulletAgentClashes(self):
+        """
+        1 player fires bullet, 1 enemy approaches bullet
+        bullet hits enemy
+        :return:
+        """
+        print_board = True
+        state = self.gamestateInit
+
+        # make a player and add it
+        player = PlayerAgent(1, 1, 5, 0)
+        state.addAgent(player)
+        enemy = SimpleGoLeftAgent(5, 9)
+        state.addAgent(enemy)
+        newState = state.generateSuccessorState(0,Actions.FIRE)
+        newState.reset_agents_move_status()
+
+        for i in range(4):
+            newState = newState.generateSuccessorState(0, Actions.STOP)
+            newState = newState.generateSuccessorState(1, Actions.LEFT)
+            newState.reset_agents_move_status()
+
+        if print_board:
+            print(newState.gameBoard)
+
+        self.assertEquals(1, len(newState.current_agents))
+        self.assertEquals(0,len(newState.current_projectiles))
+
+    def test_checkBulletAgentClashesFlyBy(self):
+        """
+        1 player fires bullet, 1 enemy approaches bullet
+        bullet hits enemy
+        :return:
+        """
+        print_board = True
+        state = self.gamestateInit
+
+        # make a player and add it
+        player = PlayerAgent(1, 1, 5, 0)
+        state.addAgent(player)
+        enemy = SimpleGoLeftAgent(5, 8)
+        state.addAgent(enemy)
+        newState = state.generateSuccessorState(0,Actions.FIRE)
+        newState.reset_agents_move_status()
+
+        for i in range(4):
+            newState = newState.generateSuccessorState(0, Actions.STOP)
+            newState = newState.generateSuccessorState(1, Actions.LEFT)
+            newState.reset_agents_move_status()
+
+        if print_board:
+            print(newState.gameBoard)
+
+        self.assertEquals(1, len(newState.current_agents))
+        self.assertEquals(0,len(newState.current_projectiles))
+
 
 
 def main():

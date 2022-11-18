@@ -213,3 +213,36 @@ class TestSimpleAgentBullet(unittest.TestCase):
 
         self.assertTrue(enemy_bullet.didHitAgent(player_in_range_1))
         self.assertTrue(enemy_bullet.didHitAgent(player_in_range_2))
+
+    def test_performAction(self):
+        """
+        Testing the movement is accurate even with speed > 1
+        :return:
+        """
+
+        player = PlayerAgent(1, 1, 5, 0)
+        #position should be at row=5, col=1
+        player_bullet_s1 = SimpleAgentBullet(player, speed=1)
+        self.assertEqual((5,1), player_bullet_s1.get_position())
+        s1_after_move = player_bullet_s1.take_action(Actions.RIGHT)
+        self.assertEqual((5,2),s1_after_move.get_position())
+
+        #now try with bullet w/ speed > 1
+        player_bullet_s2 = SimpleAgentBullet(player,speed=2)
+        self.assertEqual((5,2), player_bullet_s2.get_position())
+        s2_after_move = player_bullet_s2.take_action(Actions.RIGHT)
+        self.assertEqual((5,4), s2_after_move.get_position())
+
+        #--------Same situation but using enemy agent----------#
+        enemy_prime = SimpleGoLeftAgent(5, 9)
+        enemy_bullet = SimpleAgentBullet(enemy_prime, speed=1)
+        self.assertEqual((5,8),enemy_bullet.get_position())
+        e1_after_move = enemy_bullet.take_action(Actions.LEFT)
+        self.assertEqual((5,7), e1_after_move.get_position())
+
+        e_b2 = SimpleAgentBullet(enemy_prime, speed=2)
+        self.assertEqual((5,7), e_b2.get_position())
+        e_b2_after_move = e_b2.take_action(Actions.LEFT)
+        self.assertEqual((5,5), e_b2_after_move.get_position())
+
+

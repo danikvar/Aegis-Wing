@@ -64,6 +64,7 @@ class SimpleAgentBullet(ProjectileSuperClass):
         copy.least_col = self.least_col
         copy.lowest_row = self.lowest_row
         copy.agent_is_player_flag = self.agent_is_player_flag
+        copy.all_possible_raw_actions = self.all_possible_raw_actions
         copy.direction = self.direction
         return copy
 
@@ -138,7 +139,9 @@ class SimpleAgentBullet(ProjectileSuperClass):
                     break
 
         else:
-            if self.is_overlapping_other_agent(agent):
+            copy_one_col_back = self.deepcopy()
+            copy_one_col_back.least_col = self.least_col-1
+            if self.is_overlapping_other_agent(agent) or copy_one_col_back.is_overlapping_other_agent(agent):
                 hit_flag = True
 
         return hit_flag
