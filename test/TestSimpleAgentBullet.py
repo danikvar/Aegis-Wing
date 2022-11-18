@@ -246,3 +246,8 @@ class TestSimpleAgentBullet(unittest.TestCase):
         self.assertEqual((5,5), e_b2_after_move.get_position())
 
 
+def main():
+    unittest.main(verbosity=3)
+
+if __name__ == '__main__':
+    main()

@@ -97,3 +97,8 @@ class TestProjectilesSuperClass(unittest.TestCase):
         self.assertEqual(1, len(newState.current_agents))
 
 
+def main():
+    unittest.main(verbosity=3)
+
+if __name__ == '__main__':
+    main()
