@@ -1,3 +1,4 @@
+#encoding: utf-8
 import unittest
 
 from Model.Agents.Actions import Actions
@@ -7,9 +8,6 @@ from Model.Agents.SimpleGoLeftAgent import SimpleGoLeftAgent
 from Model.Agents.EnemyMoveFireHeuristicAgent import EnemyMoveFireHeuristicAgent
 from Model.GameState import GameState
 import sys
-import codecs
-
-#branch_2
 
 class TestGameStateGameExamples(unittest.TestCase):
     def setUp(self) -> None:
@@ -118,7 +116,7 @@ class TestGameStateGameExamples(unittest.TestCase):
 
         enemy_1 = EnemyMoveFireHeuristicAgent(3, 3)
         #row 1, col = 7
-        enemy_2 = EnemyMoveFireHeuristicAgent(1, 7)
+        enemy_2 = EnemyMoveFireHeuristicAgent(7, 7)
 
         # add agents
         state.addAgent(enemy_1)

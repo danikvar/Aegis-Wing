@@ -1,8 +1,7 @@
 from Model.Agents.Actions import Actions
-#from Model.GameState import GameState
+
 
 class AgentInterface:
-
     '''
     This interface mandates all methods that must be
     implemented by any subtype. The methods must be defined
@@ -92,14 +91,14 @@ class AgentInterface:
         """
         raise NotImplementedError
 
-    def get_hp(self)-> int:
+    def get_hp(self) -> int:
         """
         Returns the amount of hp an agent has
         :return: {int} hp of the agent
         """
         raise NotImplementedError
 
-    def set_hp(self, new_hp: int)->None:
+    def set_hp(self, new_hp: int) -> None:
         """
         Sets the current hp of an agent
         :param new_hp: {int} the new hp of the agent
@@ -121,7 +120,6 @@ class AgentInterface:
         """
         raise NotImplementedError
 
-
     def take_action(self, action: Actions):
         """
         Returns a copy of the current agent with the same length and width
@@ -139,19 +137,19 @@ class AgentInterface:
         """
         raise NotImplementedError
 
-    #TODO write tests
-    def autoPickAction(self, state = None) -> Actions:
+    # TODO write tests
+    def autoPickAction(self, state=None) -> Actions:
         """
         The agent will choose an action based off of user defined
         algorithm.
         :return: {None}
         """
-        #TODO Perhaps include a behavior parameter or let behavior be
+        # TODO Perhaps include a behavior parameter or let behavior be
         # defined in class??
         raise NotImplementedError
 
-    #TODO write tests
-    def hasMoved(self)-> bool:
+    # TODO write tests
+    def hasMoved(self) -> bool:
         """
         Returns true if action was already taken, false otherwise
         :return: {bool} True if already took actions, false otherwise
@@ -169,7 +167,3 @@ class AgentInterface:
 
     def isHeuristicAgent(self) -> bool:
         raise NotImplementedError
-
-
-
-
