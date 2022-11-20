@@ -396,7 +396,7 @@ class GameState:
         if successor_state.haveAllAgentsMoved() == True:
             successor_state.checkBulletAgentClashes()
             successor_state.removeBullets()
-            successor_state.reset_agents_move_status()
+            #successor_state.reset_agents_move_status()
 
         #after action check if player has clashed with any enemy agents
         successor_state.checkPlayerAgentClashes()
