@@ -787,7 +787,7 @@ class TestGameState(unittest.TestCase):
     def test_generateSuccessorState_enemy_fires_SimpleAgentBullet_s1(self):
         """
         Test that an enemy taking the action Actions.Fire will add
-        a player bullet to the self.current_projectiles list.
+        a enemy bullet to the self.current_projectiles list.
         Speed of SimpleBulletAgent = 1
         :return:
         """
@@ -823,8 +823,13 @@ class TestGameState(unittest.TestCase):
         state.addAgent(player)
         enemy = EnemyAgentBasicFireAndMove(5, 9)
         state.addAgent(enemy)
+        state.update_board()
 
+        print(state.gameBoard)
+
+        #TODO RAMZI what if both enemy and player fire at the same "time"
         newState = state.generateSuccessorState(0, Actions.FIRE)
+        print(newState.gameBoard)
         newState = newState.generateSuccessorState(1,Actions.FIRE)
         newState = newState.moveAllProjectiles()
         newState.update_board()
@@ -846,11 +851,17 @@ class TestGameState(unittest.TestCase):
         enemy = EnemyAgentBasicFireAndMove(5, 9)
         state.addAgent(enemy)
 
+        #player fires
         newState = state.generateSuccessorState(0, Actions.FIRE)
+        # enemy fires
         newState = newState.generateSuccessorState(1, Actions.FIRE)
         self.assertEquals((0, 1), newState.current_projectiles[0].get_position())
         self.assertEquals((5, 8), newState.current_projectiles[1].get_position())
-        newState.reset_agents_move_status()
+
+        if print_board:
+            print("Player bullet should be at pos row=0, col=1")
+            print("Enemy bullet should be at pos row = 5, col=8")
+            print(newState.gameBoard)
 
         # the projectiles should have moved
         newState = newState.generateSuccessorState(0,Actions.STOP)
@@ -859,6 +870,8 @@ class TestGameState(unittest.TestCase):
         newState = newState.generateSuccessorState(1,Actions.LEFT)
 
         if print_board:
+            print("Player bullet should be at row=0, col=2")
+            print("Enemy bullet should be at row=5, col=5")
             print(newState.gameBoard)
 
     def test_checkBulletAgentClashes(self):
@@ -891,25 +904,32 @@ class TestGameState(unittest.TestCase):
 
     def test_checkBulletAgentClashesFlyBy(self):
         """
-        1 player fires bullet, 1 enemy approaches bullet
-        bullet hits enemy
+        1 enemy fires bullet, 1 player approaches bullet
+        bullet hits palyer
         :return:
         """
+        #TODO Ramzi fix test
         print_board = True
         state = self.gamestateInit
 
         # make a player and add it
         player = PlayerAgent(1, 1, 5, 0)
         state.addAgent(player)
-        enemy = SimpleGoLeftAgent(5, 8)
+        enemy = EnemyAgentBasicFireAndMove(5, 8)
         state.addAgent(enemy)
-        newState = state.generateSuccessorState(0,Actions.FIRE)
-        newState.reset_agents_move_status()
+        newState = state.generateSuccessorState(0, Actions.STOP)
+        #bullet originates at row=5, col=7
+        newState = newState.generateSuccessorState(1, Actions.FIRE)
 
-        for i in range(4):
+        for i in range(6):
             newState = newState.generateSuccessorState(0, Actions.STOP)
-            newState = newState.generateSuccessorState(1, Actions.LEFT)
-            newState.reset_agents_move_status()
+            #iter 0 bullet should now be at row=5, col=6
+            #iter 1 bullet should bet at col=5
+            newState = newState.generateSuccessorState(1, Actions.STOP)
+            #newState.update_board()
+            if print_board:
+                print(f"iter {i}")
+                print(newState.gameBoard)
 
         if print_board:
             print(newState.gameBoard)
