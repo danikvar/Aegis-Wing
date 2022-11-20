@@ -1,5 +1,5 @@
 from Model.Agents.Actions import Actions
-
+#from Model.GameState import GameState
 
 class AgentInterface:
 
@@ -140,7 +140,7 @@ class AgentInterface:
         raise NotImplementedError
 
     #TODO write tests
-    def autoPickAction(self) -> Actions:
+    def autoPickAction(self, state = None) -> Actions:
         """
         The agent will choose an action based off of user defined
         algorithm.
@@ -165,6 +165,9 @@ class AgentInterface:
         raise NotImplementedError
 
     def setHasMovedStatus(self, hasMoved: bool) -> None:
+        raise NotImplementedError
+
+    def isHeuristicAgent(self) -> bool:
         raise NotImplementedError
 
 

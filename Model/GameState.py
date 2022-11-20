@@ -9,6 +9,8 @@ from Model.Projectiles.SimpleAgentBullet import SimpleAgentBullet
 
 
 class GameState:
+
+
     '''
     This class represents any given state during the game
     It keeps track of:
@@ -36,6 +38,8 @@ class GameState:
         self.current_agents = [] #list of AgentInterface Objects
         self.current_projectiles = []
         self.isPlayerAdded = False
+        self.fireActions = [Actions.FIRE, Actions.FIRERIGHT, Actions.FIRELEFT,
+                            Actions.FIREDOWN, Actions.FIREUP]
 
 
     def addAgent(self, agent: AgentSuperClass) -> bool:
@@ -77,46 +81,34 @@ class GameState:
                 else:
                     print("WARNING: Cannot exceed enemy agent limit, agent not added")
                     return False
-                
-    def addProjectile(self, agent: AgentSuperClass) -> bool:
+
+    def getPlayerPos(self):
+        if len(self.current_agents) > 0:
+            playerAgent =  self.current_agents[0]
+            return playerAgent.get_position()
+        else:
+            print("WARNING: No player agent to return position from.")
+            return None
+
+    def getPlayer(self):
+        return self.current_agents[0]
+
+    def addProjectile(self, bullet: ProjectileSuperClass, agent: AgentSuperClass) -> bool:
         '''
-        Adds a projectile to the list of bulletagents. Player agent
-        MUST be first agent added. This does not care about agent
-        positions to allow for agents to come into board
-        from outside the boundary
-        :param agent: {Agent} adds an agent to list of current agents
+        Adds a projectile to the list of bulletagents. 
+        :param bullet: {ProjectileSuperClass} adds a projectile to list of current projectiles
         :return: {bool} True if successfully added, false otherwise
         '''
 
-        # empty agent list This code was just copied and does nothing for logic of the game
-        if len(self.current_agents) == 0:
-            # enforce that player agent is first element, so don't add enemies first
-            if agent.isPlayer == False:
-                print("WARNING: Player agent must be added first, no agent added")
-                return False
-            else:  # adding player agent as first element
-                # check if player position is valid
-                if self.isValidAgent(agent):
-                    self.current_agents.append(agent)
-                    self.isPlayerAdded = True
-                    return True
-                else:
-                    print(f"WARNING: Cannot place player is position ({agent.lowest_row, agent.least_col})")
-                    return False
 
-        else:  # length of list > 1 i.e. player already added
-            if agent.isPlayer() == True and self.isPlayerAdded == True:
-                print("WARNING: Player agent already added, cannot add more player agents")
-                return False
-            else:  # if enemy agent, check we don't add more than allowed at one state
-                current_amt_enemies = len(self.current_agents) - 1
-                if (current_amt_enemies < self.max_enemies_at_any_given_time):
-                    # now we check that enemy doesn't spawn inside player agent
-                    self.current_agents.append(agent)
-                    return True
-                else:
-                    print("WARNING: Cannot exceed enemy agent limit, agent not added")
-                    return False
+        if agent is not None:
+            playerBullet  = SimpleAgentBullet(agent)
+            self.current_projectiles.append(playerBullet)
+            return True
+        else:
+            #TODO: Create non agent projectiles.
+            return False
+            # this is for adding projectiles not related to agents
 
 
     def decrement_turn(self):
@@ -380,7 +372,20 @@ class GameState:
         current_agent: AgentInterface = successor_state.current_agents[agentIndex]
         all_legal_agent_actions = successor_state.getAllLegalActions(agentIndex)
 
-        if action in all_legal_agent_actions:
+        # TODO: TEST THIS --> IF IS HEURISTIC AGENT --> IF IT SHOOTS AND MOVES THEN MOVE FIRST
+        #  UPDATE AGENT AND THEN PASS UPDATED AGENT TO THE BULLET
+
+        if current_agent.isHeuristicAgent():
+            if action in all_legal_agent_actions:
+                movedAgent = current_agent.take_action(action)
+                successor_state.current_agents[agentIndex] = movedAgent
+                if action in self.fireActions:
+                    newBullet = SimpleAgentBullet(movedAgent)
+                    successor_state.current_projectiles.append(newBullet)
+                    current_agent: AgentInterface = successor_state.current_agents[agentIndex]
+                    current_agent.setHasMovedStatus(True)
+
+        elif action in all_legal_agent_actions:
             if action == Actions.FIRE:
                 newBullet = SimpleAgentBullet(current_agent)
                 successor_state.current_projectiles.append(newBullet)

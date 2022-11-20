@@ -7,5 +7,9 @@ class Actions(Enum):
     LEFT = 3
     RIGHT = 4
     FIRE = 5
+    FIREUP = 6
+    FIREDOWN = 7
+    FIRELEFT = 8
+    FIRERIGHT = 9
 
 

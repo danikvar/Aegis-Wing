@@ -147,5 +147,5 @@ class GameBoard:
 
         board_str += x_axis_add_on
 
-        return board_str
+        return board_str.encode('utf-8').decode("ascii", "ignore")
 
