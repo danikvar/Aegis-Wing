@@ -41,7 +41,7 @@ class AgentSuperClass(AgentInterface):
         '''
         Returns a tuple representing lowest left x position
         and lowest y position
-        :return: {tuple} (furthest left x post, highest y pos)
+        :return: {tuple} (furthest lowest y post, least x pos)
         '''
         return (self.lowest_row, self.least_col)
 
@@ -66,6 +66,13 @@ class AgentSuperClass(AgentInterface):
         '''
         Returns True if player agent, otherwise false. Only player agent needs to override this method
         :return: {bool} Returns True if player agent, otherwise false
+        '''
+        return False
+
+    def isHeuristicAgent(self) -> bool:
+        '''
+        Returns True if agent requires player as a variable
+        :return: {bool} Returns True if player variable requires updating, otherwise false
         '''
         return False
 
@@ -132,13 +139,13 @@ class AgentSuperClass(AgentInterface):
         :param action: {Actions} action taken
         :return: None
         """
-        if action == Actions.UP: #moving up so going up one row
+        if action in [Actions.UP, Actions.FIREUP]: #moving up so going up one row
             self.set_position(self.lowest_row + 1, self.least_col)
-        elif action == Actions.DOWN:
+        elif action in [Actions.DOWN, Actions.FIREDOWN]:
             self.set_position(self.lowest_row - 1, self.least_col)
-        elif action == Actions.LEFT: # move left so move back one col, y - 1
+        elif action in [Actions.LEFT, Actions.FIRELEFT]: # move left so move back one col, y - 1
             self.set_position(self.lowest_row, self.least_col - 1)
-        elif action == Actions.RIGHT:
+        elif action in [Actions.RIGHT, Actions.FIRERIGHT]:
             self.set_position(self.lowest_row, self.least_col + 1)
 
         #TODO maybe have a has fired attribute??
@@ -171,6 +178,25 @@ class AgentSuperClass(AgentInterface):
                 else:
                     # agents don't overlap
                     return False
+
+
+    def is_same_height_agent(self, other_agent: AgentInterface) -> bool:
+        current_agent_row_min = self.get_min_row_boundary()
+        current_agent_row_max = self.get_max_row_boundary()
+
+        other_agent_row_min = other_agent.get_min_row_boundary()
+        other_agent_row_max = other_agent.get_max_row_boundary()
+
+        #check if current agent min row overlaps with other agent
+        if (current_agent_row_min >= other_agent_row_min
+                and current_agent_row_min <= other_agent_row_max):
+            if (current_agent_row_max >= other_agent_row_min
+                    and current_agent_row_max <= other_agent_row_max):
+                return True
+            else:
+                return False
+        else:
+            return False
 
     #TODO write tests, also haven't really incorporated this
     # maybe use in checkAgentClashes???

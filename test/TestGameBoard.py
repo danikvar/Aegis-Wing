@@ -92,7 +92,7 @@ class TestGameBoard(unittest.TestCase):
 
     def test_populate_board(self):
         # set to true to print board to terminal/console for visual aid
-        print_board = False
+        print_board = True
 
         # default position is bottom left corner
         player = PlayerAgent()
@@ -100,10 +100,10 @@ class TestGameBoard(unittest.TestCase):
         #self.board has #8 rows, 10 columns,
         #min row = 0, max_row = 9, min col = 0, max_col = 9
         #Place enemy on top left corner
-        enemy_1 = SimpleGoLeftAgent(7,9)
+        enemy_1 = SimpleGoLeftAgent(7, 9)
 
         #another enemy agent maybe like somewhere in the middle of the board
-        enemy_2 = SimpleGoLeftAgent(3,4)
+        enemy_2 = SimpleGoLeftAgent(3, 4)
 
         #key is AgentInterface obj, value is what its agentIndex+1 value would be
         dict_agents = {player: 1}
