@@ -352,14 +352,16 @@ class GameState:
 
         for i in range(len(copy.current_projectiles)):
             current_bullet: ProjectileInterface = copy.current_projectiles[i]
-            bullet_action = current_bullet.autoPickAction()
-            #TODO test this makes deepcopy
-            bullet_after_move = current_bullet.take_action(bullet_action)
-            #replace bullet with bullet at new position
-            copy.current_projectiles[i] = bullet_after_move
+            if current_bullet.hasMoved() == False:
+                bullet_action = current_bullet.autoPickAction()
+                #TODO test this makes deepcopy
+                bullet_after_move = current_bullet.take_action(bullet_action)
+                #replace bullet with bullet at new position
+                copy.current_projectiles[i] = bullet_after_move
+            else:
+                continue
 
         return copy
-
 
 
     def generateSuccessorState(self, agentIndex: int, action: Actions):
@@ -388,6 +390,7 @@ class GameState:
         elif action in all_legal_agent_actions:
             if action == Actions.FIRE:
                 newBullet = SimpleAgentBullet(current_agent)
+                newBullet.setHasMovedStatus(True)
                 successor_state.current_projectiles.append(newBullet)
                 current_agent: AgentInterface = successor_state.current_agents[agentIndex]
                 current_agent.setHasMovedStatus(True)
@@ -398,6 +401,7 @@ class GameState:
         if successor_state.haveAllAgentsMoved() == True:
             successor_state.checkBulletAgentClashes()
             successor_state.removeBullets()
+            #successor_state.reset_agents_move_status()
 
         #after action check if player has clashed with any enemy agents
         successor_state.checkPlayerAgentClashes()

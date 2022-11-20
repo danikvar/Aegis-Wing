@@ -95,6 +95,7 @@ class TestProjectilesSuperClass(unittest.TestCase):
         print(newState.gameBoard)
 
         self.assertEqual(1, len(newState.current_agents))
+        self.assertEqual(0, len(newState.current_projectiles))
 
 
 def main():

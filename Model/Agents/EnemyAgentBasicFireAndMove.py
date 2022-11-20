@@ -12,7 +12,7 @@ class EnemyAgentBasicFireAndMove(AgentSuperClass):
         super().__init__(1, 1, lowest_row, least_col)
 
     def get_all_possible_raw_actions(self) -> list:
-        return [Actions.LEFT, Actions.DOWN, Actions.UP, Actions.FIRE]
+        return [Actions.LEFT, Actions.DOWN, Actions.UP, Actions.FIRE, Actions.STOP]
 
     def isPlayer(self):
         return False

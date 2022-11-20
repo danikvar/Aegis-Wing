@@ -121,8 +121,10 @@ class TestSimpleAgentBullet(unittest.TestCase):
         """
         player = PlayerAgent(3, 3, 5, 0)
         player_bullet = SimpleAgentBullet(player)
+        #player is taking up rows/y = 5,6,7
+        #player is taking up columns/x = 0,1,2
 
-        # position should be at row=6, col=3
+        # position should be at row/y=6, col/x=3
         self.assertEqual((6, 3), player_bullet.get_position())
         self.assertTrue(player_bullet.isPlayerBullet())
         self.assertEqual([Actions.RIGHT], player_bullet.get_all_possible_raw_actions())
@@ -141,8 +143,10 @@ class TestSimpleAgentBullet(unittest.TestCase):
         enemy_ship.agent_length = 3
         enemy_ship.agent_height = 3
         enemy_bullet = SimpleAgentBullet(enemy_ship)
+        #enemy agent is taking up column/x = 8,9,10
+        #enemy agent is taking up row/y = 5,6,7
 
-        # position should be row=5, col=8
+        # position should be row=5, cols=8
         self.assertEqual((6, 7), enemy_bullet.get_position())
         self.assertFalse(enemy_bullet.isPlayerBullet())
         self.assertEqual([Actions.LEFT], enemy_bullet.get_all_possible_raw_actions())
@@ -157,6 +161,9 @@ class TestSimpleAgentBullet(unittest.TestCase):
         """
         # player bullet should not hit player bullet
         player = PlayerAgent(1, 1, 5, 0)
+        # player is taking up rows/y = 5
+        # player is taking up columns/x = 0
+
         # position should be at row=5,col=1
         player_bullet = SimpleAgentBullet(player)
         player_moved_to_bullet = player.take_action(Actions.RIGHT)
@@ -183,7 +190,7 @@ class TestSimpleAgentBullet(unittest.TestCase):
         """
         Testing bullet and agent clashes. All sizes of agents
         are length = 1, height = 1.
-        All speed of bullets are = 1
+        All speed of bullets are = 2
         :return: None
         """
 
