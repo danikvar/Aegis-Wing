@@ -855,8 +855,10 @@ class TestGameState(unittest.TestCase):
         newState = state.generateSuccessorState(0, Actions.FIRE)
         # enemy fires
         newState = newState.generateSuccessorState(1, Actions.FIRE)
+        newState.reset_agents_move_status()
         self.assertEquals((0, 1), newState.current_projectiles[0].get_position())
         self.assertEquals((5, 8), newState.current_projectiles[1].get_position())
+
 
         if print_board:
             print("Player bullet should be at pos row=0, col=1")
@@ -868,6 +870,7 @@ class TestGameState(unittest.TestCase):
         self.assertEquals((0, 2), newState.current_projectiles[0].get_position())
         self.assertEquals((5, 7), newState.current_projectiles[1].get_position())
         newState = newState.generateSuccessorState(1,Actions.LEFT)
+        newState.reset_agents_move_status()
 
         if print_board:
             print("Player bullet should be at row=0, col=2")
@@ -920,12 +923,14 @@ class TestGameState(unittest.TestCase):
         newState = state.generateSuccessorState(0, Actions.STOP)
         #bullet originates at row=5, col=7
         newState = newState.generateSuccessorState(1, Actions.FIRE)
+        newState.reset_agents_move_status()
 
         for i in range(6):
             newState = newState.generateSuccessorState(0, Actions.STOP)
             #iter 0 bullet should now be at row=5, col=6
             #iter 1 bullet should bet at col=5
             newState = newState.generateSuccessorState(1, Actions.STOP)
+            newState.reset_agents_move_status()
             #newState.update_board()
             if print_board:
                 print(f"iter {i}")
