@@ -11,7 +11,7 @@ class TestGameBoard(unittest.TestCase):
 
     def setUp(self) -> None:
         self.board = GameBoard(16, 12) #10 columns, 8 rows
-        self.playerShip = PlayerAgent
+        self.playerShip = PlayerAgent()
 
     def testView(self):
         # set variables
