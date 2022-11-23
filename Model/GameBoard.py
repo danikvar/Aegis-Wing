@@ -88,22 +88,22 @@ class GameBoard:
 
 
     def setUpBlankBoard(self) -> None:
-       '''
-       Creates a board represented as a 2D array where all
-       values inside each inner list is 0 and sets the .baoard_array
-       attribute to it
-       :return: {list[list[int]]} A 2D array of list
-       '''
+        '''
+        Creates a board represented as a 2D array where all
+        values inside each inner list is 0 and sets the .baoard_array
+        attribute to it
+        :return: {list[list[int]]} A 2D array of list
+        '''
 
-       board_2d_array: list = []
+        board_2d_array: list = []
 
-       for i in range(0, self.board_height):
+        for i in range(0, self.board_height):
            any_row = []
            for j in range(0, self.board_length):
                any_row.append(0)
            board_2d_array.append(any_row)
 
-       self.board_array = board_2d_array
+        self.board_array = board_2d_array
 
     def __str__(self):
         '''
