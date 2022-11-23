@@ -39,18 +39,6 @@ soundMixer.init()
 thrusterSound = soundMixer.Sound("../Assets/thrust.mp3")
 
 
-# Key map
-def KeyMap():
-    def __init__(self):
-        self.keys = pygame.key.get_pressed()
-
-    def up(self):
-        return self.keys[pygame.K_UP] or self.keys[pygame.K_w]
-
-    def down(self):
-        return self.keys[pygame.K_DOWN] or self.keys[pygame.K_s]
-
-
 # Ship class
 class Spaceship(pygame.sprite.Sprite):
     def __init__(self, spriteSheet, x, y):
@@ -63,6 +51,7 @@ class Spaceship(pygame.sprite.Sprite):
         self.sound = thrusterSound
         self.thrusters_off()
         self.lastShot = pygame.time.get_ticks()
+        self.lastMove = pygame.time.get_ticks()
 
 
     def thrusters_off(self):
@@ -76,13 +65,14 @@ class Spaceship(pygame.sprite.Sprite):
 
     def update(self):
         #set movement speed
-        speed = 9
+        speed = 50
         cooldown = 300 #milliseconds
+        timeNow = pygame.time.get_ticks()
 
         #get key press
         key = pygame.key.get_pressed()
         #movement of ship
-        if (key[pygame.K_UP] or key[pygame.K_w]) and (self.rect.top > 0):
+        if (key[pygame.K_UP] or key[pygame.K_w]) and (self.rect.top > 0) and (timeNow - self.lastMove > cooldown):
             self.thrusters_on()
             self.rect.y -= speed
         if (key[pygame.K_DOWN] or key[pygame.K_s]) and (self.rect.bottom < screenHeight):
@@ -94,8 +84,7 @@ class Spaceship(pygame.sprite.Sprite):
         if (key[pygame.K_RIGHT] or key[pygame.K_d]) and (self.rect.right < screenWidth):
             self.thrusters_on()
             self.rect.x += speed
-        #shoot
-        timeNow = pygame.time.get_ticks()
+
         if key[pygame.K_SPACE] and (timeNow - self.lastShot > cooldown):
             bullet = Bullets(self.rect.right, self.rect.centery)
             bulletGroup.add(bullet)

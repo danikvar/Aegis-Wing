@@ -10,7 +10,7 @@ from View import View
 class TestGameBoard(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.board = GameBoard(16, 12) #10 columns, 8 rows
+        self.board = GameBoard(5, 5) #10 columns, 8 rows
         self.playerShip = PlayerAgent
 
     def testView(self):
@@ -33,8 +33,8 @@ class TestGameBoard(unittest.TestCase):
         # debris = pygame.transform.scale(debris, (screenWidth, screenHeight))
         #
         # # object images
-        playerSpriteSheet = pygame.image.load("../Assets/double_ship.png")
-        playerSpriteScaled = pygame.transform.scale(playerSpriteSheet, (100, 50))
+        # playerSpriteSheet = pygame.image.load("../Assets/double_ship.png")
+        # playerSpriteScaled = pygame.transform.scale(playerSpriteSheet, (100, 50))
         # bulletSprite = pygame.image.load("../Assets/shot2.png")
         # enemySheetSmall = pygame.image.load("../Assets/enemySmall.png")
         # enemySmallScaled = pygame.transform.scale(enemySheetSmall, (300, 50))
@@ -50,7 +50,7 @@ class TestGameBoard(unittest.TestCase):
         # thrusterSound = soundMixer.Sound("../Assets/thrust.mp3")
 
         # create sprite group
-        spaceshipGroup = pygame.sprite.Group()
+        # spaceshipGroup = pygame.sprite.Group()
         # bulletGroup = pygame.sprite.Group()
         # enemySmallGroup = pygame.sprite.Group()
         # enemyMediumGroup = pygame.sprite.Group()
@@ -58,8 +58,8 @@ class TestGameBoard(unittest.TestCase):
         # explosionGroup = pygame.sprite.Group()
 
         # create player
-        playerShip = View.Spaceship(playerSpriteScaled, 25, 25)
-        spaceshipGroup.add(playerShip)
+        # playerShip = View.Spaceship(playerSpriteScaled, 25, 25)
+        # spaceshipGroup.add(playerShip)
 
         # # small enemies
         # enemySmall1 = EnemySmall(enemySmallScaled, 25 + 450, 25 + 50, 0)
@@ -95,4 +95,4 @@ class TestGameBoard(unittest.TestCase):
         # # explosion = Explosion(explosionSpriteSheet, 200, 200, 3)
         # # explosionGroup.add(explosion)
 
-        View.main(screenWidth, screenHeight, screen, playerShip)
+        View.main(screenWidth, screenHeight, screen)
