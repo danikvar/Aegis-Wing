@@ -95,4 +95,4 @@ class TestGameBoard(unittest.TestCase):
         # # explosion = Explosion(explosionSpriteSheet, 200, 200, 3)
         # # explosionGroup.add(explosion)
 
-        View.main(screenWidth, screenHeight, screen, playerShip)
+        # View.main(screenWidth, screenHeight, screen, playerShip)
