@@ -39,24 +39,61 @@ class EnemyMoveFireHeuristicAgent(AgentSuperClass):
         in a uniform distribution.
         :return:
         """
+        agent_copy = self.deepcopy()
+        list_enemy_agents = state.current_agents[1:]
+
+        list_enemy_agents.remove(self)
+
         #extract player agent position from state
         if state is None:
             raise ValueError("GameState cannot be None for Heuristic Agent")
         player_y, player_x = state.getPlayerPos()
         playerAgent = state.getPlayer();
+        ideal_pos = player_x + 2
+
         if self.is_same_height_agent(playerAgent):
-            ideal_pos = player_x + 2
-            if self.least_col < ideal_pos:
-                allActions = [Actions.FIRERIGHT]
+            if ideal_pos > self.least_col > player_x - 4:
+                allActions = [Actions.FIREDOWN, Actions.FIREUP]
+            elif self.least_col < ideal_pos:
+                agent_copy.performAction(Actions.RIGHT)
+                overlaps = any([self.is_overlapping_other_agent(other) for other in list_enemy_agents])
+                agent_copy.performAction(Actions.LEFT)
+                if overlaps:
+                    allActions = [Actions.FIRERIGHT, Actions.FIREUP, Actions.FIREDOWN]
+                else:
+                    allActions = [Actions.FIRERIGHT]
             elif self.least_col > ideal_pos:
-                allActions = [Actions.FIRELEFT]
+                agent_copy.performAction(Actions.LEFT)
+                overlaps = any([self.is_overlapping_other_agent(other) for other in list_enemy_agents])
+                agent_copy.performAction(Actions.RIGHT)
+                if overlaps:
+                    allActions = [Actions.FIRERIGHT, Actions.FIRELEFT, Actions.FIRE, Actions.FIREUP, Actions.FIREDOWN]
+                else:
+                    allActions = [Actions.FIRELEFT]
             else:
-                return Actions.FIRE
+                allActions = [Actions.FIRE, Actions.FIRERIGHT]
 
         if self.lowest_row > player_y:
-            allActions = [Actions.FIREDOWN, Actions.DOWN]
+            if ideal_pos > self.least_col > player_x - 4:
+                return Actions.FIRERIGHT
+            agent_copy.performAction(Actions.DOWN)
+            overlaps = any([self.is_overlapping_other_agent(other) for other in list_enemy_agents])
+            agent_copy.performAction(Actions.UP)
+            if overlaps:
+                allActions = [Actions.FIREDOWN, Actions.FIRERIGHT, Actions.FIRE]
+            else:
+                allActions = [Actions.FIREDOWN]
         elif self.lowest_row < player_y:
-            allActions = [Actions.FIREUP, Actions.UP]
+            if ideal_pos > self.least_col > player_x - 4:
+                return Actions.FIRERIGHT
+            agent_copy.performAction(Actions.UP)
+            overlaps = any([self.is_overlapping_other_agent(other) for other in list_enemy_agents])
+            agent_copy.performAction(Actions.DOWN)
+            if overlaps:
+                allActions = [Actions.FIREUP, Actions.FIRERIGHT, Actions.FIRE]
+            else:
+                allActions = [Actions.FIREUP]
+
         return random.choice(allActions)
 
     def isHeuristicAgent(self) -> bool:
