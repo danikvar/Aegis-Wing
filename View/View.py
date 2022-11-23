@@ -139,7 +139,7 @@ class Explosion(pygame.sprite.Sprite):
                 img = img.subsurface((frame * 200), 0, 200, 200)
             self.images.append(img)
 
-        self.image = self.images[10]
+        self.image = self.images[0]
         self.rect = self.image.get_rect()
         self.rect.center = [x, y]
 
