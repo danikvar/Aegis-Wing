@@ -1,9 +1,8 @@
 import unittest
 
 from Model.Agents.Actions import Actions
-from Model.Agents.PlayerAgent import PlayerAgent
 from Model.Agents.EnemyMoveFireHeuristicAgent import EnemyMoveFireHeuristicAgent
-from Model.Projectiles.SimpleAgentBullet import SimpleAgentBullet
+from Model.Agents.SimpleGoLeftAgent import SimpleGoLeftAgent
 
 
 class TestHeuristicAgentBullet(unittest.TestCase):
