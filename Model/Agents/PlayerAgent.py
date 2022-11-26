@@ -51,3 +51,9 @@ class PlayerAgent(AgentSuperClass):
     def getId(self):
         return self.id
 
+    def getX(self):
+        return self.spawn_x
+
+    def getY(self):
+        return self.spawn_y
+

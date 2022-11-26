@@ -42,3 +42,9 @@ class SimpleGoLeftAgent(AgentSuperClass):
 
     def getId(self):
         return self.id
+
+    def getX(self):
+        return self.lowest_row
+
+    def getY(self):
+        return self.least_col

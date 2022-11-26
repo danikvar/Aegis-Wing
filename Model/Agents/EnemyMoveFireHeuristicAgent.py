@@ -9,6 +9,7 @@ class EnemyMoveFireHeuristicAgent(AgentSuperClass):
     """
     This agent can move left, down, up, or fire
     """
+    #
 
     #TODO: CHANGE THIS TO TAKE THE WHOLE GAME STATE
     #TODO: CHANGE TAKE_ACTION TO USE GAMESTATE

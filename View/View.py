@@ -69,6 +69,20 @@ class Spaceship(pygame.sprite.Sprite):
         if not any(key):
             self.thrusters_off()
 
+        # collision
+        if pygame.sprite.spritecollide(self, enemySmallGroup, True, pygame.sprite.collide_mask):
+            self.kill()
+            explosion = Explosion(explosionSpriteSheet, self.rect.centerx, self.rect.centery, 1)
+            explosionGroup.add(explosion)
+        elif pygame.sprite.spritecollide(self, enemyMediumGroup, True, pygame.sprite.collide_mask):
+            self.kill()
+            explosion = Explosion(explosionSpriteSheet, self.rect.centerx, self.rect.centery, 2)
+            explosionGroup.add(explosion)
+        elif pygame.sprite.spritecollide(self, enemyBigGroup, True, pygame.sprite.collide_mask):
+            self.kill()
+            explosion = Explosion(explosionSpriteSheet, self.rect.centerx, self.rect.centery, 3)
+            explosionGroup.add(explosion)
+
 
 # Bullets class
 class Bullets(pygame.sprite.Sprite):
@@ -83,6 +97,20 @@ class Bullets(pygame.sprite.Sprite):
         if self.rect.left > screenWidth:
             self.kill()
 
+        #collision
+        if pygame.sprite.spritecollide(self, enemySmallGroup, True, pygame.sprite.collide_mask):
+            self.kill()
+            explosion = Explosion(explosionSpriteSheet, self.rect.centerx, self.rect.centery, 1)
+            explosionGroup.add(explosion)
+        elif pygame.sprite.spritecollide(self, enemyMediumGroup, True, pygame.sprite.collide_mask):
+            self.kill()
+            explosion = Explosion(explosionSpriteSheet, self.rect.centerx, self.rect.centery, 2)
+            explosionGroup.add(explosion)
+        elif pygame.sprite.spritecollide(self, enemyBigGroup, True, pygame.sprite.collide_mask):
+            self.kill()
+            explosion = Explosion(explosionSpriteSheet, self.rect.centerx, self.rect.centery, 3)
+            explosionGroup.add(explosion)
+
 
 class EnemySmall(pygame.sprite.Sprite):
     def __init__(self, spriteSheet, x, y, frame):
@@ -93,7 +121,8 @@ class EnemySmall(pygame.sprite.Sprite):
         self.rect.center = [x, y]
 
     def update(self):
-        pass
+        #update mask
+        self.mask = pygame.mask.from_surface(self.image)
 
 
 class EnemyMedium(pygame.sprite.Sprite):
@@ -105,7 +134,8 @@ class EnemyMedium(pygame.sprite.Sprite):
         self.rect.center = [x, y]
 
     def update(self):
-        pass
+        # update mask
+        self.mask = pygame.mask.from_surface(self.image)
 
 
 class EnemyBig(pygame.sprite.Sprite):
@@ -117,7 +147,8 @@ class EnemyBig(pygame.sprite.Sprite):
         self.rect.center = [x, y]
 
     def update(self):
-        pass
+        # update mask
+        self.mask = pygame.mask.from_surface(self.image)
 
 
 class Explosion(pygame.sprite.Sprite):
@@ -139,12 +170,18 @@ class Explosion(pygame.sprite.Sprite):
                 img = img.subsurface((frame * 200), 0, 200, 200)
             self.images.append(img)
 
-        self.image = self.images[10]
+        self.index = 0
+        self.image = self.images[self.index]
         self.rect = self.image.get_rect()
         self.rect.center = [x, y]
 
     def update(self):
-        pass
+        if self.index < len(self.images) - 1:
+            self.index += 1
+            self.image = self.images[self.index]
+
+        if self.index >= len(self.images) - 1:
+            self.kill()
 
 
 
@@ -172,9 +209,9 @@ def main():
                 run = False
 
         #update spaceship
-        playerShip.update()
+        spaceshipGroup.update()
 
-        #update
+        #update sprites
         bulletGroup.update()
         enemySmallGroup.update()
         enemyMediumGroup.update()
@@ -250,7 +287,7 @@ if __name__ == "__main__":
     playerShip = Spaceship(playerSpriteScaled, 25, 25)
     spaceshipGroup.add(playerShip)
 
-    # # small enemies
+    # small enemies
     enemySmall1 = EnemySmall(enemySmallScaled, 25 + 450, 25 + 50, 0)
     enemySmall2 = EnemySmall(enemySmallScaled, 25 + 450, 25 + 0, 1)
     enemySmall3 = EnemySmall(enemySmallScaled, 25 + 450, 25 + 100, 2)
@@ -281,7 +318,7 @@ if __name__ == "__main__":
     enemyBigGroup.add(enemyBig4)
 
     # explosion
-    explosion = Explosion(explosionSpriteSheet, 200, 200, 3)
-    explosionGroup.add(explosion)
+    # explosion = Explosion(explosionSpriteSheet, 200, 200, 3)
+    # explosionGroup.add(explosion)
 
     main()
