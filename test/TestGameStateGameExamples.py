@@ -232,6 +232,7 @@ class TestGameStateGameExamples(unittest.TestCase):
                     state.decrement_turn()
 
                     if print_board:
+                        state.update_board()
                         print("Turn: " + str(state.turns_left))
                         print(state.gameBoard)
                         print(f"lives left: {state.current_player_lives}")

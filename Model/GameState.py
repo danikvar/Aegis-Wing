@@ -368,6 +368,9 @@ class GameState:
 
 
     def generateSuccessorState(self, agentIndex: int, action: Actions):
+        #check if player agent is an expetimax agent
+        #if it is then choose autopick action
+        #setters for iteration depth and gamestate
         #move all projectiles first before making any agent moves
         if (agentIndex == 0 and self.current_agents[agentIndex].hasMoved() == False):
             successor_state = self.moveAllProjectiles()
