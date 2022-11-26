@@ -19,8 +19,10 @@ class PlayerBulletView(pygame.sprite.Sprite):
             self.kill()
 
         #collision
-        if pygame.sprite.spritecollide(self, self.view.enemySmallGroup, True,):
-            self.kill()
+        #enemy sprite instead of pygame sprite
+        # if pygame.sprite.spritecollide(self, self.view.enemySmallGroup, True, pygame.sprite.collide_mask):
+        #     # self.kill()
+        #     print("KILL")
             # explosion = Explosion(explosionSpriteSheet, self.rect.centerx, self.rect.centery, 1)
             # explosionGroup.add(explosion)
         # elif pygame.sprite.spritecollide(self, enemyMediumGroup, True, pygame.sprite.collide_mask):
