@@ -19,11 +19,11 @@ class EnemyPicker():
         self.board_min_col, self.board_max_col, \
         self.board_min_row, self.board_max_row = gameboard.getBoardBoundaries()
 
-        #This logic should be in gameloop
-        # if spawn_rate < 0:
-        #     raise ValueError("Spawn rate cannot be less than 0 (0%), must be 0 >= spawn_rate <= 100 ")
-        # if spawn_rate > 100:
-        #     raise ValueError("Spawn rate cannot be greater than 100 (100%), must be  0 >= spawn_rate <= 100  ")
+        #logic of actual spawning must be in game loop
+        if spawn_rate < 0:
+            raise ValueError("Spawn rate cannot be less than 0 (0%), must be 0 >= spawn_rate <= 100 ")
+        if spawn_rate > 100:
+            raise ValueError("Spawn rate cannot be greater than 100 (100%), must be  0 >= spawn_rate <= 100  ")
 
         self.spawn_rate = spawn_rate
 
@@ -37,6 +37,8 @@ class EnemyPicker():
         :param weight: {int} influences probability of being chosen, cannot be negative or 0
         :return:
         """
+        if self.initialized == True:
+            raise RuntimeError("Cannot add new enemies after spawner has been initialized")
         if enemy.isPlayer() == True:
             raise ValueError("Cannot add player to enemy list")
 
@@ -46,6 +48,7 @@ class EnemyPicker():
         self.enemy_spawn_list.append(enemy)
         self.enemy_weights.append(weight)
 
+    # TODO test
     def initialize_spawn_behavior(self):
         """
         Performs proper checks to make sure choose enemy will not
@@ -62,6 +65,7 @@ class EnemyPicker():
 
         self.initialized = True
 
+    # TODO test
     def choose_enemy(self):
         """
         Chooses an enemy from list of enemies.
@@ -73,9 +77,9 @@ class EnemyPicker():
             raise RuntimeError("Spawn Behavior not initialized, please call .initialize_spawn_behavior method")
 
         #choose enemy by weight
-        chosen_enemy: AgentInterface = random.choices(population=self.enemy_spawn_list,
+        chosen_enemy: AgentInterface = (random.choices(population=self.enemy_spawn_list,
                        weights=self.enemy_weights,
-                       k=1)
+                       k=1))[0]
 
         valid_pos = False
 

@@ -40,6 +40,7 @@ class GameState:
         self.isPlayerAdded = False
         self.fireActions = [Actions.FIRE, Actions.FIRERIGHT, Actions.FIRELEFT,
                             Actions.FIREDOWN, Actions.FIREUP]
+        self.score = 0 #TODO test
 
 
     def addAgent(self, agent: AgentSuperClass) -> bool:
@@ -113,6 +114,8 @@ class GameState:
 
     def decrement_turn(self):
             self.turns_left -= 1
+        #TODO test score
+            self.score += 1
 
     def set_turn(self, turns_left: int) -> None:
         if turns_left < 0:
