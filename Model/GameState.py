@@ -40,6 +40,7 @@ class GameState:
         self.isPlayerAdded = False
         self.fireActions = [Actions.FIRE, Actions.FIRERIGHT, Actions.FIRELEFT,
                             Actions.FIREDOWN, Actions.FIREUP]
+        self.score = 0 #TODO test
 
 
     def addAgent(self, agent: AgentSuperClass) -> bool:
@@ -113,6 +114,8 @@ class GameState:
 
     def decrement_turn(self):
             self.turns_left -= 1
+        #TODO test score
+            self.score += 1
 
     def set_turn(self, turns_left: int) -> None:
         if turns_left < 0:
@@ -365,6 +368,9 @@ class GameState:
 
 
     def generateSuccessorState(self, agentIndex: int, action: Actions):
+        #check if player agent is an expetimax agent
+        #if it is then choose autopick action
+        #setters for iteration depth and gamestate
         #move all projectiles first before making any agent moves
         if (agentIndex == 0 and self.current_agents[agentIndex].hasMoved() == False):
             successor_state = self.moveAllProjectiles()
