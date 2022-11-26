@@ -209,9 +209,9 @@ def main():
                 run = False
 
         #update spaceship
-        playerShip.update()
+        spaceshipGroup.update()
 
-        #update
+        #update sprites
         bulletGroup.update()
         enemySmallGroup.update()
         enemyMediumGroup.update()
@@ -287,7 +287,7 @@ if __name__ == "__main__":
     playerShip = Spaceship(playerSpriteScaled, 25, 25)
     spaceshipGroup.add(playerShip)
 
-    # # small enemies
+    # small enemies
     enemySmall1 = EnemySmall(enemySmallScaled, 25 + 450, 25 + 50, 0)
     enemySmall2 = EnemySmall(enemySmallScaled, 25 + 450, 25 + 0, 1)
     enemySmall3 = EnemySmall(enemySmallScaled, 25 + 450, 25 + 100, 2)

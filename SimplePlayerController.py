@@ -86,6 +86,7 @@ class SimplePlayerController:
         # move player first
         self.state = self.state.generateSuccessorState(0, self.player_action)
         self.move_enemies()
+        print(self.state)
 
     def player_down(self):
         self.player_action = Actions.DOWN

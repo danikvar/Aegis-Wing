@@ -1,9 +1,13 @@
 #turtle screen set up
+import random
 import turtle as turtle_module
 
 import pygame
 
 from Model.Agents.AgentInterface import AgentInterface
+from View.PlayerBulletView import PlayerBulletView
+from View.PlayerShipView import PlayerShipView
+from View.EnemyShipSmallView import EnemyShipSmallView
 
 
 class View2:
@@ -17,6 +21,11 @@ class View2:
         self.turtle_ships = []
         self.turtle_dict = {}
 
+        # create sprite groups
+        self.spaceshipGroup = pygame.sprite.Group()
+        self.bulletGroup = pygame.sprite.Group()
+        self.enemySmallGroup = pygame.sprite.Group()
+
         """
         Define FPS
         """
@@ -24,14 +33,13 @@ class View2:
         self.fps = 60
 
 
-    def set_coord_values(self,min_x: int, max_x: int, min_y: int, max_y: int):
+    def set_coord_values(self, gameModel, min_x: int, max_x: int, min_y: int, max_y: int):
+        self.model = gameModel
         self.lowest_x_cord_value = min_x
-        self.max_x_cord_value = max_x
+        self.max_x_cord_value = (max_x + 1) * 50
         self.lowest_y_cord_value = min_y
-        self.max_y_cord_value = max_y
-
-        self.screen = pygame.display.set_mode((self.max_x_cord_value, self.max_y_cord_value))
-        pygame.display.set_caption('Aegis Wing')
+        self.maxY = max_y
+        self.max_y_cord_value = (max_y + 1) * 50
 
         """
         Load images image
@@ -43,6 +51,47 @@ class View2:
         # background debris
         self.debris = pygame.image.load("../Assets/debris2_brown.png")
         self.debris = pygame.transform.scale(self.debris, (self.max_x_cord_value, self.max_y_cord_value))
+
+        # object images
+        # bulletSprite = pygame.image.load("../Assets/shot2.png")
+        # enemySheetMedium = pygame.image.load("../Assets/enemyMedium.png")
+        # enemyMediumScaled = pygame.transform.scale(enemySheetMedium, (300, 100))
+        # enemySheetBig = pygame.image.load("../Assets/enemyBig.png")
+        # enemyBigScaled = pygame.transform.scale(enemySheetBig, (840, 200))
+        # explosionSpriteSheet = pygame.image.load("../Assets/explosion_alpha.png")
+
+        # set screen
+        self.screen = pygame.display.set_mode((self.max_x_cord_value, self.max_y_cord_value))
+        pygame.display.set_caption('Aegis Wing')
+
+        # create small enemies
+        # enemySmall1 = EnemyShipSmallView(25 + 450, 25 + 50, 0)
+        # self.enemySmallGroup.add(enemySmall1)
+
+
+    # Setup PlayerShip
+    def setupPlayerShip(self, playerAgent, view):
+        x = (playerAgent.getX() * 50) + 25
+        # x = (x * 50) + 25
+        # y = abs((y - self.maxY) * 50) + 25
+        y = abs(((playerAgent.getY() - self.maxY) * 50) + 25)
+        playerShip = PlayerShipView(playerAgent, view, x, y, self.max_x_cord_value, self.max_y_cord_value)
+        self.spaceshipGroup.add(playerShip)
+
+    # Setup enemy ships - small
+    def setupEnemyShipSmall(self, x, y):
+        x = (x * 50) + 25
+        y = abs((y - self.maxY) * 50) + 25
+        enemyShip = EnemyShipSmallView(x, y, random.randint(0, 4))
+        self.enemySmallGroup.add(enemyShip)
+
+    # Setup enemy ships - small
+    def setupPlayerBullets(self, view, x, y):
+        playerBullet = PlayerBulletView(view, x, y, self.max_x_cord_value, self.max_y_cord_value)
+        self.enemySmallGroup.add(playerBullet)
+
+    def getView(self):
+        return self
 
 
     def main(self):
@@ -66,19 +115,19 @@ class View2:
                     run = False
 
             # update spaceship
-            # playerShip.update()
-            #
+            self.spaceshipGroup.update()
+
             # # update
             # bulletGroup.update()
-            # enemySmallGroup.update()
+            self.enemySmallGroup.update()
             # enemyMediumGroup.update()
             # enemyBigGroup.update()
             # explosionGroup.update()
-            #
-            # # draw sprite groups
-            # spaceshipGroup.draw(screen)
+
+            # draw sprite groups
+            self.spaceshipGroup.draw(self.screen)
             # bulletGroup.draw(screen)
-            # enemySmallGroup.draw(screen)
+            self.enemySmallGroup.draw(self.screen)
             # enemyMediumGroup.draw(screen)
             # enemyBigGroup.draw(screen)
             # explosionGroup.draw(screen)
