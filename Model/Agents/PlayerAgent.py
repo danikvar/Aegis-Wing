@@ -42,11 +42,6 @@ class PlayerAgent(AgentSuperClass):
     def respawnPlayer(self):
         return PlayerAgent(self.agent_length,self.agent_height,self.spawn_y, self.spawn_x)
 
-    # def take_action(self, action: Actions):
-    #     agentCopy = self.copy()
-    #     agentCopy.performAction(action)
-    #     agentCopy.hasAlreadyMoved = True
-    #     return agentCopy
 
     def getId(self):
         return self.id

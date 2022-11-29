@@ -23,14 +23,18 @@ class TestGameStateGameExamples(unittest.TestCase):
     def test_game_example_1(self):
         """
         Ramzi Branch 2
-        In this example game loop there are 2 GO left enemies, they move at the same rate
-        They do not hit the player agent
-        They both exit the board simultaneously
-        The game lasts for 10 turns
+        Game Conditions:
+            - 2 SimpleGoLeft Agents, they move at the same rate
+            - They do not hit the player agent
+            - They both exit the board simultaneously
+            - The game lasts for 10 turns
+        Tests:
+        - Enemy agents get removed from state (agents list) upon exiting board space
+        - Update board renders positions correctly
         :return:
         """
         # set to true to print board to terminal/console for visual aid
-        print_board = True
+        print_board = False
 
         state = self.gamestateInit
         state.max_enemies_at_any_given_time = 2
@@ -93,23 +97,28 @@ class TestGameStateGameExamples(unittest.TestCase):
                 break
 
         self.assertEquals(1, state.gameBoard.board_array[0][0])
+        self.assertEquals(1, len(state.current_agents))
 
     def test_game_example_2(self):
         """
         Ramzi Branch 2
-        For this test
-            - 2 enemies
+        Game Conditions
+            - Player does not move
+            - 2 enemies (SimpleGoLeft)
             - neither enemy hits player
             - one enemy exits the game before the other
+        Tests:
+            - Check that one enemy removed from state
+            - Check board renders correctly
         :return:
         """
         # set to true to print board to terminal/console for visual aid
-        print_board = True
+        print_board = False
 
         state = self.gamestateInit
         state.max_enemies_at_any_given_time = 2
         # set small turns
-        state.turns_left = 10
+        state.turns_left = 9
         # make a player and add it
         player = PlayerAgent(1, 1, 0, 0)
         state.addAgent(player)
@@ -168,18 +177,25 @@ class TestGameStateGameExamples(unittest.TestCase):
                 break
 
         self.assertEquals(1, state.gameBoard.board_array[0][0])
+        self.assertEquals(2, len(state.current_agents))
 
     def test_game_example_3(self):
         """
         Ramzi Branch 2
-        For this test
-            - 2 enemies
-            - One enemy hits player, causes player to lose
+        Game Conditions:
+            - 2 SimpleGoLeft enemy Agents
+            - Player does not move
+            - One SimpleGoLeft hits player, causes player to lose
+        Tests:
+            - board rendered correctly
+            - isWin and isLose methods
+            - player and colliding enemy removed from state
+            - Game ended after 5 turns
         :return:
         """
 
         # set to true to print board to terminal/console for visual aid
-        print_board = True
+        print_board = False
 
         state = self.gamestateInit
         state.max_enemies_at_any_given_time = 2
@@ -243,24 +259,30 @@ class TestGameStateGameExamples(unittest.TestCase):
             if state.isWin() or state.isLose():
                 break
 
-        self.assertEquals(0, state.gameBoard.board_array[0][0])
+        self.assertTrue(state.isLose())
+        self.assertFalse(state.isWin())
+        self.assertEquals(5, state.turns_left)
+        self.assertEquals(1, len(state.current_agents))
 
     def test_game_example_4(self):
         """
         Ramzi Branch 3
         Game Conditions:
-        - 10 turns player spawn in middle of board on furthest left col
-        - Spawn rate is 100%
-        - max enemies is 5
-        - Only enemy type is SimpleGoLeft
-        - 1 enemy should spawn per turn up until turn 5, total 5 enemies
-        - player will not move the whole time
-        - score should be 5
+            - 10 turns player spawn in middle of board on furthest left col
+            - Spawn rate is 100%
+            - max enemies is 5
+            - Only enemy type is SimpleGoLeft
+            - 1 enemy should spawn per turn up until turn 5, total 5 enemies
+            - player does not move
+        Test:
+            - amount of enemies by the end is 5
+            - one enemy added per turn until 5 is reached
+            - board renders correctly
         :return:
         """
 
         # set to true to print board to terminal/console for visual aid
-        print_board = True
+        print_board = False
 
         state = self.gamestateInit
         state.max_enemies_at_any_given_time = 5
@@ -277,6 +299,8 @@ class TestGameStateGameExamples(unittest.TestCase):
         state.update_board()
 
         PLAYER_ACTION = Actions.STOP #placeholder action
+
+        enemies_added = 0
 
         #Main game loop
         while state.turns_left > 4:
@@ -323,6 +347,10 @@ class TestGameStateGameExamples(unittest.TestCase):
                         print(f"lives left: {state.current_player_lives}")
                         print(f"Win?\t{state.isWin()}\nLose?\t{state.isLose()}\n")
 
+                    enemies_added += 1
+                    if enemies_added > 5:
+                        enemies_added = 5
+                    self.assertEquals(enemies_added, len(state.current_agents) - 1)
             state.reset_agents_move_status()
 
         self.assertEquals(6, len(state.current_agents))
@@ -330,13 +358,18 @@ class TestGameStateGameExamples(unittest.TestCase):
     def test_game_example_5(self):
         """
         Ramzi Branch 3
-        - 10 turns player spawn in middle of board on furthest left col
-        - Spawn rate is 100%
-        - max enemies is 5
-        - 2 enemy types SimpleGoLeft and EnemyAgentBasicFireAndMove
-        - 1 enemy should spawn per turn up until turn 5, total 5 enemies
-        - player will not move the whole time
-        - score should be 5
+        Game Conditions:
+            - 10 turns
+            - player spawn in middle of board on furthest left col
+            - Spawn rate is 100%
+            - max enemies is 5
+            - 2 enemy types SimpleGoLeft and EnemyAgentBasicFireAndMove
+            - 1 enemy should spawn per turn up until turn 5, total 5 enemies
+            - player will not move the whole time
+        Tests:
+             - amount of enemies by the end is 5
+            - one enemy added per turn until 5 is reached
+            - board renders correctly
         :return:
         """
 
@@ -362,6 +395,8 @@ class TestGameStateGameExamples(unittest.TestCase):
         state.update_board()
 
         PLAYER_ACTION = Actions.STOP  # placeholder action
+
+        enemies_added = 0
 
         # Main game loop
         while state.turns_left > 4:
@@ -417,18 +452,26 @@ class TestGameStateGameExamples(unittest.TestCase):
                         print(f"lives left: {state.current_player_lives}")
                         print(f"Win?\t{state.isWin()}\nLose?\t{state.isLose()}\n")
 
+                    enemies_added += 1
+                    if enemies_added > 5:
+                        enemies_added = 5
+
             state.reset_agents_move_status()
 
         self.assertEquals(6, len(state.current_agents))
 
     def test_gain_one_point_per_turn_survival(self):
         """
-        Testing gamestate updates score by 1 per turn of survival
+        Game Conditions:
+            - Gain one point while Game Loop continues
+            - Game loop will forcibly be broken early after 6 turns
+        Tests:
+            - Score should be 5 at the end
         :return:
         """
 
         # set to true to print board to terminal/console for visual aid
-        print_board = True
+        print_board = False
 
         state = self.gamestateInit
         state.max_enemies_at_any_given_time = 5
@@ -481,6 +524,148 @@ class TestGameStateGameExamples(unittest.TestCase):
             state.reset_agents_move_status()
 
         self.assertEquals(6, state.score)
+
+    def test_score_1(self):
+        """
+        Game Conditions:
+            - Game lasts 1 turn
+            - Only player on board
+        Tests:
+            - Final score should be score for winning + survival for one turn
+                > 10000 + 1
+            - isWin should return True
+        :return:
+        """
+
+        # set to true to print board to terminal/console for visual aid
+        print_board = False
+
+        state = self.gamestateInit
+        state.max_enemies_at_any_given_time = 5
+        # set small turns
+        state.turns_left = 1
+        # make a player size 1 X 1 at row=5,col=0 and add it
+        player = PlayerAgent(1, 1, 5, 0)
+        state.addAgent(player)
+
+        PLAYER_ACTION = Actions.STOP  # placeholder action
+
+        # Main game loop
+        while state.isWin() == False:
+            # move each agents
+            for each_index in range(len(state.current_agents)):
+                try:
+                    each_agent: AgentInterface = state.current_agents[each_index]
+                except IndexError:
+                    # means list was shortened because enemy agent died or exited board
+                    # 3 cases
+                    # case 1 agent in middle of list disappeared
+                    each_agent: AgentInterface = state.current_agents[each_index - 1]
+                    # case agent at end of list died/disappeared
+                    # no more agents to move
+                    if each_agent.hasMoved():
+                        state.decrement_turn()
+                        break
+                    else:
+                        each_index -= 1
+                    # continue otherwise
+
+                # making player action just stop for this example
+                if each_agent.isPlayer():
+                    agent_action = PLAYER_ACTION
+                else:
+                    agent_action = each_agent.autoPickAction()
+
+                # len of current agents may change here, potentiall causing index error
+                state = state.generateSuccessorState(each_index, agent_action)
+
+                if (state.current_agents[len(state.current_agents) - 1].hasMoved() == True):
+                    state.decrement_turn()
+
+                    if print_board:
+                        print("Current Score: ", state.score)
+                        print("Turns left: ", state.turns_left)
+                        state.update_board()
+
+            state.reset_agents_move_status()
+
+        self.assertEquals(10_001, state.score)
+        self.assertTrue(state.isWin())
+
+    def test_score_2(self):
+        """
+        Game Conditions:
+            - Game has 10 turns left until over
+            - Only player on board
+            - enemy will create a bullet on the first turn
+                > At next turn the bullet should reduce hp of player
+            - Since player only has 1 life, this should end the game
+        Tests:
+            - Final score should be score for loss of health + loss of life + loss of game + 1 turn survive
+                > -100 + -500 + -1000 + 1 = -1699
+            - isLose should return True since only 1 life
+            :return:
+        """
+
+        # set to true to print board to terminal/console for visual aid
+        print_board = True
+
+        state = self.gamestateInit
+        state.max_enemies_at_any_given_time = 5
+        # set small turns
+        state.turns_left = 10
+        # make a player size 1 X 1 at row=5,col=0 and add it
+        player = PlayerAgent(1, 1, 5, 0)
+        e1 = EnemyAgentBasicFireAndMove(5,2)
+        state.addAgent(player)
+        state.addAgent(e1)
+
+        PLAYER_ACTION = Actions.STOP  # placeholder action
+
+        # Main game loop
+        while True:
+            # move each agents
+            for each_index in range(len(state.current_agents)):
+                try:
+                    each_agent: AgentInterface = state.current_agents[each_index]
+                except IndexError:
+                    # means list was shortened because enemy agent died or exited board
+                    # 3 cases
+                    # case 1 agent in middle of list disappeared
+                    each_agent: AgentInterface = state.current_agents[each_index - 1]
+                    # case agent at end of list died/disappeared
+                    # no more agents to move
+                    if each_agent.hasMoved():
+                        state.decrement_turn()
+                        break
+                    else:
+                        each_index -= 1
+                    # continue otherwise
+
+                # making player action just stop for this example
+                if each_agent.isPlayer():
+                    agent_action = PLAYER_ACTION
+                else:
+                    agent_action = Actions.FIRE
+
+                # len of current agents may change here, potentiall causing index error
+                state = state.generateSuccessorState(each_index, agent_action)
+
+                if (state.current_agents[len(state.current_agents) - 1].hasMoved() == True):
+                    state.decrement_turn()
+
+                    if print_board:
+                        print("Current Score: ", state.score)
+                        print("Turns left: ", state.turns_left)
+                        state.update_board()
+
+            state.reset_agents_move_status()
+            if state.isWin() == True or state.isLose() == True:
+                break
+
+        self.assertEquals(-1699, state.score)
+        self.assertTrue(state.isLose())
+
 
 
 

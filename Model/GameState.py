@@ -147,9 +147,14 @@ class GameState:
             each_bullet: ProjectileSuperClass = self.current_projectiles[i]
             for j in range(len(self.current_agents)):
                 each_agent: AgentInterface = self.current_agents[j]
+
+                # if bullet hits the agent
                 if each_bullet.get_hp() > 0 and each_bullet.didHitAgent(each_agent):
                     each_bullet.set_hp(each_bullet.get_hp() - 1)
                     each_agent.set_hp(each_agent.get_hp() - 1)
+
+                    if each_agent.isPlayer(): #if agent that got hit was the player then reduce score
+                        self.score -= 100
 
     def haveAllAgentsMoved(self) -> bool:
         for each in self.current_agents:
@@ -217,11 +222,7 @@ class GameState:
                 # add agent index to list to be popped
                 agent_indexes_to_be_popped.append(i)
                 already_popped = True
-                if each_agent.isPlayer() == True:
-                    #TODO test
-                    self.score -= 500
-                else:
-                    self.score += each_agent.getPointValue()
+                self.score += each_agent.getPointValue()
 
             if already_popped == True:
                 # will go to next agent if agent is dead
@@ -242,6 +243,7 @@ class GameState:
             if current_agent.isPlayer() == True:
                 if (current_agent.is_dead()):
                     self.current_player_lives -= 1
+                    self.score -= 500 # lose 1 life score decreases
                     if self.current_player_lives > 0:
                         self.isPlayerAdded = False
                         # if more lives left than player agent gets restarted at initial point
