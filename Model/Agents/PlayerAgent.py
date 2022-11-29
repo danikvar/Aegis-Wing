@@ -57,3 +57,5 @@ class PlayerAgent(AgentSuperClass):
     def getY(self):
         return self.spawn_y
 
+    def getPointValue(self) -> int:
+        return -100

@@ -421,6 +421,68 @@ class TestGameStateGameExamples(unittest.TestCase):
 
         self.assertEquals(6, len(state.current_agents))
 
+    def test_gain_one_point_per_turn_survival(self):
+        """
+        Testing gamestate updates score by 1 per turn of survival
+        :return:
+        """
+
+        # set to true to print board to terminal/console for visual aid
+        print_board = True
+
+        state = self.gamestateInit
+        state.max_enemies_at_any_given_time = 5
+        # set small turns
+        state.turns_left = 10
+        # make a player size 1 X 1 at row=5,col=0 and add it
+        player = PlayerAgent(1, 1, 5, 0)
+        state.addAgent(player)
+
+        PLAYER_ACTION = Actions.STOP  # placeholder action
+
+        # Main game loop
+        while state.turns_left > 4:
+            # move each agents
+            for each_index in range(len(state.current_agents)):
+                try:
+                    each_agent: AgentInterface = state.current_agents[each_index]
+                except IndexError:
+                    # means list was shortened because enemy agent died or exited board
+                    # 3 cases
+                    # case 1 agent in middle of list disappeared
+                    each_agent: AgentInterface = state.current_agents[each_index - 1]
+                    # case agent at end of list died/disappeared
+                    # no more agents to move
+                    if each_agent.hasMoved():
+                        state.decrement_turn()
+                        break
+                    else:
+                        each_index -= 1
+                    # continue otherwise
+
+                # making player action just stop for this example
+                if each_agent.isPlayer():
+                    agent_action = PLAYER_ACTION
+                else:
+                    agent_action = each_agent.autoPickAction()
+
+                # len of current agents may change here, potentiall causing index error
+                state = state.generateSuccessorState(each_index, agent_action)
+
+                if (state.current_agents[len(state.current_agents) - 1].hasMoved() == True):
+                    state.decrement_turn()
+
+                    if print_board:
+                        print("Current Score: ", state.score)
+                        print("Turns left: ", state.turns_left)
+                        state.update_board()
+
+
+            state.reset_agents_move_status()
+
+        self.assertEquals(6, state.score)
+
+
 
 
 #ramzi merged

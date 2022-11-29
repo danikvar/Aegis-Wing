@@ -125,11 +125,13 @@ class GameState:
     def isWin(self) -> bool:
         #you win game if player still has lives and timer has reached 0
         if self.current_player_lives > 0 and self.isGameOver():
+            self.score += 10000
             return True
         return False
 
     def isLose(self):
         if (self.current_player_lives <= 0):
+            self.score -= 1000
             return True
         else:
             return False
@@ -191,6 +193,8 @@ class GameState:
             #TODO maybe just have them blow up instead of subtracting health? Already happens since player hp = 1
             if (player_agent.is_overlapping_other_agent(enemy_agent)):
                 player_agent.set_hp(player_agent.get_hp() - 1)
+                #TODO Test
+                self.score += player_agent.getPointValue() #returns negative so adding is subtracting
                 enemy_agent.set_hp(enemy_agent.get_hp() - 1)
 
         #TODO test case where playern and enemy right next to each other then move past each other, this should cause a hit
@@ -213,6 +217,11 @@ class GameState:
                 # add agent index to list to be popped
                 agent_indexes_to_be_popped.append(i)
                 already_popped = True
+                if each_agent.isPlayer() == True:
+                    #TODO test
+                    self.score -= 500
+                else:
+                    self.score += each_agent.getPointValue()
 
             if already_popped == True:
                 # will go to next agent if agent is dead
@@ -337,6 +346,7 @@ class GameState:
         copy.current_player_lives = self.current_player_lives
         copy.turns_left = self.turns_left
         copy.max_enemies_at_any_given_time = self.max_enemies_at_any_given_time
+        copy.score = self.score
         #TODO NOTE does not copy bullet_agents, or current projectiles
 
         #copy agents over

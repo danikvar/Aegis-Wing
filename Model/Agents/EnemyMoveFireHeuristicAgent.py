@@ -49,7 +49,7 @@ class EnemyMoveFireHeuristicAgent(AgentSuperClass):
         if state is None:
             raise ValueError("GameState cannot be None for Heuristic Agent")
         player_y, player_x = state.getPlayerPos()
-        playerAgent = state.getPlayer();
+        playerAgent = state.getPlayer()
         ideal_pos = player_x + 2
 
         if self.is_same_height_agent(playerAgent):
@@ -112,3 +112,6 @@ class EnemyMoveFireHeuristicAgent(AgentSuperClass):
             return agent_copy
         else:
             return self
+
+    def getPointValue(self) -> int:
+        return 50

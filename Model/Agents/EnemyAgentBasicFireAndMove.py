@@ -29,3 +29,6 @@ class EnemyAgentBasicFireAndMove(AgentSuperClass):
         :return:
         """
         return random.choice(self.get_all_possible_raw_actions())
+
+    def getPointValue(self) -> int:
+        return 25
