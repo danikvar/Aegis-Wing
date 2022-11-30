@@ -3,7 +3,9 @@ import unittest
 from Model.GameBoard import GameBoard
 from modelPositionToTkinterViewAdapter import createAdapterDict
 
-
+"""
+This class tests that the modelToView Adapter method.
+"""
 class TestModelToViewAdapter(unittest.TestCase):
     def setUp(self) -> None:
         self.gboard = GameBoard(5,8)
@@ -19,8 +21,6 @@ class TestModelToViewAdapter(unittest.TestCase):
         self.assertEquals(2, height_dict[5])
         self.assertEquals(1, height_dict[6])
         self.assertEquals(0, height_dict[7])
-
-
 
 def main():
     unittest.main(verbosity=3)

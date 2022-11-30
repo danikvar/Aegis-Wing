@@ -7,7 +7,11 @@ from Model.GameState import GameState
 from Model.Projectiles.ProjectileSuperClass import ProjectileSuperClass
 from Model.Projectiles.SimpleAgentBullet import SimpleAgentBullet
 
-
+"""
+The tests in this class verify ProjectileSuperClass implementation.
+There are tests to check proper spawn location, and proper position 
+change (in relation to speed and prior position).
+"""
 class TestProjectilesSuperClass(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -61,9 +65,6 @@ class TestProjectilesSuperClass(unittest.TestCase):
             errors_thrown += 1
 
         self.assertEqual(2, errors_thrown)
-
-
-
 
 
     def testPlayerProjectile1(self):

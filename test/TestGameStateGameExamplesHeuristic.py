@@ -10,8 +10,6 @@ import sys
 import codecs
 
 
-# branch_4
-
 class TestGameStateGameExamples(unittest.TestCase):
     def setUp(self) -> None:
         """
@@ -24,7 +22,7 @@ class TestGameStateGameExamples(unittest.TestCase):
     def test_game_example_1(self):
         """
         For this test
-            - 1 simple and 1 heuristic enemy
+            - 1 player, 1 SimpleGoLeft enemy and 1 heuristic enemy
             - simple enemy does not hit player
             - one enemy exits the game before the other
             - Heuristic agent moves towards the player and kills it

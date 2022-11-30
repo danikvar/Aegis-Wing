@@ -16,6 +16,10 @@ RIGHT = Actions.RIGHT
 STOP = Actions.STOP
 FIRE = Actions.FIRE
 
+"""
+This class tests the methods in the 
+GameState class.
+"""
 class TestGameState(unittest.TestCase):
     def setUp(self) -> None:
         """

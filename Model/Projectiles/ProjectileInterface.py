@@ -4,12 +4,12 @@ from Model.Agents.AgentSuperClass import AgentSuperClass
 from Model.Agents.Directions import Directions
 
 
-class ProjectileInterface(AgentSuperClass):
+class ProjectileInterface(AgentInterface):
 
     '''
     This interface mandates all methods that must be
-    implemented by any subtype. The methods must be defined
-    by the subtype. Most of these methods will be defined
+    implemented by any subtype. This interface also contains methods of the AgentInreface.
+    The methods must be defined by the subtype. Most of these methods will be defined
     in the ProjectileSuperClass.
     '''
     

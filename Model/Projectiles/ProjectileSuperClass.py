@@ -8,10 +8,10 @@ from Model.Agents.AgentSuperClass import AgentSuperClass
 from Model.Projectiles.ProjectileInterface import ProjectileInterface
 
 
-class ProjectileSuperClass(ProjectileInterface):
+class ProjectileSuperClass(ProjectileInterface,AgentSuperClass):
     """
     This is the abstract class for all projectiles. It is extending the Agent
-    super class and implementing the AgentInterface.
+    super class and implementing the ProjectileInterface.
     """
 
     def __init__(self, direction: Actions, projectile_length=1, projectile_height=1, lowest_row=0, least_col=0, hp=1,

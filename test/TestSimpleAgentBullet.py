@@ -5,7 +5,12 @@ from Model.Agents.PlayerAgent import PlayerAgent
 from Model.Agents.SimpleGoLeftAgent import SimpleGoLeftAgent
 from Model.Projectiles.SimpleAgentBullet import SimpleAgentBullet
 
-
+"""
+The tests in this class verify SimpleAgentBullet implementation.
+There are tests to check proper spawn location, proper position 
+change (in relation to speed and prior position) as well as 
+"hit" logic.
+"""
 class TestSimpleAgentBullet(unittest.TestCase):
 
     def test_player_bullet_from_player_size_1(self):

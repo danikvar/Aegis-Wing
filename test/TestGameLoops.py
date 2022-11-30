@@ -9,12 +9,15 @@ from Model.Agents.PlayerAgent import PlayerAgent
 from Model.Agents.SimpleGoLeftAgent import SimpleGoLeftAgent
 from Model.EnemyPicker import EnemyPicker
 from Model.GameState import GameState
-#branch_2
 
+"""
+This class tests game loops with varying game conditions
+to ensure successive gamestates are being generated correctly (generateSuccessorState method)
+as the game progresses.
+"""
 class TestGameStateGameExamples(unittest.TestCase):
     def setUp(self) -> None:
         """
-        Ramzi Branch 2
         Sets up variables to use. These variables are
         reset prior to every test
         :return: None
@@ -23,7 +26,6 @@ class TestGameStateGameExamples(unittest.TestCase):
 
     def test_game_example_1(self):
         """
-        Ramzi Branch 2
         Game Conditions:
             - 2 SimpleGoLeft Agents, they move at the same rate
             - They do not hit the player agent
