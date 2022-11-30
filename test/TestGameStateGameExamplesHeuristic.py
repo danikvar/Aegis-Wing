@@ -99,6 +99,7 @@ class TestGameStateGameExamples(unittest.TestCase):
         self.assertEqual('B', state.gameBoard.board_array[0][1])
 
     def test_game_example_2(self):
+        # TODO: DECIDE DO WE WANT IT TO ALWAYS FIRE
         """
         For this test
             - 1 heuristic enemy
@@ -176,7 +177,8 @@ class TestGameStateGameExamples(unittest.TestCase):
     # TODO: What happens if 2 bullets are fired from the same spot?
 
     def test_game_example_3(self):
-
+        # TODO: Dan - Check to see how this would work with ExpectiMax version of this Agent.
+        # TODO: Ideas - Think about how far the expectimax tree should go down.
         """
         For this test
             - 2 Heuristic Enemies

@@ -54,6 +54,8 @@ class EnemyMoveFireHeuristicAgent(AgentSuperClass):
         if self.is_same_height_agent(playerAgent):
             if ideal_pos > self.least_col > player_x - 4:
                 allActions = [Actions.FIREDOWN, Actions.FIREUP]
+                # TODO: Dan - Look at issue if player highest or lowest to change the up/down action
+                # TODO: Dan - Give chance of crashing into player
             elif self.least_col < ideal_pos:
                 agent_copy.performAction(Actions.RIGHT)
                 overlaps = any([self.is_overlapping_other_agent(other) for other in list_enemy_agents])
