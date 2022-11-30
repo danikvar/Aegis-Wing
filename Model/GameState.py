@@ -393,6 +393,16 @@ class GameState:
                     current_agent: AgentInterface = successor_state.current_agents[agentIndex]
                     current_agent.setHasMovedStatus(True)
 
+        elif current_agent.isExpectimaxAgent():
+            if action in all_legal_agent_actions:
+                movedAgent = current_agent.take_action(action)
+                successor_state.current_agents[agentIndex] = movedAgent
+                if action in self.fireActions:
+                    newBullet = SimpleAgentBullet(movedAgent, 2)
+                    successor_state.current_projectiles.append(newBullet)
+                    current_agent: AgentInterface = successor_state.current_agents[agentIndex]
+                    current_agent.setHasMovedStatus(True)
+
         elif action in all_legal_agent_actions:
             if action == Actions.FIRE:
                 newBullet = SimpleAgentBullet(current_agent)

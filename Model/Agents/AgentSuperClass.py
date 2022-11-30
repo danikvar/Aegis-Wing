@@ -13,7 +13,7 @@ class AgentSuperClass(AgentInterface):
     the AgentInterface.
     """
 
-    def __init__(self, agent_length=1, agent_height=1, lowest_row=0, least_col=0, hp=1):
+    def __init__(self, agent_length=1, agent_height=1, lowest_row=0, least_col=0, hp=1, depth=2):
         '''
         Create a new Agent. Warning this code does not reinforce
         whether agents can be outside of board. We need to allow it
@@ -36,6 +36,9 @@ class AgentSuperClass(AgentInterface):
         self.least_col = least_col
         self.hp = hp # default hp is 1
         self.hasAlreadyMoved = False
+
+        self.depth = depth
+        self.index = 0  #Player is always index 0
 
     def get_position(self) -> tuple:
         '''
@@ -70,6 +73,13 @@ class AgentSuperClass(AgentInterface):
         return False
 
     def isHeuristicAgent(self) -> bool:
+        '''
+        Returns True if agent requires player as a variable
+        :return: {bool} Returns True if player variable requires updating, otherwise false
+        '''
+        return False
+
+    def isExpectimaxAgent(self) -> bool:
         '''
         Returns True if agent requires player as a variable
         :return: {bool} Returns True if player variable requires updating, otherwise false
