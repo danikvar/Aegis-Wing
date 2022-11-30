@@ -114,8 +114,9 @@ class GameState:
 
     def decrement_turn(self):
             self.turns_left -= 1
-        #TODO test score
-            self.score += 1
+            #only add survival point if player is still in the game
+            if self.current_agents[0].isPlayer() and self.current_agents[0].get_hp() > 0:
+                self.score += 1
 
     def set_turn(self, turns_left: int) -> None:
         if turns_left < 0:
@@ -222,7 +223,8 @@ class GameState:
                 # add agent index to list to be popped
                 agent_indexes_to_be_popped.append(i)
                 already_popped = True
-                self.score += each_agent.getPointValue()
+                if each_agent.isPlayer() == False:
+                    self.score += each_agent.getPointValue()
 
             if already_popped == True:
                 # will go to next agent if agent is dead
@@ -236,6 +238,7 @@ class GameState:
 
         subtract_by = 0
 
+        # COde below handles if player dies and can or does not respawn
         for each_index in agent_indexes_to_be_popped:
             value_to_pop = each_index - subtract_by
             current_agent: AgentInterface = self.current_agents[value_to_pop]
@@ -371,6 +374,7 @@ class GameState:
                 bullet_action = current_bullet.autoPickAction()
                 #TODO test this makes deepcopy
                 bullet_after_move = current_bullet.take_action(bullet_action)
+                bullet_after_move.setHasMovedStatus(True)
                 #replace bullet with bullet at new position
                 copy.current_projectiles[i] = bullet_after_move
             else:

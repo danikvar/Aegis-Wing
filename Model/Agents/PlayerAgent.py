@@ -35,6 +35,7 @@ class PlayerAgent(AgentSuperClass):
         """
         copy = PlayerAgent(self.agent_length,self.agent_height,self.lowest_row, self.least_col)
         copy.hasAlreadyMoved = self.hasAlreadyMoved
+        copy.hp = self.get_hp()
         return copy
 
 

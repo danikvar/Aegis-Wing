@@ -32,3 +32,4 @@ class EnemyAgentBasicFireAndMove(AgentSuperClass):
 
     def getPointValue(self) -> int:
         return 25
+

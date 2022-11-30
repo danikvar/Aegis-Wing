@@ -91,6 +91,8 @@ class SimpleAgentBullet(ProjectileSuperClass):
             else:
                 raise RuntimeError(f"Action: {action} is invalid for bullet agent, only Actions.Left is valid")
 
+        self.hasAlreadyMoved = True
+
     def take_action(self, action: Actions):
         """
         Creates a deepcopy of the bullet that has taken the action
@@ -140,7 +142,11 @@ class SimpleAgentBullet(ProjectileSuperClass):
 
         else:
             copy_one_col_back = self.deepcopy()
-            copy_one_col_back.least_col = self.least_col-1
+            if copy_one_col_back.agent_is_player_flag:
+                copy_one_col_back.least_col = self.least_col - 1
+            else:
+                copy_one_col_back.least_col = self.least_col + 1
+
             if self.is_overlapping_other_agent(agent) or copy_one_col_back.is_overlapping_other_agent(agent):
                 hit_flag = True
 

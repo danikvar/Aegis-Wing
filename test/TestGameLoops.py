@@ -525,6 +525,9 @@ class TestGameStateGameExamples(unittest.TestCase):
 
         self.assertEquals(6, state.score)
 
+
+    #TODO need to test head on collision
+
     def test_score_1(self):
         """
         Game Conditions:
@@ -532,7 +535,7 @@ class TestGameStateGameExamples(unittest.TestCase):
             - Only player on board
         Tests:
             - Final score should be score for winning + survival for one turn
-                > 10000 + 1
+                > 10000 + 1 = 10001
             - isWin should return True
         :return:
         """
@@ -596,14 +599,17 @@ class TestGameStateGameExamples(unittest.TestCase):
         """
         Game Conditions:
             - Game has 10 turns left until over
-            - Only player on board
+            - Player and BasicFireAndMove Agent on board
             - enemy will create a bullet on the first turn
-                > At next turn the bullet should reduce hp of player
-            - Since player only has 1 life, this should end the game
+                > At next turn the bullet should reduce hp of player,
+                    but player has 3 hp so player not destroyed
+            - Score reduced due to decrease in player hp
+            - Game plays out until win due to survival
+            - No Enemies destroyed
         Tests:
-            - Final score should be score for loss of health + loss of life + loss of game + 1 turn survive
-                > -100 + -500 + -1000 + 1 = -1699
-            - isLose should return True since only 1 life
+            - Final score should be score for loss of health + turns survived + points for winning
+            - -100 + 10 + 10000 = 9910
+            - isWin = True and isLose = False
             :return:
         """
 
@@ -616,9 +622,11 @@ class TestGameStateGameExamples(unittest.TestCase):
         state.turns_left = 10
         # make a player size 1 X 1 at row=5,col=0 and add it
         player = PlayerAgent(1, 1, 5, 0)
+        player.set_hp(3)
         e1 = EnemyAgentBasicFireAndMove(5,2)
         state.addAgent(player)
         state.addAgent(e1)
+        state.update_board()
 
         PLAYER_ACTION = Actions.STOP  # placeholder action
 
@@ -646,7 +654,10 @@ class TestGameStateGameExamples(unittest.TestCase):
                 if each_agent.isPlayer():
                     agent_action = PLAYER_ACTION
                 else:
-                    agent_action = Actions.FIRE
+                    if state.turns_left == 10:
+                        agent_action = Actions.FIRE
+                    else:
+                        agent_action = Actions.STOP
 
                 # len of current agents may change here, potentiall causing index error
                 state = state.generateSuccessorState(each_index, agent_action)
@@ -657,17 +668,202 @@ class TestGameStateGameExamples(unittest.TestCase):
                     if print_board:
                         print("Current Score: ", state.score)
                         print("Turns left: ", state.turns_left)
+                        print(f"Player hp: {state.current_agents[0].get_hp()}")
+                        print(state.gameBoard)
                         state.update_board()
 
             state.reset_agents_move_status()
             if state.isWin() == True or state.isLose() == True:
                 break
 
-        self.assertEquals(-1699, state.score)
-        self.assertTrue(state.isLose())
+        self.assertEquals(9910, state.score)
+        self.assertTrue(state.isWin())
+        self.assertFalse(state.isLose())
+
+    def test_score_3(self):
+        """
+        Game Conditions:
+            - Game has 10 turns left until over
+            - Player and BasicFireAndMove Agent on board
+            - enemy will create a bullet on the first turn and second turn
+                > At next turn the bullet should reduce hp of player,
+                    but player has 3 hp so player not destroyed, and be left with 1 hp
+            - Score reduced due to decrease in player hp
+            - Game plays out until win due to survival
+            - No Enemies destroyed
+        Tests:
+            - Final score should be score for (loss of health * 2) + turns survived + points for winning
+            - (-100 * 2) + 10 + 10000 = 9810
+            - isWin = True and isLose = False
+            :return:
+        """
+
+        # set to true to print board to terminal/console for visual aid
+        print_board = True
+
+        state = self.gamestateInit
+        state.max_enemies_at_any_given_time = 5
+        # set small turns
+        state.turns_left = 10
+        # make a player size 1 X 1 at row=5,col=0 and add it
+        player = PlayerAgent(1, 1, 5, 0)
+        player.set_hp(3)
+        e1 = EnemyAgentBasicFireAndMove(5, 2)
+        state.addAgent(player)
+        state.addAgent(e1)
+        state.update_board()
+
+        PLAYER_ACTION = Actions.STOP  # placeholder action
+
+        # Main game loop
+        while True:
+            # move each agents
+            for each_index in range(len(state.current_agents)):
+                try:
+                    each_agent: AgentInterface = state.current_agents[each_index]
+                except IndexError:
+                    # means list was shortened because enemy agent died or exited board
+                    # 3 cases
+                    # case 1 agent in middle of list disappeared
+                    each_agent: AgentInterface = state.current_agents[each_index - 1]
+                    # case agent at end of list died/disappeared
+                    # no more agents to move
+                    if each_agent.hasMoved():
+                        state.decrement_turn()
+                        break
+                    else:
+                        each_index -= 1
+                    # continue otherwise
+
+                # making player action just stop for this example
+                if each_agent.isPlayer():
+                    agent_action = PLAYER_ACTION
+                else:
+                    if state.turns_left > 8:
+                        agent_action = Actions.FIRE
+                    else:
+                        agent_action = Actions.STOP
+
+                # len of current agents may change here, potentiall causing index error
+                state = state.generateSuccessorState(each_index, agent_action)
+
+                if (state.current_agents[len(state.current_agents) - 1].hasMoved() == True):
+                    state.decrement_turn()
+
+                    if print_board:
+                        print("Current Score: ", state.score)
+                        print("Turns left: ", state.turns_left)
+                        print(f"Player hp: {state.current_agents[0].get_hp()}")
+                        print(state.gameBoard)
+                        state.update_board()
+
+            state.reset_agents_move_status()
+            if state.isWin() == True or state.isLose() == True:
+                break
+
+        self.assertEquals(9810, state.score)
+        self.assertTrue(state.isWin())
+        self.assertFalse(state.isLose())
+
+    def test_score_4(self):
+        """
+        Game Conditions:
+            - Game has 10 turns left until over
+            - Only player on board
+            - enemy will create a bullet on the first turn
+                > At next turn the bullet should reduce hp of player
+            - Since player only has 1 life, this should end the game
+        Tests:
+            - Final score should be score for loss of health + loss of life + loss of game + 2 turn survive
+                > -100 + -500 + -1000 + 2 = -1598
+            - isLose should return True since only 1 life
+            :return:
+        """
+
+        # set to true to print board to terminal/console for visual aid
+        print_board = True
+
+        state = self.gamestateInit
+        state.max_enemies_at_any_given_time = 5
+        # set small turns
+        state.turns_left = 10
+        # make a player size 1 X 1 at row=5,col=0 and add it
+        player = PlayerAgent(1, 1, 5, 0)
+        player.set_hp(1)
+        e1 = EnemyAgentBasicFireAndMove(5, 3)
+        state.addAgent(player)
+        state.addAgent(e1)
+
+        PLAYER_ACTION = Actions.STOP  # placeholder action
+
+        if print_board: # print initial board
+            print("Current Score: ", state.score)
+            print("Turns left: ", state.turns_left)
+            print(f"Player hp: {player.get_hp()}")
+            state.update_board()
+            print(state.gameBoard)
+
+        # Main game loop
+        while state.isWin() == False or state.isLose() == False:
+            # move each agents
+            for each_index in range(len(state.current_agents)):
+                try:
+                    each_agent: AgentInterface = state.current_agents[each_index]
+                except IndexError:
+                    # means list was shortened because enemy agent died or exited board
+                    # 3 cases
+                    # case 1 agent in middle of list disappeared
+                    each_agent: AgentInterface = state.current_agents[each_index - 1]
+                    # case agent at end of list died/disappeared
+                    # no more agents to move
+                    if each_agent.hasMoved():
+                        state.decrement_turn()
+                        break
+                    else:
+                        each_index -= 1
+                    # continue otherwise
+
+                agent_action = None # initialize var
+
+                # making player action just stop for this example
+                if each_agent.isPlayer():
+                    agent_action = PLAYER_ACTION
+                else:
+                    if state.turns_left == 10: #Force enemy to fire on first turn
+                        agent_action = Actions.FIRE
+                    else:
+                        # enemy moves randomly up or down after first turn
+                        agent_action = random.choice([Actions.UP, Actions.DOWN])
+
+                # len of current agents may change here, potentiall causing index error
+
+                state = state.generateSuccessorState(each_index, agent_action)
+
+                if (state.current_agents[len(state.current_agents) - 1].hasMoved() == True):
+                    state.decrement_turn()
+
+            if print_board:
+                print("Current Score: ", state.score)
+                print("Turns left: ", state.turns_left)
+                print(f"Player hp: {player.get_hp()}")
+                state.update_board()
+                print(state.gameBoard)
 
 
+            state.reset_agents_move_status()
 
+            if state.isWin() == True or state.isLose() == True:
+
+                if print_board:
+                    print("Current Score: ", state.score)
+                    print("Turns left: ", state.turns_left)
+                    print(f"Player hp: {player.get_hp()}")
+                    state.update_board()
+                    print(state.gameBoard)
+
+                break
+
+        self.assertEquals(-1598, state.score)
 
 
 #ramzi merged
