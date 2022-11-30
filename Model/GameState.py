@@ -224,7 +224,7 @@ class GameState:
                 agent_indexes_to_be_popped.append(i)
                 already_popped = True
                 if each_agent.isPlayer() == False:
-                    self.score += each_agent.getPointValue()
+                    self.score += each_agent.getPointValue() #represents destruction of enemy ship
 
             if already_popped == True:
                 # will go to next agent if agent is dead
@@ -243,7 +243,7 @@ class GameState:
             value_to_pop = each_index - subtract_by
             current_agent: AgentInterface = self.current_agents[value_to_pop]
             # if player agent died
-            if current_agent.isPlayer() == True:
+            if current_agent.isPlayer() == True: # if player agent was destroyed
                 if (current_agent.is_dead()):
                     self.current_player_lives -= 1
                     self.score -= 500 # lose 1 life score decreases
