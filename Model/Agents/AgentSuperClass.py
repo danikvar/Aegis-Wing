@@ -22,6 +22,9 @@ class AgentSuperClass(AgentInterface):
         :param agent_height: {int} height of agent (cannot be > 1)
         :param lowest_row: {int} position of the lowest "y" or row value for an agent
         :param least_col: {int} position of the least (furthest left) "x" or column value for the agent
+        :param counter: {int} How many turns until the agent leaves the board. If none then stays
+        Args:
+
         '''
         if agent_length < 1:
             raise ValueError("Agent size length must be >= 1")
@@ -30,9 +33,9 @@ class AgentSuperClass(AgentInterface):
 
         self.agent_length = agent_length
         self.agent_height = agent_height
-        # position of lowest side
+        # position of the lowest side
         self.lowest_row = lowest_row
-        # position of furthest left side
+        # position of the furthest left side
         self.least_col = least_col
         self.hp = hp # default hp is 1
         self.hasAlreadyMoved = False
@@ -179,7 +182,6 @@ class AgentSuperClass(AgentInterface):
                     # agents don't overlap
                     return False
 
-
     def is_same_height_agent(self, other_agent: AgentInterface) -> bool:
         current_agent_row_min = self.get_min_row_boundary()
         current_agent_row_max = self.get_max_row_boundary()
@@ -187,11 +189,9 @@ class AgentSuperClass(AgentInterface):
         other_agent_row_min = other_agent.get_min_row_boundary()
         other_agent_row_max = other_agent.get_max_row_boundary()
 
-        #check if current agent min row overlaps with other agent
-        if (current_agent_row_min >= other_agent_row_min
-                and current_agent_row_min <= other_agent_row_max):
-            if (current_agent_row_max >= other_agent_row_min
-                    and current_agent_row_max <= other_agent_row_max):
+        # check if current agent min row overlaps with other agent
+        if other_agent_row_min <= current_agent_row_min <= other_agent_row_max:
+            if other_agent_row_min <= current_agent_row_max <= other_agent_row_max:
                 return True
             else:
                 return False

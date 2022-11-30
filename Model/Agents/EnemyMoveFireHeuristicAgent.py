@@ -9,15 +9,11 @@ class EnemyMoveFireHeuristicAgent(AgentSuperClass):
     """
     This agent can move left, down, up, or fire
     """
-    #
 
-    #TODO: CHANGE THIS TO TAKE THE WHOLE GAME STATE
-    #TODO: CHANGE TAKE_ACTION TO USE GAMESTATE
-    def __init__(self, lowest_row, least_col):
+    def __init__(self, lowest_row, least_col, count: int = None):
         super().__init__(1, 1, lowest_row, least_col)
+        self.counter = count
 
-
-    #TODO: Override auto pick action method --> Change this to a list of all possible actions
     def get_all_possible_raw_actions(self) -> list:
 
         allactions = [Actions.LEFT, Actions.DOWN, Actions.UP, Actions.RIGHT,
@@ -29,10 +25,9 @@ class EnemyMoveFireHeuristicAgent(AgentSuperClass):
         return False
 
     def deepcopy(self):
-        copy = EnemyMoveFireHeuristicAgent(self.lowest_row, self.least_col)
+        copy = EnemyMoveFireHeuristicAgent(self.lowest_row, self.least_col, count=self.counter)
         copy.hasAlreadyMoved = self.hasAlreadyMoved
         return copy
-
 
     def autoPickAction(self, state: GameState = None) -> Actions:
         """
@@ -40,12 +35,17 @@ class EnemyMoveFireHeuristicAgent(AgentSuperClass):
         in a uniform distribution.
         :return:
         """
+        print("Current counter:" + str(self.counter))
+
+        if self.counter is not None and self.counter <= 0:
+            return Actions.FIRELEFT
+
         agent_copy = self.deepcopy()
         list_enemy_agents = state.current_agents[1:]
 
         list_enemy_agents.remove(self)
 
-        #extract player agent position from state
+        # extract player agent position from state
         if state is None:
             raise ValueError("GameState cannot be None for Heuristic Agent")
         player_y, player_x = state.getPlayerPos()
@@ -107,6 +107,8 @@ class EnemyMoveFireHeuristicAgent(AgentSuperClass):
     def take_action(self, action: Actions):
         if action in self.get_all_possible_raw_actions():
             agent_copy = self.deepcopy()
+            if agent_copy.counter is not None and agent_copy.counter > 0:
+                agent_copy.counter -= 1
             agent_copy.performAction(action)
             agent_copy.hasAlreadyMoved = True
             return agent_copy
