@@ -1,7 +1,7 @@
 from Model.Agents.Actions import Actions
 from Model.Agents.AgentInterface import AgentInterface
 from Model.Agents.AgentSuperClass import AgentSuperClass
-from Model.Agents.Directions import Directions
+
 
 
 class ProjectileInterface(AgentInterface):

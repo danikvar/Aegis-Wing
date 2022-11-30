@@ -2,7 +2,6 @@ import uuid
 
 from Model.Agents.Actions import Actions
 from Model.Agents.AgentInterface import AgentInterface
-from Model.Agents.Directions import Directions
 from Model.Agents.PlayerAgent import PlayerAgent
 from Model.Projectiles.ProjectileSuperClass import ProjectileSuperClass
 
