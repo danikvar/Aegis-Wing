@@ -7,6 +7,7 @@ from Model.Agents.EnemyAgentBasicFireAndMove import EnemyAgentBasicFireAndMove
 from Model.Agents.PlayerAgent import PlayerAgent
 from Model.Agents.SimpleGoLeftAgent import SimpleGoLeftAgent
 from Model.GameState import GameState
+from Model.Projectiles.ProjectileInterface import ProjectileInterface
 
 UP = Actions.UP
 DOWN = Actions.DOWN
@@ -15,6 +16,10 @@ RIGHT = Actions.RIGHT
 STOP = Actions.STOP
 FIRE = Actions.FIRE
 
+"""
+This class tests the methods in the 
+GameState class.
+"""
 class TestGameState(unittest.TestCase):
     def setUp(self) -> None:
         """
@@ -850,6 +855,11 @@ class TestGameState(unittest.TestCase):
         state.addAgent(player)
         enemy = EnemyAgentBasicFireAndMove(5, 9)
         state.addAgent(enemy)
+        state.update_board()
+
+        if print_board:
+            print("initial state")
+            print(state.gameBoard)
 
         #player fires
         newState = state.generateSuccessorState(0, Actions.FIRE)
@@ -863,11 +873,13 @@ class TestGameState(unittest.TestCase):
             print("Enemy bullet should be at pos row = 5, col=8")
             print(newState.gameBoard)
 
+        newState.reset_agents_move_status()
         # the projectiles should have moved
         newState = newState.generateSuccessorState(0,Actions.STOP)
+        newState = newState.generateSuccessorState(1, Actions.LEFT)
         self.assertEquals((0, 2), newState.current_projectiles[0].get_position())
         self.assertEquals((5, 7), newState.current_projectiles[1].get_position())
-        newState = newState.generateSuccessorState(1,Actions.LEFT)
+
 
         if print_board:
             print("Player bullet should be at row=0, col=2")
@@ -904,13 +916,14 @@ class TestGameState(unittest.TestCase):
 
     def test_checkBulletAgentClashesFlyBy(self):
         """
-        1 enemy fires bullet, 1 player approaches bullet
-        bullet hits palyer
+        1 enemy fires bullet
+        bullet hits player
         :return:
         """
         #TODO Ramzi fix test
         print_board = True
         state = self.gamestateInit
+        state.turns_left = 10
 
         # make a player and add it
         player = PlayerAgent(1, 1, 5, 0)
@@ -921,20 +934,31 @@ class TestGameState(unittest.TestCase):
         #bullet originates at row=5, col=7
         newState = newState.generateSuccessorState(1, Actions.FIRE)
 
-        for i in range(6):
-            newState = newState.generateSuccessorState(0, Actions.STOP)
-            #iter 0 bullet should now be at row=5, col=6
-            #iter 1 bullet should bet at col=5
-            newState = newState.generateSuccessorState(1, Actions.STOP)
-            #newState.update_board()
+
+        while newState.isWin() == False and newState.isLose() == False:
             if print_board:
-                print(f"iter {i}")
+                print(f"Turns left {newState.turns_left}")
                 print(newState.gameBoard)
 
-        if print_board:
-            print(newState.gameBoard)
+            # for j in range(len(newState.current_projectiles)):
+            #     current_bullet : ProjectileInterface = newState.current_projectiles[j]
+            #     moved_bullet = current_bullet.take_action(current_bullet.autoPickAction())
+            #     newState.current_projectiles[j] = moved_bullet
+
+            if newState.turns_left == 4:
+                print("hello")
+
+            for k in range(len(newState.current_agents)):
+                newState = newState.generateSuccessorState(k, Actions.STOP)
+
+            newState.decrement_turn()
+            newState.reset_agents_move_status()
+            newState.update_board()
+
 
         self.assertEquals(1, len(newState.current_agents))
+        agent_left : AgentInterface = newState.current_agents[0]
+        self.assertFalse(agent_left.isPlayer())
         self.assertEquals(0,len(newState.current_projectiles))
 
 

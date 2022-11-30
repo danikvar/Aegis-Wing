@@ -3,9 +3,13 @@ import unittest
 from Model.Agents.Actions import Actions
 from Model.Agents.SimpleGoLeftAgent import SimpleGoLeftAgent
 
-#TODO Ramzi_iter1 show team
 
+"""
+The tests in this class check that valid actions of the SimpleGoLeft agent
+changes the agent's position and that invalid actions do not change its position.
+"""
 class TestSimpleGoLeftAgent(unittest.TestCase):
+
     def test_take_action_SimpleGoLeft(self):
         """
         Testing SimpleGoLeft Agent.

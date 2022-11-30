@@ -128,6 +128,7 @@ class TestGameBoard(unittest.TestCase):
 
         #TODO write test with enemies with largers lengths, heights
         #TODO write test where enemy is beyond col boundaries, should be allowed
+        #TODO: ask team where are the other tests
 
 
 

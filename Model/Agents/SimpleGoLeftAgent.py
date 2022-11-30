@@ -1,5 +1,4 @@
-
-#TODO write tests for this
+# TODO write tests for this
 import uuid
 
 from Model.Agents.Actions import Actions
@@ -33,7 +32,7 @@ class SimpleGoLeftAgent(AgentSuperClass):
     #     else:
     #         return self
 
-    def autoPickAction(self) -> Actions:
+    def autoPickAction(self, state=None) -> Actions:
         """
         Picks one of potentially many pre-defined actions.
         :return:
@@ -48,3 +47,6 @@ class SimpleGoLeftAgent(AgentSuperClass):
 
     def getY(self):
         return self.least_col
+
+    def getPointValue(self) -> int:
+        return 10

@@ -3,7 +3,10 @@ import unittest
 from Model.Agents.Actions import Actions
 from Model.Agents.AgentSuperClass import AgentSuperClass
 
-
+"""
+This class verifies correct behavior of 
+methods in the AgentSuperClass.
+"""
 class AgentSuperClassTest(unittest.TestCase):
     def setUp(self) -> None:
 

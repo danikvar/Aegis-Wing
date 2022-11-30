@@ -114,8 +114,9 @@ class GameState:
 
     def decrement_turn(self):
             self.turns_left -= 1
-        #TODO test score
-            self.score += 1
+            #only add survival point if player is still in the game
+            if self.current_agents[0].isPlayer() and self.current_agents[0].get_hp() > 0:
+                self.score += 1
 
     def set_turn(self, turns_left: int) -> None:
         if turns_left < 0:
@@ -125,11 +126,13 @@ class GameState:
     def isWin(self) -> bool:
         #you win game if player still has lives and timer has reached 0
         if self.current_player_lives > 0 and self.isGameOver():
+            self.score += 10000
             return True
         return False
 
     def isLose(self):
         if (self.current_player_lives <= 0):
+            self.score -= 1000
             return True
         else:
             return False
@@ -145,9 +148,14 @@ class GameState:
             each_bullet: ProjectileSuperClass = self.current_projectiles[i]
             for j in range(len(self.current_agents)):
                 each_agent: AgentInterface = self.current_agents[j]
+
+                # if bullet hits the agent
                 if each_bullet.get_hp() > 0 and each_bullet.didHitAgent(each_agent):
                     each_bullet.set_hp(each_bullet.get_hp() - 1)
                     each_agent.set_hp(each_agent.get_hp() - 1)
+
+                    if each_agent.isPlayer(): #if agent that got hit was the player then reduce score
+                        self.score -= 100
 
     def haveAllAgentsMoved(self) -> bool:
         for each in self.current_agents:
@@ -191,6 +199,8 @@ class GameState:
             #TODO maybe just have them blow up instead of subtracting health? Already happens since player hp = 1
             if (player_agent.is_overlapping_other_agent(enemy_agent)):
                 player_agent.set_hp(player_agent.get_hp() - 1)
+                #TODO Test
+                self.score += player_agent.getPointValue() #returns negative so adding is subtracting
                 enemy_agent.set_hp(enemy_agent.get_hp() - 1)
 
         #TODO test case where playern and enemy right next to each other then move past each other, this should cause a hit
@@ -213,6 +223,8 @@ class GameState:
                 # add agent index to list to be popped
                 agent_indexes_to_be_popped.append(i)
                 already_popped = True
+                if each_agent.isPlayer() == False:
+                    self.score += each_agent.getPointValue() #represents destruction of enemy ship
 
             if already_popped == True:
                 # will go to next agent if agent is dead
@@ -226,13 +238,15 @@ class GameState:
 
         subtract_by = 0
 
+        # COde below handles if player dies and can or does not respawn
         for each_index in agent_indexes_to_be_popped:
             value_to_pop = each_index - subtract_by
             current_agent: AgentInterface = self.current_agents[value_to_pop]
             # if player agent died
-            if current_agent.isPlayer() == True:
+            if current_agent.isPlayer() == True: # if player agent was destroyed
                 if (current_agent.is_dead()):
                     self.current_player_lives -= 1
+                    self.score -= 500 # lose 1 life score decreases
                     if self.current_player_lives > 0:
                         self.isPlayerAdded = False
                         # if more lives left than player agent gets restarted at initial point
@@ -337,6 +351,7 @@ class GameState:
         copy.current_player_lives = self.current_player_lives
         copy.turns_left = self.turns_left
         copy.max_enemies_at_any_given_time = self.max_enemies_at_any_given_time
+        copy.score = self.score
         #TODO NOTE does not copy bullet_agents, or current projectiles
 
         #copy agents over
@@ -359,6 +374,7 @@ class GameState:
                 bullet_action = current_bullet.autoPickAction()
                 #TODO test this makes deepcopy
                 bullet_after_move = current_bullet.take_action(bullet_action)
+                bullet_after_move.setHasMovedStatus(True)
                 #replace bullet with bullet at new position
                 copy.current_projectiles[i] = bullet_after_move
             else:

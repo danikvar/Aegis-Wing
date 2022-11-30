@@ -10,6 +10,10 @@ RIGHT = Actions.RIGHT
 STOP = Actions.STOP
 FIRE = Actions.FIRE
 
+"""
+This class verfies PlayerAgent logic and tests methods specific
+to the player agent.
+"""
 class TestPlayerAgent(unittest.TestCase):
     def setUp(self) -> None:
         self.p1 = PlayerAgent()

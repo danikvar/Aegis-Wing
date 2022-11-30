@@ -227,3 +227,6 @@ class AgentSuperClass(AgentInterface):
 
     def setHasMovedStatus(self, hasMoved: bool) -> None:
         self.hasAlreadyMoved = hasMoved
+
+    def isHeuristicAgent(self) -> bool:
+        return False
