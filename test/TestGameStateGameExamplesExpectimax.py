@@ -9,7 +9,7 @@ from Model.Agents.PlayerAgent import PlayerAgent
 from Model.Agents.SimpleGoLeftAgent import SimpleGoLeftAgent
 from Model.GameState import GameState
 
-
+#TODO Nosky fix tests
 class TestGameStateGameExamples(unittest.TestCase):
     def setUp(self) -> None:
         """
