@@ -264,6 +264,106 @@ class TestGameStateGameExamples(unittest.TestCase):
         self.assertEquals(5, state.turns_left)
         self.assertEquals(1, len(state.current_agents))
 
+    def test_game_example_head_on_collision(self):
+        """
+        Game Conditions:
+            - 1 SimpleGoLeft enemy Agents
+            - Player moves only to the right
+            - SimpleGoLeft hits player, causes player to lose
+        Tests:
+            - board rendered correctly
+            - isWin and isLose methods
+            - player and colliding enemy removed from state
+            - Game ended after 2 turns
+        :return:
+        """
+
+        # set to true to print board to terminal/console for visual aid
+        print_board = True
+
+        state = self.gamestateInit
+        state.max_enemies_at_any_given_time = 2
+        # set small turns
+        state.turns_left = 10
+        # make a player and add it
+        player = PlayerAgent(1, 1, 5, 4)
+        state.addAgent(player)
+
+        enemy_1 = SimpleGoLeftAgent(5, 7)
+
+        # add agents
+        state.addAgent(enemy_1)
+
+        state.update_board()
+        if print_board:
+            print("initial state")
+            print(state.gameBoard)
+
+        inner_loop_flag = False
+        # while game is still going
+        while True:
+            if inner_loop_flag == True:
+                break
+            # get enemy agent action,
+            for each_index in range(len(state.current_agents)):
+                try:
+                    each_agent: AgentInterface = state.current_agents[each_index]
+                except IndexError:
+                    # means list was shortened because enemy agent died or exited board
+                    # 3 cases
+                    # case 1 agent in middle of list disappeared
+                    each_agent: AgentInterface = state.current_agents[each_index - 1]
+                    # case agent at end of list died/disappeared
+                    # no more agents to move
+                    if each_agent.hasMoved():
+                        state.decrement_turn()
+                        break
+                    else:
+                        each_index -= 1
+                    # continue otherwise
+
+                # making player action just stop for this example
+                if each_agent.isPlayer():
+                    agent_action = Actions.RIGHT
+                else:
+                    agent_action = each_agent.autoPickAction()
+
+                # len of current agents may change here, potentiall causing index error
+                state = state.generateSuccessorState(each_index, agent_action)
+
+                if len(state.current_agents) > 0: #TODO Ramzi: Needs to implement this in final game loop
+                    if (state.current_agents[len(state.current_agents) - 1].hasMoved() == True):
+                        state.decrement_turn()
+
+                        if print_board:
+                            state.update_board()
+                            print("Turn: " + str(state.turns_left))
+                            print(state.gameBoard)
+                            print(f"lives left: {state.current_player_lives}")
+                            print(f"Win?\t{state.isWin()}\nLose?\t{state.isLose()}\n")
+                else:
+                    inner_loop_flag = True
+                    state.turns_left -= 1
+
+                    if print_board:
+                        state.update_board()
+                        print("Turn: " + str(state.turns_left))
+                        print(state.gameBoard)
+                        print(f"lives left: {state.current_player_lives}")
+                        print(f"Win?\t{state.isWin()}\nLose?\t{state.isLose()}\n")
+
+                    break
+
+            state.reset_agents_move_status()
+
+            if state.isWin() or state.isLose():
+                break
+
+        self.assertTrue(state.isLose())
+        self.assertFalse(state.isWin())
+        self.assertEquals(8, state.turns_left)
+
+
     def test_game_example_4(self):
         """
         Ramzi Branch 3
@@ -864,6 +964,105 @@ class TestGameStateGameExamples(unittest.TestCase):
                 break
 
         self.assertEquals(-1598, state.score)
+
+    def test_score_player_destroys_simple_go_left_near(self):
+        """
+            Game Conditions:
+                - Game has 10 turns left until over
+                - Only player and 1 SimpleGoLeftAgent on board
+                - Player will create a bullet on the first turn
+                    > At next turn the bullet should reduce hp of SimpleGoLEft and destroy it
+                - Player will gain points
+            Tests:
+                - Final score should be score for points for destroyed enemy + 10 turns survived + points for winning
+                    > 10 + 10 + 10000 = 10020
+                - isLose should return True since only 1 life
+                :return:
+            """
+
+        # set to true to print board to terminal/console for visual aid
+        print_board = True
+
+        state = self.gamestateInit
+        state.max_enemies_at_any_given_time = 5
+        # set small turns
+        state.turns_left = 10
+        # make a player size 1 X 1 at row=5,col=0 and add it
+        player = PlayerAgent(1, 1, 5, 0)
+        player.set_hp(1)
+        e1 = SimpleGoLeftAgent(5, 2)
+        state.addAgent(player)
+        state.addAgent(e1)
+
+        PLAYER_ACTION = Actions.STOP  # placeholder action
+
+        if print_board:  # print initial board
+            print("Current Score: ", state.score)
+            print("Turns left: ", state.turns_left)
+            print(f"Player hp: {player.get_hp()}")
+            state.update_board()
+            print(state.gameBoard)
+
+        # Main game loop
+        while state.isWin() == False or state.isLose() == False:
+            # move each agents
+            for each_index in range(len(state.current_agents)):
+                try:
+                    each_agent: AgentInterface = state.current_agents[each_index]
+                except IndexError:
+                    # means list was shortened because enemy agent died or exited board
+                    # 3 cases
+                    # case 1 agent in middle of list disappeared
+                    each_agent: AgentInterface = state.current_agents[each_index - 1]
+                    # case agent at end of list died/disappeared
+                    # no more agents to move
+                    if each_agent.hasMoved():
+                        state.decrement_turn()
+                        break
+                    else:
+                        each_index -= 1
+                    # continue otherwise
+
+                agent_action = None  # initialize var
+
+                # making player action just stop for this example
+                if each_agent.isPlayer():
+                    if state.turns_left == 10:
+                        agent_action = Actions.FIRE
+                    else:
+                        agent_action = PLAYER_ACTION
+                else:
+                    agent_action = each_agent.autoPickAction()
+
+                # len of current agents may change here, potentiall causing index error
+
+                state = state.generateSuccessorState(each_index, agent_action)
+
+                if (state.current_agents[len(state.current_agents) - 1].hasMoved() == True):
+                    state.decrement_turn()
+
+            if print_board:
+                print("Current Score: ", state.score)
+                print("Turns left: ", state.turns_left)
+                print(f"Player hp: {player.get_hp()}")
+                state.update_board()
+                print(state.gameBoard)
+
+            state.reset_agents_move_status()
+
+            if state.isWin() == True or state.isLose() == True:
+
+                if print_board:
+                    print("Current Score: ", state.score)
+                    print("Turns left: ", state.turns_left)
+                    print(f"Player hp: {player.get_hp()}")
+                    state.update_board()
+                    print(state.gameBoard)
+
+                break
+
+        self.assertEquals(10_020, state.score)
+
 
 
 #ramzi merged
