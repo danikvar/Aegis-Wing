@@ -107,20 +107,38 @@ def main():
 
     # game loop
     while current_state.isWin() == False and current_state.isLose() == False:
+        removed_counter = 0
         #have each agent take an action
-        for each_index in range(len(current_state.current_agents)):
+        for each_index in range(0,len(current_state.current_agents)):
+            each_index = each_index - removed_counter
             try:
                 each_agent: AgentInterface = current_state.current_agents[each_index]
             # this error only happens if an agent in the previous state was killed or removed from board
             # if agent was removed from list each_index value will be off by 1
             except IndexError:
-                each_index -= 1
+                print("Reached INDEX ERROR")
+                print(f"Highest valid index is {len(current_state.current_agents) - 1}\nCurrent amt agents: {len(current_state.current_agents)}")
+                print(f"Current index is: {each_index}")
+
+
+
+                print(f"index {each_index} is greater than highest valid {len(current_state.current_agents) - 1}")
+                diff = each_index - len(current_state.current_agents) - 1
+                each_index = len(current_state.current_agents) - 1
+                print(f"updated index = {each_index}")
+
                 each_agent: AgentInterface = current_state.current_agents[each_index]
 
-                # enemy agent at the end of list was killed and we look at the most recent one
+                # enemy agent at the end of list was removed and we look at the most recent one
                 #before that
+
+                removed_counter = diff
+
                 if each_agent.hasMoved():
+                    removed_counter += 1
                     break # move on to next agent
+                else:
+                    removed_counter += 1
 
             if each_agent.isPlayer():
                 #TODO DAN YOU WILL HAVE TO MAKE YOUR OWN PLAYER AGENT CLASS and overwrite auto pick action
@@ -139,14 +157,7 @@ def main():
         # Reset move status of agents after everyone has moved
         current_state.reset_agents_move_status()
 
-        #Optional board visualization
-        if visualize_game:
-            print_enemies_status(current_state)
-            print_board(current_state)
-            print_score_and_status(current_state)
-            print(end_line)
-
-        #spawn enemies at the start of new turn
+        # spawn enemies at the start of new turn
         if len(current_state.current_agents) - 1 < current_state.max_enemies_at_any_given_time:
             # spawn enemy based on spawn rate
             probability_to_spawn = random.randint(0, 100)
@@ -154,6 +165,14 @@ def main():
                 # pick an enemy
                 enemy_to_spawn = ENEMY_SPAWNER.choose_enemy()
                 current_state.addAgent(enemy_to_spawn)
+
+        #Optional board visualization
+        if visualize_game:
+            print_enemies_status(current_state)
+            print_board(current_state)
+            print_score_and_status(current_state)
+            print(end_line)
+
 
 if __name__ == "__main__":
     main()

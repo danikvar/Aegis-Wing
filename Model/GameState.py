@@ -66,23 +66,28 @@ class GameState:
                 if self.isValidAgent(agent):
                     self.current_agents.append(agent)
                     self.isPlayerAdded = True
+                    self.update_board()
                     return True
                 else:
-                    print(f"WARNING: Cannot place player is position ({agent.lowest_row, agent.least_col})")
+                    print(f"WARNING: Cannot place enemy {agent.__str__()} in position ({agent.lowest_row, agent.least_col})")
+                    self.update_board()
                     return False
 
         else: # length of list > 1 i.e. player already added
             if agent.isPlayer() == True and self.isPlayerAdded == True:
                 print("WARNING: Player agent already added, cannot add more player agents")
+                self.update_board()
                 return False
             else: # if enemy agent, check we don't add more than allowed at one state
                 current_amt_enemies = len(self.current_agents) - 1
                 if (current_amt_enemies < self.max_enemies_at_any_given_time):
                     # now we check that enemy doesn't spawn inside player agent
                     self.current_agents.append(agent)
+                    self.update_board()
                     return True
                 else:
                     print("WARNING: Cannot exceed enemy agent limit, agent not added")
+                    self.update_board()
                     return False
 
     def getPlayerPos(self):
