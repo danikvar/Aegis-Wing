@@ -58,14 +58,13 @@ ENEMY_SPAWNER.initialize_spawn_behavior()
 def print_enemies_status(gameState: GameState ):
     all_enemy_agents = gameState.current_agents[1:]
 
-    if len(all_enemy_agents) == 0:
-        print("No Enemies on board")
-        return
+    if len(all_enemy_agents) > 0:
 
-    print(f"Total enemies on board: {len(all_enemy_agents)}")
 
-    for each_enemy_index in range(len(all_enemy_agents)):
-        print(str(each_enemy_index + 1) + ".) " + all_enemy_agents[each_enemy_index].__str__())
+        print(f"Total enemies on board: {len(all_enemy_agents)}")
+
+        for each_enemy_index in range(len(all_enemy_agents)):
+            print("\t" + str(each_enemy_index + 2) + ".) " + all_enemy_agents[each_enemy_index].__str__())
 
 def print_board(gameState: GameState):
     print(f"Turns left: {gameState.turns_left}")
@@ -77,6 +76,23 @@ def print_score_and_status(gameState: GameState):
     elif gameState.isLose():
         print("Player LOST! :( ")
     print(f"Score: {gameState.score}")
+
+def print_projectile_locations(gameState: GameState):
+    all_projectiles = gameState.current_projectiles
+    all_player_projectiles = list(filter(lambda x: x.isPlayerBullet(), all_projectiles))
+    all_enemy_projectiles = list(filter(lambda x: x.isPlayerBullet() == False, all_projectiles))
+
+    if len(all_player_projectiles) > 0:
+        print(f"Total Player Projectiles on board: {len(all_player_projectiles)}")
+        for i in range(len(all_player_projectiles)):
+            print(f"\t{i}.) {all_player_projectiles[i]}")
+
+    if len(all_enemy_projectiles) > 0:
+        print(f"Total Enemy Projectiles on board: {len(all_enemy_projectiles)}")
+        for j in range(len(all_enemy_projectiles)):
+            print(f"\t{j}.) {all_enemy_projectiles[j]}")
+
+
 
 def main():
 
@@ -100,44 +116,35 @@ def main():
 
     current_state = starting_gamestate
 
+    end_line = "=" * 50
+
     if visualize_game:
         print("Staring GameState")
         print_board(current_state)
         print_score_and_status(current_state)
-        end_line = "=" * 50
         print(end_line,"\n")
 
     # game loop
     while current_state.isWin() == False and current_state.isLose() == False:
-        removed_counter = 0
-        break_flag = False
         #have each agent take an action
         for each_index in range(0,len(current_state.current_agents)):
-            if break_flag == True:
+            # print(f"Highest valid index is {len(current_state.current_agents)-1}")
+            # print(f"Current index is {each_index}")
+            # print(f"updating index -> {each_index} - {current_state.removed_agents} = {each_index - current_state.removed_agents}")
+            each_index = each_index - current_state.removed_agents
+            #print(f"updated index is {each_index}")
+
+            try:
+                each_agent : AgentInterface = current_state.current_agents[each_index]
+            except IndexError:
+                #print("BREAKING FOR LOOP")
                 break
 
-            break_flag = False
-            diff = None
-            each_index = each_index - removed_counter
-            try:
-                each_agent: AgentInterface = current_state.current_agents[each_index]
-            # this error only happens if an agent in the previous state was killed or removed from board
-            # if agent was removed from list each_index value will be off by 1
-            except IndexError:
-                diff = each_index - len(current_state.current_agents) - 1
-                each_index = len(current_state.current_agents) - 1
-
-                each_agent: AgentInterface = current_state.current_agents[each_index]
-
-                removed_counter = diff
-
-                if each_agent.hasMoved():
-                    removed_counter += 1
-                    break_flag = False
-                    break # move on to next agent
+            if each_agent.hasMoved():
+                if each_index + 1 > len(current_state.current_agents) - 1:
+                    break
                 else:
-                    break_flag = False
-                    removed_counter += 1
+                    continue # move on to next agent
 
             if each_agent.isPlayer():
                 #TODO DAN YOU WILL HAVE TO MAKE YOUR OWN PLAYER AGENT CLASS and overwrite auto pick action
@@ -149,12 +156,18 @@ def main():
             else:
                 agent_action = each_agent.autoPickAction()
 
-            current_state = current_state.generateSuccessorState(each_index, agent_action)
+            try:
+                current_state = current_state.generateSuccessorState(each_index, agent_action)
+            except IndexError:
+                break
+
 
         #once all agents have taken an action decrement the turn
         current_state.decrement_turn()
         # Reset move status of agents after everyone has moved
         current_state.reset_agents_move_status()
+
+        #print(end_line)
 
         # spawn enemies at the start of new turn
         if len(current_state.current_agents) - 1 < current_state.max_enemies_at_any_given_time:
@@ -167,6 +180,7 @@ def main():
 
         #Optional board visualization
         if visualize_game:
+            print_projectile_locations(current_state)
             print_enemies_status(current_state)
             print_board(current_state)
             print_score_and_status(current_state)
@@ -175,3 +189,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

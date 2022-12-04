@@ -35,8 +35,6 @@ class EnemyMoveFireHeuristicAgent(AgentSuperClass):
         in a uniform distribution.
         :return:
         """
-        print("Current counter:" + str(self.counter))
-
         if self.counter is not None and self.counter <= 0:
             return Actions.FIRELEFT
 

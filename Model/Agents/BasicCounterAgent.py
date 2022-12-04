@@ -43,7 +43,6 @@ class BasicCounterAgent(AgentSuperClass):
         :return:
         """
 
-        print("Counter is at: " + str(self.counter))
         if self.counter <= 0:
             return Actions.FIRELEFT
 
@@ -52,7 +51,6 @@ class BasicCounterAgent(AgentSuperClass):
             return Actions.FIRE
 
         elif self.ideal_y == self.lowest_row:
-            print("Increasing Counter1:")
 
             if self.least_col < self.ideal_x:
                 return Actions.FIRERIGHT
