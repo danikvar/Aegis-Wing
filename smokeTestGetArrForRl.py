@@ -135,6 +135,7 @@ def main():
         print_score_and_status(current_state)
         print(end_line,"\n")
 
+    #TODO THIS IS THE KEY EXAMPLE TO GET THE ARR
     x = current_state.gameBoard.get_arr_for_RL(current_state, 2,5)
 
     for row in range(-1,-len(x) - 1,-1):
