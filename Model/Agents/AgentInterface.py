@@ -183,3 +183,14 @@ class AgentInterface:
 
     def getPointValue(self) -> int:
         raise NotImplementedError("No points have been assigned to this agent")
+
+
+    def getAgentType(self) -> int:
+        """
+        Get a unique ID for each type of agent.
+        Should be 1 for player, 2 for simple go left, 3 for basic fire and move,
+        4 for  heuristic, and 5 for basic counter
+        Returns: The agent type as an integer
+
+        """
+        raise NotImplementedError("No type assigned")

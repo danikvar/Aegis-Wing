@@ -57,3 +57,6 @@ class PlayerAgent(AgentSuperClass):
 
     def getPointValue(self) -> int:
         return -100
+
+    def getAgentType(self) -> int:
+        return 1

@@ -53,3 +53,6 @@ class SimpleGoLeftAgent(AgentSuperClass):
 
     def __str__(self):
         return f"SimpleGoLeft at col/x = {self.get_position()[1]}\t row/y = {self.get_position()[0]}"
+
+    def getAgentType(self) -> int:
+        return 5

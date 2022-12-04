@@ -68,8 +68,16 @@ class DQNAgent(torch.nn.Module):
             - Can move down
             - Player Location
             - Heuristic Enemy Locations board col x board row tensor
+            - GoLeft Enemy Locations boc col x row tensor
+            - BasicFireAndMove Locations
             - Counter Enemy Locations
         """
+
+        [[0, 1, 0, 0, 0]
+         [0, 0, 0, 0, 1]
+        [0, 0]]
+        []
+        []
         state = [
             (player.x_change == 20 and player.y_change == 0 and (
                         (list(map(add, player.position[-1], [20, 0])) in player.position) or

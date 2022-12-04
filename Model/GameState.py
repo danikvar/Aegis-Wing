@@ -423,7 +423,7 @@ class GameState:
         # TODO: TEST THIS --> IF IS HEURISTIC AGENT --> IF IT SHOOTS AND MOVES THEN MOVE FIRST
         #  UPDATE AGENT AND THEN PASS UPDATED AGENT TO THE BULLET
 
-        if current_agent.isHeuristicAgent() or current_agent.isCounterAgent():
+        if current_agent.isHeuristicAgent():
             if action in all_legal_agent_actions:
                 movedAgent = current_agent.take_action(action)
                 successor_state.current_agents[agentIndex] = movedAgent

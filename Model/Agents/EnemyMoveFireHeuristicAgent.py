@@ -128,3 +128,5 @@ class EnemyMoveFireHeuristicAgent(AgentSuperClass):
         else:
             return False
 
+    def getAgentType(self) -> int:
+        return 4
