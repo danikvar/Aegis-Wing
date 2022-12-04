@@ -66,3 +66,6 @@ class BasicCounterAgent(AgentSuperClass):
 
             elif self.lowest_row > self.ideal_y:
                 return Actions.FIREDOWN
+
+    def getPointValue(self) -> int:
+        return 15
