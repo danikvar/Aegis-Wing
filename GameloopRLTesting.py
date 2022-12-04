@@ -24,6 +24,7 @@ TURNS_UNTIL_GAME_FINISHED = 300
 PLAYER_INITIAL_SPAWN_ROW_POSITION = BOARD_ROWS // 2  # spawn in middle of board rows
 PLAYER_INITIAL_SPAWN_COL_POSITION = 0  # spawn player at furthest left position
 PLAYER_LIVES = 1
+PLAYER_HP = 3
 
 ########## Specific Enemy Spawn Rate Configuration ##########
 # if enemy does get spawned then this is the probability they get chosen
@@ -90,6 +91,7 @@ def main():
     # player will be of size 1 X 1
     player_agent = PlayerAgent(1, 1, PLAYER_INITIAL_SPAWN_ROW_POSITION,
                                PLAYER_INITIAL_SPAWN_COL_POSITION)
+    player_agent.set_hp(PLAYER_HP)
 
     did_add_agent = starting_gamestate.addAgent(player_agent)
 
