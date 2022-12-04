@@ -67,8 +67,8 @@ def print_enemies_status(gameState: GameState ):
             print("\t" + str(each_enemy_index + 2) + ".) " + all_enemy_agents[each_enemy_index].__str__())
 
 def print_board(gameState: GameState):
-    print(f"Turns left: {gameState.turns_left}")
     print(gameState.gameBoard)
+    print(f"Turns left: {gameState.turns_left}")
 
 def print_score_and_status(gameState: GameState):
     if gameState.isWin():
@@ -183,6 +183,10 @@ def main():
             print_projectile_locations(current_state)
             print_enemies_status(current_state)
             print_board(current_state)
+            if current_state.current_agents[0].isPlayer():
+                print(f"PLAYER HP: {current_state.current_agents[0].get_hp()}")
+            else:
+                print("PLAYER HP: 0")
             print_score_and_status(current_state)
             print(end_line)
 

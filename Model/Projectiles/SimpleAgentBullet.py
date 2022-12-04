@@ -158,7 +158,7 @@ class SimpleAgentBullet(ProjectileSuperClass):
         else:
             prepend += "Enemy Bullet"
 
-        prepend += f" at x/col = {self.get_position()[1]}\ty/row = {self.get_position()[0]}"
+        prepend += f" at x/col = {self.get_position()[1]}\ty/row = {self.get_position()[0]}\tspeed = {self.speed}"
 
         return prepend
 
