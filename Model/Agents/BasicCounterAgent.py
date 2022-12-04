@@ -69,3 +69,6 @@ class BasicCounterAgent(AgentSuperClass):
 
     def getPointValue(self) -> int:
         return 15
+
+    def isCounterAgent(self) -> bool:
+        return True

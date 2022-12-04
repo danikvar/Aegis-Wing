@@ -168,5 +168,8 @@ class AgentInterface:
     def isHeuristicAgent(self) -> bool:
         raise NotImplementedError
 
+    def isCounterAgent(self) -> bool:
+        raise NotImplementedError
+
     def isExpectimaxAgent(self) -> bool:
         raise NotImplementedError

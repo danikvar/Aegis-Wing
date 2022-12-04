@@ -117,3 +117,10 @@ class EnemyMoveFireHeuristicAgent(AgentSuperClass):
 
     def getPointValue(self) -> int:
         return 50
+
+    def isCounterAgent(self) -> bool:
+        if self.counter is not None:
+            return True
+        else:
+            return False
+
