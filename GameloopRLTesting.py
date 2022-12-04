@@ -122,11 +122,8 @@ def main():
             # this error only happens if an agent in the previous state was killed or removed from board
             # if agent was removed from list each_index value will be off by 1
             except IndexError:
-                print(f"current index is {each_index}")
-                print(f"Highest valid index is {len(current_state.current_agents) - 1}")
                 diff = each_index - len(current_state.current_agents) - 1
                 each_index = len(current_state.current_agents) - 1
-                print(f"updated index is {each_index}")
 
                 each_agent: AgentInterface = current_state.current_agents[each_index]
 
@@ -139,9 +136,6 @@ def main():
                 else:
                     break_flag = False
                     removed_counter += 1
-
-            if diff != None:
-                print(f"updated index is {each_index}")
 
             if each_agent.isPlayer():
                 #TODO DAN YOU WILL HAVE TO MAKE YOUR OWN PLAYER AGENT CLASS and overwrite auto pick action
