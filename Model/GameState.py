@@ -1,3 +1,5 @@
+from random import random
+
 from Model.Agents.Actions import Actions
 from Model.Agents.AgentInterface import AgentInterface
 from Model.Agents.AgentSuperClass import AgentSuperClass
@@ -453,9 +455,6 @@ class GameState:
         for each_index in range(len(self.current_projectiles)):
             each_bullet: ProjectileInterface = self.current_projectiles[each_index]
             each_bullet.resetMoveStatus()
-
-
-
 
 
 

@@ -22,7 +22,7 @@ class EnemyAgentBasicFireAndMove(AgentSuperClass):
         copy.hasAlreadyMoved = self.hasAlreadyMoved
         return copy
 
-    def autoPickAction(self) -> Actions:
+    def autoPickAction(self, state=None) -> Actions:
         """
         Picks one of potentially many pre-defined actions randomly
         in a uniform distribution.
@@ -32,4 +32,7 @@ class EnemyAgentBasicFireAndMove(AgentSuperClass):
 
     def getPointValue(self) -> int:
         return 25
+
+    def __str__(self):
+        return f"BasicFireAndMove at col/x = {self.get_position()[1]}\t row/y = {self.get_position()[0]}"
 
