@@ -1,4 +1,5 @@
 from Model.Agents.AgentInterface import AgentInterface
+from Model.GameState import GameState
 from Model.Projectiles.ProjectileInterface import ProjectileInterface
 from Model.Projectiles.ProjectileSuperClass import ProjectileSuperClass
 
@@ -70,6 +71,37 @@ class GameBoard:
                             else:
                                 self.board_array[eachRowIndex][eachColIndex] = agentIndex
 
+    def get_arr_for_RL(self, gameState: GameState, min_agent_type: int, max_agent_type: int):
+        """
+        only for agents, produces array based on param spec
+        :param gameState:
+        :param min_agent_type:
+        :param max_agent_type:
+        :return:
+        """
+        all_agents = gameState.current_agents
+
+        #TODO test to check but should produce filtered list
+        all_agents_filtered = filter(lambda x: x.getAgentType() >= min_agent_type and x.getAgentType() <= max_agent_type , all_agents)
+
+        #get empty board
+        template_arr = self.make_blank_board()
+
+        for each in all_agents_filtered:
+            each_agent : AgentInterface = each
+
+            agent_row_min, agent_row_max = each_agent.get_row_boundaries()
+            agent_col_min, agent_col_max = each_agent.get_col_boundaries()
+
+            for eachRowIndex in range(len(template_arr)):
+                if eachRowIndex >= agent_row_min and eachRowIndex <= agent_row_max:
+                    for eachColIndex in range(len(template_arr)):
+                        if eachColIndex >= agent_col_min and eachColIndex <= agent_col_max:
+                            template_arr[eachRowIndex][eachColIndex] = 1
+
+        return template_arr
+
+
     def populate_board_with_projectiles(self, bullet: ProjectileInterface):
         bullet_row_min, bullet_row_max = bullet.get_row_boundaries()
         bullet_col_min, bullet_col_max = bullet.get_col_boundaries()
@@ -104,6 +136,21 @@ class GameBoard:
            board_2d_array.append(any_row)
 
         self.board_array = board_2d_array
+
+    def make_blank_board(self) -> list:
+        """
+        Helper method for get board arr for RL
+        :return:
+        """
+        board_2d_array: list = []
+
+        for i in range(0, self.board_height):
+            any_row = []
+            for j in range(0, self.board_length):
+                any_row.append(0)
+            board_2d_array.append(any_row)
+
+        return board_2d_array
 
     def __str__(self):
         '''
