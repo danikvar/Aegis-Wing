@@ -41,7 +41,9 @@ class PlayerAgent(AgentSuperClass):
 
     #TODO test this method if necessary, use when player dies and has another life left
     def respawnPlayer(self):
-        return PlayerAgent(self.agent_length,self.agent_height,self.spawn_y, self.spawn_x)
+        #TODO would be an issue if game has more than 1 player life beacuse health not copied over
+        respawned =  PlayerAgent(self.agent_length,self.agent_height,self.spawn_y, self.spawn_x)
+        return respawned
 
 
     def getId(self):

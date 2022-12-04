@@ -1,3 +1,5 @@
+from random import random
+
 from Model.Agents.Actions import Actions
 from Model.Agents.AgentInterface import AgentInterface
 from Model.Agents.AgentSuperClass import AgentSuperClass
@@ -42,6 +44,9 @@ class GameState:
                             Actions.FIREDOWN, Actions.FIREUP]
         self.score = 0 #TODO test
 
+        #Added late
+        self.removed_agents = 0
+
 
     def addAgent(self, agent: AgentSuperClass) -> bool:
         '''
@@ -64,23 +69,28 @@ class GameState:
                 if self.isValidAgent(agent):
                     self.current_agents.append(agent)
                     self.isPlayerAdded = True
+                    self.update_board()
                     return True
                 else:
-                    print(f"WARNING: Cannot place player is position ({agent.lowest_row, agent.least_col})")
+                    print(f"WARNING: Player agent is killed, No point in adding more enemies")
+                    self.update_board()
                     return False
 
         else: # length of list > 1 i.e. player already added
             if agent.isPlayer() == True and self.isPlayerAdded == True:
                 print("WARNING: Player agent already added, cannot add more player agents")
+                self.update_board()
                 return False
             else: # if enemy agent, check we don't add more than allowed at one state
                 current_amt_enemies = len(self.current_agents) - 1
                 if (current_amt_enemies < self.max_enemies_at_any_given_time):
                     # now we check that enemy doesn't spawn inside player agent
                     self.current_agents.append(agent)
+                    self.update_board()
                     return True
                 else:
                     print("WARNING: Cannot exceed enemy agent limit, agent not added")
+                    self.update_board()
                     return False
 
     def getPlayerPos(self):
@@ -171,11 +181,15 @@ class GameState:
 
         for each in self.current_projectiles:
             each_bullet: ProjectileInterface = each
-            if each_bullet.get_hp() <= 0:
+            if each_bullet.get_hp() <= 0 or \
+                    each_bullet.get_min_col_boundary() < self.gameBoard.min_col or \
+                    each_bullet.get_max_col_boundary() > self.gameBoard.board_max_x_boundary:
                 bullets_to_remove.append(each_bullet)
 
         for bullet in bullets_to_remove:
             each_bullet: ProjectileInterface = bullet
+            #TODO delete print
+            #print("removing bullets")
             self.current_projectiles.remove(each_bullet)
 
 
@@ -255,13 +269,22 @@ class GameState:
                         self.current_agents[0] = player.respawnPlayer()
                         continue
 
-            if value_to_pop == 0:
+            if value_to_pop == 0 and self.current_player_lives <= 0:
                 self.current_agents.pop(value_to_pop)
                 subtract_by = 1
+                #TODO Delete print
+                #print("Removing Player Agent")
+                self.removed_agents += 1
+            elif value_to_pop == 0 and self.current_player_lives >= 1:
+                continue
             else:
                 value_to_pop = each_index - subtract_by
                 self.current_agents.pop(value_to_pop)
                 subtract_by = each_index
+                #TODO Delete print
+                #print("Removing Agent")
+                self.removed_agents += 1
+
 
     def update_board(self):
         '''
@@ -352,6 +375,7 @@ class GameState:
         copy.turns_left = self.turns_left
         copy.max_enemies_at_any_given_time = self.max_enemies_at_any_given_time
         copy.score = self.score
+        copy.removed_agents = self.removed_agents
         #TODO NOTE does not copy bullet_agents, or current projectiles
 
         #copy agents over
@@ -415,6 +439,7 @@ class GameState:
                 successor_state.current_agents[agentIndex] = movedAgent
                 if action in self.fireActions:
                     newBullet = SimpleAgentBullet(movedAgent, 2)
+                    newBullet.setHasMovedStatus(True)
                     successor_state.current_projectiles.append(newBullet)
                     current_agent: AgentInterface = successor_state.current_agents[agentIndex]
                     current_agent.setHasMovedStatus(True)
@@ -433,7 +458,6 @@ class GameState:
         if successor_state.haveAllAgentsMoved() == True:
             successor_state.checkBulletAgentClashes()
             successor_state.removeBullets()
-            #successor_state.reset_agents_move_status()
 
         #after action check if player has clashed with any enemy agents
         successor_state.checkPlayerAgentClashes()
@@ -454,8 +478,7 @@ class GameState:
             each_bullet: ProjectileInterface = self.current_projectiles[each_index]
             each_bullet.resetMoveStatus()
 
-
-
+        self.removed_agents = 0
 
 
 

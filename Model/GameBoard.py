@@ -22,10 +22,10 @@ class GameBoard:
         :param minimum_y: {int} the lowest y/row value for the board, by default it is 0
         '''
 
-        if (board_length <= 0):
-            raise ValueError("board length cannot be less than 0")
-        if (board_height <= 0):
-            raise ValueError("board height cannot be less than 0")
+        if (board_length <= 2):
+            raise ValueError("board length cannot be less than 2")
+        if (board_height <= 2):
+            raise ValueError("board height cannot be less than 2")
 
         self.board_length = board_length #amount of col
         self.board_height = board_height # amount of rows

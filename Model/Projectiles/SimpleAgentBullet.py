@@ -151,6 +151,16 @@ class SimpleAgentBullet(ProjectileSuperClass):
 
         return hit_flag
 
+    def __str__(self):
+        prepend = ""
+        if self.isPlayerBullet():
+            prepend += "Player Bullet"
+        else:
+            prepend += "Enemy Bullet"
+
+        prepend += f" at x/col = {self.get_position()[1]}\ty/row = {self.get_position()[0]}\tspeed = {self.speed}"
+
+        return prepend
 
 
 

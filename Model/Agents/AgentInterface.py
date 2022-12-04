@@ -173,3 +173,13 @@ class AgentInterface:
 
     def isExpectimaxAgent(self) -> bool:
         raise NotImplementedError
+
+    def getCount(self) -> int:
+        '''
+        This method should only be implemented in counter agents
+        :return:
+        '''
+        raise NotImplementedError("This agent is NOT a counter agent")
+
+    def getPointValue(self) -> int:
+        raise NotImplementedError("No points have been assigned to this agent")

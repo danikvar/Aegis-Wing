@@ -47,7 +47,7 @@ class AgentSuperClass(AgentInterface):
         '''
         Returns a tuple representing lowest left x position
         and lowest y position
-        :return: {tuple} (furthest lowest y post, least x pos)
+        :return: {tuple} (furthest lowest y pos, least x pos)
         '''
         return (self.lowest_row, self.least_col)
 
