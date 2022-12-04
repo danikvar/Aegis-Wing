@@ -1,5 +1,4 @@
 from Model.Agents.AgentInterface import AgentInterface
-from Model.GameState import GameState
 from Model.Projectiles.ProjectileInterface import ProjectileInterface
 from Model.Projectiles.ProjectileSuperClass import ProjectileSuperClass
 
@@ -71,7 +70,7 @@ class GameBoard:
                             else:
                                 self.board_array[eachRowIndex][eachColIndex] = agentIndex
 
-    def get_arr_for_RL(self, gameState: GameState, min_agent_type: int, max_agent_type: int):
+    def get_arr_for_RL(self, gameState, min_agent_type: int, max_agent_type: int):
         """
         only for agents, produces array based on param spec
         :param gameState:
@@ -82,7 +81,7 @@ class GameBoard:
         all_agents = gameState.current_agents
 
         #TODO test to check but should produce filtered list
-        all_agents_filtered = filter(lambda x: x.getAgentType() >= min_agent_type and x.getAgentType() <= max_agent_type , all_agents)
+        all_agents_filtered = list(filter(lambda x: x.getAgentType() >= min_agent_type and x.getAgentType() <= max_agent_type , all_agents))
 
         #get empty board
         template_arr = self.make_blank_board()
@@ -190,6 +189,45 @@ class GameBoard:
         # add col axis values
         x_axis_add_on = "  "
         for j in range(self.board_length):
+            x_axis_add_on += "  " + str(j) + " "
+
+        board_str += x_axis_add_on
+
+        return board_str.encode('utf-8').decode("ascii", "ignore")
+
+    @staticmethod
+    def print_RL_arr(rlArr):
+        list_row_str = []
+        board_str = ""
+
+        for row in range(len(rlArr)):  # amount of rows, or y values
+            temp = "|"
+            temp += "\u0332" + " "
+            current_row_list = rlArr[row]
+            for col in range(len(current_row_list)):  # amount of col or x's
+                string_add = None
+                if type(current_row_list[col]) == int:
+                    string_add = str(current_row_list[col])
+                else:
+                    string_add = current_row_list[col]
+                temp += "\u0332" + (string_add)
+                temp += "\u0332" + " "
+                temp += "|"
+                if col < len(current_row_list) - 1:
+                    temp += "\u0332" + " "
+                else:
+                    list_row_str.append(temp)
+
+        row_counter = len(rlArr) - 1
+
+        for i in range(-1, -len(list_row_str) - 1, -1):
+            # grab backwards so string rep axis makes sense
+            board_str += str(row_counter) + " " + list_row_str[i] + "\n"
+            row_counter -= 1
+
+        # add col axis values
+        x_axis_add_on = "  "
+        for j in range(rlArr):
             x_axis_add_on += "  " + str(j) + " "
 
         board_str += x_axis_add_on
