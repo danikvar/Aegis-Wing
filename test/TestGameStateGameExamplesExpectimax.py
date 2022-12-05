@@ -38,12 +38,12 @@ class TestGameStateGameExamples(unittest.TestCase):
         # set small turns
         state.turns_left = 10
         # make a player and add it
-        player = PlayerAgent(1, 1, 0, 0)
+        player = ExpectimaxAgent(1, 1, 0, 0)
         state.addAgent(player)
 
         enemy_1 = SimpleGoLeftAgent(3, 3)
         # row 1, col = 7
-        enemy_2 = ExpectimaxAgent(9, 9)
+        enemy_2 = EnemyMoveFireHeuristicAgent(9, 9)
 
         # add agents
         state.addAgent(enemy_1)
@@ -78,9 +78,9 @@ class TestGameStateGameExamples(unittest.TestCase):
                     # continue otherwise
 
                 # making player action just stop for this example
-                if each_agent.isPlayer():
-                    agent_action = Actions.STOP
-                elif each_agent.isExpectimaxAgent():
+                if each_agent.isExpectimaxAgent():
+                    agent_action = each_agent.autoPickAction(state)
+                elif each_agent.isHeuristicAgent():
                     agent_action = each_agent.autoPickAction(state)
                 else:
                     agent_action = each_agent.autoPickAction()

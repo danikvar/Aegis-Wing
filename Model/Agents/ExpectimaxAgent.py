@@ -8,7 +8,7 @@ from Model.Agents.AgentSuperClass import AgentSuperClass
 
 
 class ExpectimaxAgent(AgentSuperClass):
-    def __init__(self, lowest_row, least_col):
+    def __init__(self, agent_length: int = 1, agent_height: int = 1, lowest_row: int = 0, least_col: int = 0):
         super().__init__(1, 1, lowest_row, least_col)
         self.id = uuid.uuid4()
 
@@ -19,13 +19,16 @@ class ExpectimaxAgent(AgentSuperClass):
         return allactions
 
     def isPlayer(self):
-        return False
+        return True
 
     def deepcopy(self):
         copy = ExpectimaxAgent(self.lowest_row, self.least_col)
         copy.hasAlreadyMoved = self.hasAlreadyMoved
         copy.id = self.id
         return copy
+
+    def respawnPlayer(self):
+        return ExpectimaxAgent(self.agent_length,self.agent_height,self.spawn_y, self.spawn_x)
 
 
     def autoPickAction(self, gameState: GameState = None) -> Actions:
@@ -38,12 +41,16 @@ class ExpectimaxAgent(AgentSuperClass):
         Recursion function
         """
 
+        agent_copy = self.deepcopy()
+        # list_enemy_agents = state.current_agents[1:]
+
         def expectimaxFunction(state, depth, agent):
             """
             get depth
             if it cycles back to player move down the tree
             """
-            print("AGENT", agent)
+
+            # print("AGENT", agent)
             if (agent == 0):
                 nextDepth = depth - 1
             else:
@@ -52,12 +59,16 @@ class ExpectimaxAgent(AgentSuperClass):
             """
             If state is end of game
             """
+            # print(state is None)
             if state is None:
-                raise ValueError("GameState cannot be None for Heuristic Agent")
+                raise ValueError("GameState cannot be None for Expectimax Agent")
+
+            if (nextDepth == 0) or (state.isWin()) or (state.isLose()) or (state.isGameOver()):
+                return 0, 0
 
             """
             max = player
-            min = ghosts
+            min = enemy
             """
             if (agent == 0):
                 agentType = max
@@ -66,18 +77,20 @@ class ExpectimaxAgent(AgentSuperClass):
             else:
                 agentType = min
                 bestValue = inf
-            # print("BEST OF", bestOf)
-            # print("BEST VAL", bestVal)
+            # print("AgentType", agentType)
+            # print("BEST VAL", bestValue)
 
             """
             modulo to keep reverting back and forth between pacman and ghosts
             """
-            nextAgent = (agent + 1) % state.getNumAgents()
+            nextAgent = (agent + 1) % len(state.current_agents)
+            # print(nextAgent)
 
             """
             legal actions list available for an agent
             """
-            legalActionsList = state.getLegalActions(agent)
+            legalActionsList = [Actions.STOP, Actions.UP, Actions.DOWN, Actions.LEFT, Actions.RIGHT, Actions.FIRE]
+
 
             """
             If agents are not pacman
@@ -88,26 +101,30 @@ class ExpectimaxAgent(AgentSuperClass):
                 """
                 probability = 1.0 / len(legalActionsList)
                 averageValue = 0
+                # print(probability)
 
                 """
-                Loop - get all successor states and legal actions for ghosts
+                Loop - get all successor states and legal actions for enemy
                 """
+                print(legalActionsList)
                 for legalAction in legalActionsList:
-                    successorState = state.generateSuccessor(agent, legalAction)
+                    # print(legalAction, nextDepth, nextAgent)
+                    successorState = state.generateSuccessorState(agent, legalAction)
                     nodeValue, direction = expectimaxFunction(successorState, nextDepth, nextAgent)
                     """
                     calculate for the average of all available nodes
                     """
                     averageValue += probability * nodeValue
+                    # print(legalAction, nodeValue, averageValue)
 
-                # print(agent, averageValue, legalAction)
+                print(agent, averageValue, legalAction)
                 return averageValue, legalAction
 
             """
             Loop - get all successor states and legal actions for pacman
             """
             for legalAction in legalActionsList:
-                successorState = state.generateSuccessor(agent, legalAction)
+                successorState = state.generateSuccessorState(agent, legalAction)
                 actionValue, direction = expectimaxFunction(successorState, nextDepth, nextAgent)
 
                 # print(actionValue, direction)
@@ -125,7 +142,8 @@ class ExpectimaxAgent(AgentSuperClass):
 
             return bestValue, bestAction
 
-        value, legalAction = expectimaxFunction(gameState, self.depth + 1, self.index)
+        # print(gameState, self.depth, agent_copy.index)
+        value, legalAction = expectimaxFunction(gameState, self.depth + 1, agent_copy.index)
         return legalAction
 
     def isExpectimaxAgent(self) -> bool:
