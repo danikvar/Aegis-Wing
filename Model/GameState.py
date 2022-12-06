@@ -396,6 +396,23 @@ class GameState:
         current_agent: AgentInterface = successor_state.current_agents[agentIndex]
         all_legal_agent_actions = successor_state.getAllLegalActions(agentIndex)
 
+        # Expectimax Agent SuccessorState
+        if current_agent.isExpectimaxAgent():
+            if self.isWin() or self.isLose() or self.isGameOver():
+                raise Exception('Can\'t generate a successor of a terminal state.')
+
+            # Copy current game state
+            state = GameState(self)
+
+            # Let agent's logic deal with it's action's effect on the board
+            if agentIndex == 0: #Player ship is moving
+                state.data.explode = [False for i in range(len(state.current_agents))]
+                movedAgent = current_agent.take_action(action)
+                successor_state.current_agents[agentIndex] = movedAgent
+
+
+
+
         # TODO: TEST THIS --> IF IS HEURISTIC AGENT --> IF IT SHOOTS AND MOVES THEN MOVE FIRST
         #  UPDATE AGENT AND THEN PASS UPDATED AGENT TO THE BULLET
 
@@ -409,15 +426,15 @@ class GameState:
                     current_agent: AgentInterface = successor_state.current_agents[agentIndex]
                     current_agent.setHasMovedStatus(True)
 
-        elif current_agent.isExpectimaxAgent():
-            if action in all_legal_agent_actions:
-                movedAgent = current_agent.take_action(action)
-                successor_state.current_agents[agentIndex] = movedAgent
-                if action in self.fireActions:
-                    newBullet = SimpleAgentBullet(movedAgent, 2)
-                    successor_state.current_projectiles.append(newBullet)
-                    current_agent: AgentInterface = successor_state.current_agents[agentIndex]
-                    current_agent.setHasMovedStatus(True)
+        # elif current_agent.isExpectimaxAgent():
+        #     if action in all_legal_agent_actions:
+        #         movedAgent = current_agent.take_action(action)
+        #         successor_state.current_agents[agentIndex] = movedAgent
+        #         if action in self.fireActions:
+        #             newBullet = SimpleAgentBullet(movedAgent, 2)
+        #             successor_state.current_projectiles.append(newBullet)
+        #             current_agent: AgentInterface = successor_state.current_agents[agentIndex]
+        #             current_agent.setHasMovedStatus(True)
 
         elif action in all_legal_agent_actions:
             if action == Actions.FIRE:
