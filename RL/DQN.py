@@ -6,10 +6,18 @@ import collections
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from Model.GameState import GameState
 import torch.optim as optim
 import copy
 
 DEVICE = 'cpu'  # 'cuda' if torch.cuda.is_available() else 'cpu'
+REWARD_BULLET_PATH = -50  # do not want player ending 2 or < spaces away from any bullet since they will lose hp
+REWARD_NEAR_BULLET = -10  # Check how many possible future paths collide with bullet and assign -10 for each
+REWARD_WIN = 10000  # reward winning the game
+REWARD_LOSE = -1000
+REWARD_LOSE_LIFE = -100
+REWARD_TURN = 5
+PLAYER_HP = 3
 
 
 class DQNAgent(torch.nn.Module):
@@ -31,14 +39,15 @@ class DQNAgent(torch.nn.Module):
         self.weights = params['weights_path']
         self.load_weights = params['load_weights']
         self.optimizer = None
+        self.totalTurns = params['turns']
         self.network()
 
     def network(self):
         # Layers
-        self.f1 = nn.Linear(11, self.first_layer)
+        self.f1 = nn.Linear(392, self.first_layer)
         self.f2 = nn.Linear(self.first_layer, self.second_layer)
         self.f3 = nn.Linear(self.second_layer, self.third_layer)
-        self.f4 = nn.Linear(self.third_layer, 3)
+        self.f4 = nn.Linear(self.third_layer, 6)
         # weights
         if self.load_weights:
             self.model = self.load_state_dict(torch.load(self.weights))
@@ -51,88 +60,76 @@ class DQNAgent(torch.nn.Module):
         x = F.softmax(self.f4(x), dim=-1)
         return x
 
-    def get_state(self, game, player, food):
+    def get_state(self, game: GameState):
         """
         Return the state.
-        The state is a numpy array of 11 values, representing:
-            - Danger some Agent 1-3 columns to the right and -1,0,1 rows away
-            - Danger some Agent 1-2 columns to the left and -1,0,1 rows away
-            - Danger same Agent same column and 1-2 rows up or 1 col right/left 2 up.
-            - Danger same Agent same column and 1-2 rows down or 1 col right/left 2 down.
-            - Danger enemy bullet at same row and 1-3 columns to right
-            - Danger enemy bullet at one row up and 1-2 columns to right
-            - Danger enemy bullet at one row down and 1-2 columns to right
-            - Can move up
-            - Can move left
-            - Can move right
-            - Can move down
-            - Player Location
-            - Heuristic Enemy Locations board col x board row tensor
-            - GoLeft Enemy Locations boc col x row tensor
+        The state is a numpy array of (8*7*7) x 1 , representing:
+            - Player Location (in Grid)
+            - Heuristic Enemy Locations
+            - GoLeft Enemy Locations
             - BasicFireAndMove Locations
             - Counter Enemy Locations
+            - Enemy Bullet Locations
+            - Player Bullet Location
+
+            Each position in list corresponds to a location and enemy type. The locations go in
+            groups of 7 with a 1 representing that this agent is in that location. For example the
+            first seven elements represent the bottom row far left state, the next seven one space to
+            the right on the bottom row, and so on with wrapping around to the left as we increase the row.
         """
 
-        [[0, 1, 0, 0, 0]
-         [0, 0, 0, 0, 1]
-        [0, 0]]
-        []
-        []
-        state = [
-            (player.x_change == 20 and player.y_change == 0 and (
-                        (list(map(add, player.position[-1], [20, 0])) in player.position) or
-                        player.position[-1][0] + 20 >= (game.game_width - 20))) or (
-                        player.x_change == -20 and player.y_change == 0 and (
-                            (list(map(add, player.position[-1], [-20, 0])) in player.position) or
-                            player.position[-1][0] - 20 < 20)) or (player.x_change == 0 and player.y_change == -20 and (
-                        (list(map(add, player.position[-1], [0, -20])) in player.position) or
-                        player.position[-1][-1] - 20 < 20)) or (player.x_change == 0 and player.y_change == 20 and (
-                        (list(map(add, player.position[-1], [0, 20])) in player.position) or
-                        player.position[-1][-1] + 20 >= (game.game_height - 20))),  # danger straight
+        player_list_arr = game.gameBoard.get_board_with_agents_RL(game, 1, 1)
+        left_list_arr = game.gameBoard.get_board_with_agents_RL(game, 2, 2)
+        fire_move_list_arr = game.gameBoard.get_board_with_agents_RL(game, 3, 3)
+        heur_list_arr = game.gameBoard.get_board_with_agents_RL(game, 4, 4)
+        counter_list_arr = game.gameBoard.get_board_with_agents_RL(game, 5, 5)
 
-            (player.x_change == 0 and player.y_change == -20 and (
-                        (list(map(add, player.position[-1], [20, 0])) in player.position) or
-                        player.position[-1][0] + 20 > (game.game_width - 20))) or (
-                        player.x_change == 0 and player.y_change == 20 and ((list(map(add, player.position[-1],
-                                                                                      [-20, 0])) in player.position) or
-                                                                            player.position[-1][0] - 20 < 20)) or (
-                        player.x_change == -20 and player.y_change == 0 and ((list(map(
-                    add, player.position[-1], [0, -20])) in player.position) or player.position[-1][-1] - 20 < 20)) or (
-                        player.x_change == 20 and player.y_change == 0 and (
-                        (list(map(add, player.position[-1], [0, 20])) in player.position) or player.position[-1][
-                    -1] + 20 >= (game.game_height - 20))),  # danger right
+        player_proj_list_arr =  game.gameBoard.get_board_with_proj_RL(game, True)
+        enemy_proj_list_arr = game.gameBoard.get_board_with_proj_RL(game, False)
 
-            (player.x_change == 0 and player.y_change == 20 and (
-                        (list(map(add, player.position[-1], [20, 0])) in player.position) or
-                        player.position[-1][0] + 20 > (game.game_width - 20))) or (
-                        player.x_change == 0 and player.y_change == -20 and ((list(map(
-                    add, player.position[-1], [-20, 0])) in player.position) or player.position[-1][0] - 20 < 20)) or (
-                        player.x_change == 20 and player.y_change == 0 and (
-                        (list(map(add, player.position[-1], [0, -20])) in player.position) or player.position[-1][
-                    -1] - 20 < 20)) or (
-                    player.x_change == -20 and player.y_change == 0 and (
-                        (list(map(add, player.position[-1], [0, 20])) in player.position) or
-                        player.position[-1][-1] + 20 >= (game.game_height - 20))),  # danger left
+        state = []
+        for eachRowIndex in range(len(player_list_arr)):
+            for eachColIndex in range(len(player_list_arr[eachRowIndex])):
+                if player_list_arr[eachRowIndex][eachColIndex] == 1:
+                    state.append(1)
+                else:
+                    state.append(0)
 
-            player.x_change == -20,  # move left
-            player.x_change == 20,  # move right
-            player.y_change == -20,  # move up
-            player.y_change == 20,  # move down
-            food.x_food < player.x,  # food left
-            food.x_food > player.x,  # food right
-            food.y_food < player.y,  # food up
-            food.y_food > player.y  # food down
-        ]
+                if left_list_arr[eachRowIndex][eachColIndex] == 1:
+                    state.append(1)
+                else:
+                    state.append(0)
 
-        for i in range(len(state)):
-            if state[i]:
-                state[i] = 1
-            else:
-                state[i] = 0
+                if fire_move_list_arr[eachRowIndex][eachColIndex] == 1:
+                    state.append(1)
+                else:
+                    state.append(0)
 
-        return np.asarray(state)
+                if heur_list_arr[eachRowIndex][eachColIndex] == 1:
+                    state.append(1)
+                else:
+                    state.append(0)
 
-    def set_reward(self, player, crash):
+                if counter_list_arr[eachRowIndex][eachColIndex] == 1:
+                    state.append(1)
+                else:
+                    state.append(0)
+
+                if player_proj_list_arr[eachRowIndex][eachColIndex] == 1:
+                    state.append(1)
+                else:
+                    state.append(0)
+
+                if enemy_proj_list_arr[eachRowIndex][eachColIndex] == 1:
+                    state.append(1)
+                else:
+                    state.append(0)
+
+        state = np.array(state)
+
+        return state
+
+    def set_reward(self, game: GameState):
         """
         Return the reward.
         The reward is:
@@ -140,12 +137,33 @@ class DQNAgent(torch.nn.Module):
             +10 when Snake eats food
             0 otherwise
         """
+
+        # reward for killing an agent = points for that agent
+        # -10 points for each agent in the surround check up/down & left/right
+        # -5 points for each surrounding bullet
+        # reward for surviving - .2 point for each turn survived (Every 5 turns is one point)
+
+        # TODO: Check reworking scores
+        # check for score
+        # difference old_score vs new_score
         self.reward = 0
-        if crash:
-            self.reward = -10
+        if game.isWin():
+            self.reward = REWARD_WIN
             return self.reward
-        if player.eaten:
-            self.reward = 10
+        if game.isLose():
+            self.reward = REWARD_LOSE
+            return self.reward
+
+        # add score reward for surviving
+        self.reward += game.lastHit
+        if game.lostLife:
+            self.reward += REWARD_LOSE_LIFE
+
+        self.reward += (self.totalTurns - game.turns_left) / 5
+        self.reward += self.check_enemy_neighbors_up_down(game)
+        self.reward += self.check_enemy_neighbors_left_right(game)
+        self.reward += self.check_Bullet_Paths(game)
+
         return self.reward
 
     def remember(self, state, action, reward, next_state, done):
@@ -188,8 +206,8 @@ class DQNAgent(torch.nn.Module):
         self.train()
         torch.set_grad_enabled(True)
         target = reward
-        next_state_tensor = torch.tensor(next_state.reshape((1, 11)), dtype=torch.float32).to(DEVICE)
-        state_tensor = torch.tensor(state.reshape((1, 11)), dtype=torch.float32, requires_grad=True).to(DEVICE)
+        next_state_tensor = torch.tensor(next_state.reshape((1, 392)), dtype=torch.float32).to(DEVICE)
+        state_tensor = torch.tensor(state.reshape((1, 392)), dtype=torch.float32, requires_grad=True).to(DEVICE)
         if not done:
             target = reward + self.gamma * torch.max(self.forward(next_state_tensor[0]))
         output = self.forward(state_tensor)
@@ -200,3 +218,102 @@ class DQNAgent(torch.nn.Module):
         loss = F.mse_loss(output, target_f)
         loss.backward()
         self.optimizer.step()
+
+    def check_Bullet_Paths(self, game: GameState):
+        """
+        Creates a negative reward for each enemy bullet in a radius.
+        Gives -5 points for each up to a maximum of -45
+        Checks 2 columns to the right of player and -1,0,1 row up/down.
+         X |  |  |  |
+           |  |  |
+        Also checks 3 spaces to the right in the player row.
+        Args:
+            game: The current gamestate
+
+        Returns: the negative reward
+
+        """
+        neg_reward = 0
+        # gets the lowest row then the least col
+        player_y, player_x = game.getPlayerPos()
+        check_y = [player_y - 1, player_y, player_y + 1]
+        check_x = [player_x + 1, player_x + 2]
+        check_x2 = player_x + 3
+
+        enemy_proj = list(filter(lambda x: x.isPlayerBullet() is False, game.current_projectiles))
+        if len(enemy_proj) > 0:
+            for proj in enemy_proj:
+                proj_y, proj_x = proj.get_position()
+                if proj_y in check_y:
+                    if proj_x in check_x:
+                        neg_reward -= 5
+                    if proj_y == player_y and proj_x == check_x2:
+                        neg_reward -= 5
+
+        return neg_reward
+
+    def check_enemy_neighbors_left_right(self, game: GameState):
+        """
+        Creates a negative reward for each enemy agent left or right of player.
+        Gives -10 points for each up to a maximum of -50 (max of 5 agents for our current game loop)
+        Checks up to columns to the right of player and -1,0,1 row up/down.
+        |  |  | X |  |  |  |
+        Also check 2 columns left of player and same rows.
+        Args:
+            game: The current gamestate
+
+        Returns: the negative reward
+
+        """
+        neg_reward = 0
+        # gets the lowest row then the least col
+        player_y, player_x = game.getPlayerPos()
+        check_y = [player_y - 1, player_y, player_y + 1]
+        # checks the 3 columns to the right of the player and 2 to the left
+        check_x = [player_x - 1, player_x - 2, player_x + 1, player_x + 2, player_x + 3]
+        check_x2 = player_x + 3
+
+        enemy_agents = list(filter(lambda x: x.isPlayer() is False, game.current_agents))
+        if len(enemy_agents) > 0:
+            for enemy in enemy_agents:
+                proj_y, proj_x = enemy.get_position()
+                if proj_y in check_y:
+                    if proj_x in check_x:
+                        neg_reward -= 10
+                    if proj_y == player_y and proj_x == check_x2:
+                        neg_reward -= 10
+
+        return neg_reward
+
+
+    def check_enemy_neighbors_up_down(self, game: GameState):
+        """
+        Creates a negative reward for each enemy agent above/below/on player
+        Gives -10 points for each up to a maximum of -50 (max of 5 agents)
+        Checks the player column 2 rows down up to 2 rows above.
+        On the max rows also checks the columns 1 left and 1 right of player
+        Args:
+            game: The current gamestate
+
+        Returns: the negative reward
+
+        """
+        neg_reward = 0
+        # gets the lowest row then the least col
+        player_y, player_x = game.getPlayerPos()
+        check_y = [player_y - 2, player_y - 1, player_y, player_y + 1, player_y + 2]
+        check_y2 = [player_y - 2, player_y + 2]
+        # checks the 3 columns to the right of the player and 2 to the left
+        check_x = [player_x - 1, player_x + 1]
+
+        enemy_agents = list(filter(lambda x: x.isPlayer() is False, game.current_agents))
+        if len(enemy_agents) > 0:
+            for enemy in enemy_agents:
+                proj_y, proj_x = enemy.get_position()
+                if proj_y in check_y:
+                    if proj_x == player_x:
+                        neg_reward -= 10
+                    elif proj_y in check_y2 and proj_x in check_x:
+                        neg_reward -= 10
+
+        return neg_reward

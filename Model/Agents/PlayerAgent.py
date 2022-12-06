@@ -60,3 +60,5 @@ class PlayerAgent(AgentSuperClass):
 
     def getAgentType(self) -> int:
         return 1
+    def __str__(self):
+        return f"PlayerAgent at col/x = {self.get_position()[1]}\t row/y = {self.get_position()[0]}"

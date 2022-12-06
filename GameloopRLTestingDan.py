@@ -1,5 +1,6 @@
 import random
 
+import Model.Agents.AgentInterface
 from Model.Agents.Actions import Actions
 from Model.Agents.AgentInterface import AgentInterface
 from Model.Agents.BasicCounterAgent import BasicCounterAgent
@@ -66,6 +67,21 @@ def print_enemies_status(gameState: GameState ):
         for each_enemy_index in range(len(all_enemy_agents)):
             print("\t" + str(each_enemy_index + 2) + ".) " + all_enemy_agents[each_enemy_index].__str__())
 
+def print_player_status(gameState: GameState ):
+    all_enemy_agents = gameState.current_agents[1]
+
+    print(f"Player on board: {len(all_enemy_agents)}")
+    if len(all_enemy_agents) > 0:
+
+        print("\t" + str(all_enemy_agents + 2) + ".) " + all_enemy_agents.__str__())
+
+
+def print_score(gameState: GameState):
+    score = gameState.score
+
+    print(f"Current Score: {score}")
+
+
 def print_board(gameState: GameState):
     print(gameState.gameBoard)
     print(f"Turns left: {gameState.turns_left}")
@@ -93,11 +109,82 @@ def print_projectile_locations(gameState: GameState):
             print(f"\t{j}.) {all_enemy_projectiles[j]}")
 
 
+def get_state(game: GameState):
+    """
+    Return the state.
+    The state is a numpy array of (8*7*7) x 1 , representing:
+        - Player Location (in Grid)
+        - Heuristic Enemy Locations
+        - GoLeft Enemy Locations
+        - BasicFireAndMove Locations
+        - Counter Enemy Locations
+        - Enemy Bullet Locations
+        - Player Bullet Location
+
+        Each position in list corresponds to a location and enemy type. The locations go in
+        groups of 7 with a 1 representing that this agent is in that location. For example the
+        first seven elements represent the top row fdr left state, the next seven one space to
+        the rights, and so on with wrapping.
+    """
+
+    player_list_arr = game.gameBoard.get_board_with_agents_RL(game, 1, 1)
+    left_list_arr = game.gameBoard.get_board_with_agents_RL(game, 2, 2)
+    fire_move_list_arr = game.gameBoard.get_board_with_agents_RL(game, 3, 3)
+    heur_list_arr = game.gameBoard.get_board_with_agents_RL(game, 4, 4)
+    counter_list_arr = game.gameBoard.get_board_with_agents_RL(game, 5, 5)
+
+    player_proj_list_arr = game.gameBoard.get_board_with_proj_RL(game, True)
+    enemy_proj_list_arr = game.gameBoard.get_board_with_proj_RL(game, False)
+    print("PLAYER")
+    print(len(player_list_arr))
+
+    state = []
+    for eachRowIndex in range(len(player_list_arr)):
+        for eachColIndex in range(len(player_list_arr[eachRowIndex])):
+            #print(max(player_list_arr[eachRowIndex]))
+            if player_list_arr[eachRowIndex][eachColIndex] == 1:
+                state.append(1)
+            else:
+                state.append(0)
+
+            if left_list_arr[eachRowIndex][eachColIndex] == 1:
+                state.append(1)
+            else:
+                state.append(0)
+
+            if fire_move_list_arr[eachRowIndex][eachColIndex] == 1:
+                state.append(1)
+            else:
+                state.append(0)
+
+            if heur_list_arr[eachRowIndex][eachColIndex] == 1:
+                state.append(1)
+            else:
+                state.append(0)
+
+            if counter_list_arr[eachRowIndex][eachColIndex] == 1:
+                state.append(1)
+            else:
+                state.append(0)
+
+            if player_proj_list_arr[eachRowIndex][eachColIndex] == 1:
+                state.append(1)
+            else:
+                state.append(0)
+
+            if enemy_proj_list_arr[eachRowIndex][eachColIndex] == 1:
+                state.append(1)
+            else:
+                state.append(0)
+
+    return state
 
 def main():
 
     #set to false to turn off print statements
     visualize_game = True
+    # set to true to look at agent and bullet matrices
+    visualize_heuristics = False
 
     starting_gamestate = GameState(board_len=BOARD_COLUMNS, board_height=BOARD_ROWS,
                                    max_enemies_at_one_time=MAX_ENEMIES_AT_ANY_TIME,
@@ -107,9 +194,15 @@ def main():
     # player will be of size 1 X 1
     player_agent = PlayerAgent(1, 1, PLAYER_INITIAL_SPAWN_ROW_POSITION,
                                PLAYER_INITIAL_SPAWN_COL_POSITION)
+
     player_agent.set_hp(PLAYER_HP)
 
+    new_agent = SimpleGoLeftAgent(7, 6)
+
     did_add_agent = starting_gamestate.addAgent(player_agent)
+
+    starting_gamestate.addAgent(new_agent)
+
 
     if (did_add_agent == False):
         raise RuntimeError("Could not add player agent")
@@ -121,11 +214,48 @@ def main():
     if visualize_game:
         print("Staring GameState")
         print_board(current_state)
-        print_score_and_status(current_state)
+        print(end_line,"\n")
+        state_arr = get_state(current_state)
+        print(len(state_arr))
+        print(str(state_arr))
+        print(max(state_arr))
+        print(end_line, "\n")
+        res_list = [i for i in range(len(state_arr)) if state_arr[i] == 1]
+        print(str(res_list))
+        print(end_line, "\n")
+
+    if visualize_heuristics:
+        myBoard = current_state.gameBoard.get_board_with_agents_RL(current_state,2,5)
+        myBoard2 = current_state.gameBoard.get_board_with_proj_RL(current_state, True)
+
+        for row in range(len(myBoard) - 1, -1, -1):
+            print(myBoard[row])
+
+        print(end_line, "\n")
+
+        for row in range(len(myBoard2) - 1, -1, -1):
+            print(myBoard2[row])
         print(end_line,"\n")
 
+        myBoard3 = current_state.gameBoard.get_board_with_proj_RL(current_state, False)
+
+
+        for row in range(len(myBoard3) - 1, -1, -1):
+            print(myBoard3[row])
+
+        print(end_line, "\n")
+        myBoard4 = current_state.gameBoard.get_board_with_agents_overlaps_RL(current_state, 2, 6)
+        print(len(myBoard4))
+        for row in range(len(myBoard4) - 1, -1, -1):
+            print(myBoard4[row])
+
+        print(end_line, "\n")
+
+
+
+
     # game loop
-    while current_state.isWin() == False and current_state.isLose() == False:
+    while current_state.isWin() is False and current_state.isLose() is False:
         #have each agent take an action
         for each_index in range(0,len(current_state.current_agents)):
             # print(f"Highest valid index is {len(current_state.current_agents)-1}")
@@ -147,8 +277,8 @@ def main():
                     continue # move on to next agent
 
             if each_agent.isPlayer():
-                #TODO DAN YOU WILL HAVE TO MAKE YOUR OWN PLAYER AGENT CLASS and overwrite auto pick action
-                DEFAULT_ACTION = Actions.STOP
+                # TODO DAN YOU WILL HAVE TO MAKE YOUR OWN PLAYER AGENT CLASS and overwrite auto pick action
+                DEFAULT_ACTION = Actions.FIRE
                 agent_action = DEFAULT_ACTION
 
             elif each_agent.isHeuristicAgent():
@@ -183,12 +313,40 @@ def main():
             print_projectile_locations(current_state)
             print_enemies_status(current_state)
             print_board(current_state)
-            if current_state.current_agents[0].isPlayer():
-                print(f"PLAYER HP: {current_state.current_agents[0].get_hp()}")
-            else:
-                print("PLAYER HP: 0")
-            print_score_and_status(current_state)
-            print(end_line)
+            print(end_line, "\n")
+            state_arr = get_state(current_state)
+            print(len(state_arr))
+            print(str(state_arr))
+            print(max(state_arr))
+            print(end_line, "\n")
+            res_list = [i for i in range(len(state_arr)) if state_arr[i] == 1]
+            print(str(res_list))
+            print(end_line, "\n")
+
+        if visualize_heuristics:
+            myBoard = current_state.gameBoard.get_board_with_agents_RL(current_state, 2,5)
+            myBoard2 = current_state.gameBoard.get_board_with_proj_RL(current_state, True)
+
+            for row in range(len(myBoard) - 1, -1, -1):
+                print(myBoard[row])
+
+            print(end_line, "\n")
+            for row in range(len(myBoard2) - 1, -1, -1):
+                print(myBoard2[row])
+            print(end_line, "\n")
+
+            myBoard3 = current_state.gameBoard.get_board_with_proj_RL(current_state, False)
+
+            myBoard4 = current_state.gameBoard.get_board_with_agents_overlaps_RL(current_state, 2, 6),
+
+            for row in range(len(myBoard3) - 1, -1, -1):
+                print(myBoard3[row])
+
+            for row in range(len(myBoard4) - 1, -1, -1):
+                print(myBoard4[row])
+
+            print(end_line, "\n")
+
 
 
 if __name__ == "__main__":
