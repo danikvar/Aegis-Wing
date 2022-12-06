@@ -343,7 +343,7 @@ class GameState:
         if isAgentPlayer == False:
             if agent_min_x < board_min_x:
                 return False
-            if agent_max_x > board_max_x:
+            if agent_max_x - 1 > board_max_x:
                 return False
             else:
                 return True
