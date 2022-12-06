@@ -56,14 +56,12 @@ class TestGameStateGameExamples(unittest.TestCase):
                 try:
                     each_agent: AgentInterface = state.current_agents[each_index]
                 except IndexError:
-                    # means list was shortened because enemy agent died or exited board
-                    # 3 cases
+                    # means list was shortened because agent died or exited board
                     # case 1 agent in middle of list disappeared
                     each_agent: AgentInterface = state.current_agents[each_index - 1]
-                    # case agent at end of list died/disappeared
+                    # case 2 agent at end of list died/disappeared
                     # no more agents to move
                     if each_agent.hasMoved():
-                        state.decrement_turn()
                         break
                     else:
                         each_index -= 1

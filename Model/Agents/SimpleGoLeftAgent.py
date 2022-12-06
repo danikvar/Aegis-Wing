@@ -50,3 +50,6 @@ class SimpleGoLeftAgent(AgentSuperClass):
 
     def getPointValue(self) -> int:
         return 10
+
+    def __str__(self):
+        return f"SimpleGoLeft at col/x = {self.get_position()[1]}\t row/y = {self.get_position()[0]}"

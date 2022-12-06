@@ -10,7 +10,7 @@ class EnemyMoveFireHeuristicAgent(AgentSuperClass):
     This agent can move left, down, up, or fire
     """
 
-    def __init__(self, lowest_row, least_col, count: int = None):
+    def __init__(self, lowest_row, least_col, count: int = 10):
         super().__init__(1, 1, lowest_row, least_col)
         self.counter = count
 
@@ -35,8 +35,6 @@ class EnemyMoveFireHeuristicAgent(AgentSuperClass):
         in a uniform distribution.
         :return:
         """
-        print("Current counter:" + str(self.counter))
-
         if self.counter is not None and self.counter <= 0:
             return Actions.FIRELEFT
 
@@ -117,3 +115,9 @@ class EnemyMoveFireHeuristicAgent(AgentSuperClass):
 
     def getPointValue(self) -> int:
         return 50
+
+    def getCount(self) -> int:
+        return self.counter
+
+    def __str__(self):
+        return f"HeuristicMoveFire at col/x = {self.get_position()[1]}\t row/y = {self.get_position()[0]},\t count: {self.counter}"

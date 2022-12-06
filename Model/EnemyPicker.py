@@ -3,6 +3,7 @@ import random
 from Model.Agents.AgentInterface import AgentInterface
 
 #TODO write tests
+from Model.Agents.BasicCounterAgent import BasicCounterAgent
 from Model.GameBoard import GameBoard
 
 
@@ -88,6 +89,25 @@ class EnemyPicker():
             chosen_enemy.set_position(agent_lowest_row, self.board_max_col)
             if self.isValidEnemyPosition(chosen_enemy):
                 valid_pos = True
+
+        ##### Specific to integrating basic counter agents ####
+
+        if type(chosen_enemy) == BasicCounterAgent:
+            #randomly select row to go to
+            chosen_ideal_row = random.choice(list(range(0,self.board_max_row)))
+
+            #TODO heads up may cause issues if board lengths less than 3
+            chosen_ideal_col = self.board_max_col - 3 #force position to be near right side of board
+
+            if chosen_ideal_col <= 0:
+                print(f"WARNING, BASIC COUNTER AGENT MAY NOT BE ABLE TO GO TO IDEAL POSITION row = {chosen_ideal_row}, col={chosen_ideal_col}")
+                print(f"Gameboard row boundaries (inclusive) are {self.board_min_row, self.board_max_row}")
+                print(f"Gameboard col boundaris (inclusive) are {self.board_min_col, self.board_max_col}")
+
+            ce : BasicCounterAgent = BasicCounterAgent.convert_agentInterface_to_BasicCounter(chosen_enemy)
+            ce.set_ideal_row(chosen_ideal_row)
+            ce.set_ideal_col(chosen_ideal_col)
+            chosen_enemy : AgentInterface = ce
 
         return chosen_enemy
 
