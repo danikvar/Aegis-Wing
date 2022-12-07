@@ -53,11 +53,19 @@ class ExpectimaxAgent(AgentSuperClass):
         agentCopy = self.deepcopy()
         depth = agentCopy.getDepth()
 
-        def expectiMaxFunction(state, depth):
+        def expectiMaxFunction(state, depth, agentIndex):
             """
-            If state is end of game
+            get depth
+            if it cycles back to player move down the tree
             """
-            nextDepth = depth - 1
+            if (agentIndex == 0):
+                nextDepth = depth - 1
+            else:
+                nextDepth = depth
+
+            # print()
+            # print("DEPTH", depth)
+            # depth -= 1
 
             """
             Base or terminating case
@@ -65,83 +73,85 @@ class ExpectimaxAgent(AgentSuperClass):
             if (nextDepth <= 0) or (state.isWin()) or (state.isLose()) or (state.isGameOver()):
                 return state.score, None
 
-            print()
-            print("DEPTH", depth)
-            # depth -= 1
+            """
+            max = player
+            min = ghosts
+            """
+            if (agentIndex == 0):
+                agentType = max
+                bestValue = -inf
 
-            #Get all legal actions of player, arg is 0 because player index is 0
-            legalActions = state.getAllLegalActions(0)
-            print("PLAYER ACTIONS: ", legalActions)
-            #get current score of state
-            score = state.score
-            print("SCORE:", score)
+            else:
+                agentType = min
+                bestValue = inf
 
-            # generate a new state per legal agent actions
-            actionScoreDictionary = {}
-            for playerAction in legalActions:
-                print()
-                print("PLAYER ACTION", playerAction)
-                new_state = state.generateSuccessorState(0, playerAction)
-                #score of state where player agent has moved to a new position, but no enemies have moved yet
-                playerScore = new_state.score
-                print("PLAYER SCORE = ", playerScore)
+            """
+            modulo to keep reverting back and forth between pacman and ghosts
+            """
+            nextAgent = (agentIndex + 1) % len(state.current_agents)
 
-                #for each enemy have them make a move
-                #get all enemies
-                #THIS is an example, it's not a 1:1
+            """
+            legal actions list available for an agent
+            """
+            # print(state.getAllLegalActions(agentIndex))
+            legalActionsList = state.getAllLegalActions(agentIndex)
 
-                expectedEnemyValue = 0
-                allEnemyAgentsList = new_state.current_agents[1:]
-                # print(allEnemyAgentsList)
-                for eachEnemyIndex in range(len(allEnemyAgentsList)):
-                    true_enemy_index = eachEnemyIndex + 1
-                    # print()
-                    # print("ENEMY # ", true_enemy_index)
-                    all_legal_enemy_actions = new_state.getAllLegalActions(true_enemy_index)
-                    # print(all_legal_enemy_actions)
+            """
+            If agents are not player
+            """
+            if (agentIndex != 0):
+                """
+                Probability = branches of the node of possible agent moves
+                """
+                probability = 1.0 / len(legalActionsList)
+                averageValue = 0
 
-                    for each_enemy_action in all_legal_enemy_actions:
-                        enemyMoveState = new_state.generateSuccessorState(true_enemy_index,each_enemy_action)
-                        enemyScore = enemyMoveState.score
+                """
+                Loop - get all successor states and legal actions for enemy ships
+                """
+                for legalAction in legalActionsList:
+                    successorState = state.generateSuccessorState(agentIndex, legalAction)
+                    nodeValue, direction = expectiMaxFunction(successorState, nextDepth, nextAgent)
+                    """
+                    calculate for the average of all available nodes
+                    """
+                    averageValue += probability * nodeValue
 
-                        expectedEnemyValue += enemyScore
+                # print(agentIndex, averageValue, legalAction)
+                return averageValue, legalAction
 
-                    # print("ACTION: ", each_enemy_action, "ENEMY SCORE: ", enemyScore, "EXPECTED ENEMY VAL", expectedEnemyValue)
 
-                actionScoreDictionary[playerAction] = expectedEnemyValue
-                print(actionScoreDictionary)
+            """
+            Loop - get all successor states and legal actions for pacman
+            """
+            for legalAction in legalActionsList:
+                successorState = state.generateSuccessorState(agentIndex, legalAction)
+                actionValue, direction = expectiMaxFunction(successorState, nextDepth, nextAgent)
 
-            bestScore = max(actionScoreDictionary.values())
-            bestAction = max(actionScoreDictionary, key=actionScoreDictionary.get)
-            print()
-            print("BEST ACTION", bestAction)
+                # print(actionValue, direction)
 
-            return bestScore, bestAction
+                """
+                Decide on the best course of action by getting best value
+                """
+                if (agentType(bestValue, actionValue) == actionValue):
+                    bestValue = actionValue
+                    bestAction = legalAction
+                    # print(agent, bestValue, bestAction)
 
-            # agentCopy.performAction(bestAction)
-            #
-            # new_state = stateCopy.generateSuccessorState(0, bestAction)
-            # allEnemyAgentsList = new_state.current_agents[1:]
-            # for eachEnemy in allEnemyAgentsList:
-            #     if eachEnemy.isHeuristicAgent():
-            #         eachEnemy.autoPickAction(new_state)
-            #     else:
-            #         eachEnemy.autoPickAction()
-            #
-            # print("HAVE ALL AGENTS MOVED? ", stateCopy.haveAllAgentsMoved())
-            # stateCopy.moveAllProjectiles()
+            # if(agentIndex == 0):
+            #     print(agentIndex, bestValue, bestAction)
 
-        bestScore, bestAction = expectiMaxFunction(stateCopy, depth + 1)
+            return bestValue, bestAction
 
-        # action = random.choice(legalActions)
-        action = bestAction
+        bestScore, bestAction = expectiMaxFunction(stateCopy, depth + 1, 0)
+        print(bestScore, bestAction)
         print()
 
         #if enemies are minimizer nodes, then you need to go from minimizer node -> minimizer node until all enemies have moved
         #then you can go the the next depth
 
         # return random.choice(legalActions)
-        return action
+        return bestAction
 
     def isExpectimaxAgent(self) -> bool:
         '''
@@ -162,7 +172,7 @@ class ExpectimaxAgent(AgentSuperClass):
             return self
 
     def getPointValue(self) -> int:
-        return -100
+        return 100
 
     def getCount(self) -> int:
         return self.counter
