@@ -53,16 +53,27 @@ class ExpectimaxAgent(AgentSuperClass):
         agentCopy = self.deepcopy()
         depth = agentCopy.getDepth()
 
-        while depth >= 0:
+        def expectiMaxFunction(state, depth):
+            """
+            If state is end of game
+            """
+            nextDepth = depth - 1
+
+            """
+            Base or terminating case
+            """
+            if (nextDepth <= 0) or (state.isWin()) or (state.isLose()) or (state.isGameOver()):
+                return state.score, None
+
             print()
             print("DEPTH", depth)
-            depth -= 1
+            # depth -= 1
 
             #Get all legal actions of player, arg is 0 because player index is 0
-            legalActions = stateCopy.getAllLegalActions(0)
+            legalActions = state.getAllLegalActions(0)
             print("PLAYER ACTIONS: ", legalActions)
             #get current score of state
-            score = stateCopy.score
+            score = state.score
             print("SCORE:", score)
 
             # generate a new state per legal agent actions
@@ -70,7 +81,7 @@ class ExpectimaxAgent(AgentSuperClass):
             for playerAction in legalActions:
                 print()
                 print("PLAYER ACTION", playerAction)
-                new_state = stateCopy.generateSuccessorState(0, playerAction)
+                new_state = state.generateSuccessorState(0, playerAction)
                 #score of state where player agent has moved to a new position, but no enemies have moved yet
                 playerScore = new_state.score
                 print("PLAYER SCORE = ", playerScore)
@@ -100,9 +111,12 @@ class ExpectimaxAgent(AgentSuperClass):
                 actionScoreDictionary[playerAction] = expectedEnemyValue
                 print(actionScoreDictionary)
 
+            bestScore = max(actionScoreDictionary.values())
             bestAction = max(actionScoreDictionary, key=actionScoreDictionary.get)
             print()
             print("BEST ACTION", bestAction)
+
+            return bestScore, bestAction
 
             # agentCopy.performAction(bestAction)
             #
@@ -116,6 +130,8 @@ class ExpectimaxAgent(AgentSuperClass):
             #
             # print("HAVE ALL AGENTS MOVED? ", stateCopy.haveAllAgentsMoved())
             # stateCopy.moveAllProjectiles()
+
+        bestScore, bestAction = expectiMaxFunction(stateCopy, depth + 1)
 
         # action = random.choice(legalActions)
         action = bestAction
