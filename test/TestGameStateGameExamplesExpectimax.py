@@ -36,9 +36,9 @@ class TestGameStateGameExamples(unittest.TestCase):
         state = self.gamestateInit
         state.max_enemies_at_any_given_time = 2
         # set small turns
-        state.turns_left = 100
+        state.turns_left = 10
         # make a player and add it
-        player = ExpectimaxAgent(1, 1, 0, 0)
+        player = ExpectimaxAgent(1, 1, 0, 0, 2)
         state.addAgent(player)
 
         enemy_1 = SimpleGoLeftAgent(3, 3)
@@ -88,7 +88,10 @@ class TestGameStateGameExamples(unittest.TestCase):
                 # len of current agents may change here, potentiall causing index error
                 state = state.generateSuccessorState(each_index, agent_action)
 
-                if (state.current_agents[len(state.current_agents) - 1].hasMoved() == True):
+                # print("STATE CURRENT AGENTS", state.current_agents)
+                if (len(state.current_agents) <= 0):
+                    break
+                elif (state.current_agents[len(state.current_agents) - 1].hasMoved() == True):
                     state.decrement_turn()
 
                     if print_board:

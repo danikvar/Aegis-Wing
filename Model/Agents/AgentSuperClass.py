@@ -40,9 +40,6 @@ class AgentSuperClass(AgentInterface):
         self.hp = hp # default hp is 1
         self.hasAlreadyMoved = False
 
-        self.depth = depth
-        self.index = 0  #Player is always index 0
-
     def get_position(self) -> tuple:
         '''
         Returns a tuple representing lowest left x position
