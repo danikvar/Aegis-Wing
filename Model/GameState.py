@@ -47,6 +47,10 @@ class GameState:
         #Added late
         self.removed_agents = 0
 
+        #Added for DQN model
+        self.lastHit = 0
+        self.lostLife = False
+
 
     def addAgent(self, agent: AgentSuperClass) -> bool:
         '''
@@ -123,10 +127,11 @@ class GameState:
 
 
     def decrement_turn(self):
-            self.turns_left -= 1
-            #only add survival point if player is still in the game
-            if self.current_agents[0].isPlayer() and self.current_agents[0].get_hp() > 0:
-                self.score += 1
+        self.turns_left -= 1
+        # only add survival point if player is still in the game
+        if len(self.current_agents) > 0 and self.current_agents[0].isPlayer() and \
+                self.current_agents[0].get_hp() > 0:
+            self.score += 1
 
     def set_turn(self, turns_left: int) -> None:
         if turns_left < 0:
@@ -166,6 +171,7 @@ class GameState:
 
                     if each_agent.isPlayer(): #if agent that got hit was the player then reduce score
                         self.score -= 100
+                        self.lostLife = True
 
     def haveAllAgentsMoved(self) -> bool:
         for each in self.current_agents:
@@ -213,6 +219,7 @@ class GameState:
             #TODO maybe just have them blow up instead of subtracting health? Already happens since player hp = 1
             if (player_agent.is_overlapping_other_agent(enemy_agent)):
                 player_agent.set_hp(player_agent.get_hp() - 1)
+                self.lostLife = True
                 #TODO Test
                 self.score += player_agent.getPointValue() #returns negative so adding is subtracting
                 enemy_agent.set_hp(enemy_agent.get_hp() - 1)
@@ -239,6 +246,7 @@ class GameState:
                 already_popped = True
                 if each_agent.isPlayer() == False:
                     self.score += each_agent.getPointValue() #represents destruction of enemy ship
+                    self.lastHit += each_agent.getPointValue()
 
             if already_popped == True:
                 # will go to next agent if agent is dead
@@ -338,12 +346,12 @@ class GameState:
                 return False
             else:
                 return True
-        #enemies are allowed to go beyond left boundary (beyond board min col/y)
+        # enemies are allowed to go beyond left boundary (beyond board min col/y)
         # and come in from right boundary (beyond board max col/y)
         if isAgentPlayer == False:
             if agent_min_x < board_min_x:
                 return False
-            if agent_max_x > board_max_x:
+            if agent_max_x - 1 > board_max_x:
                 return False
             else:
                 return True
@@ -376,7 +384,6 @@ class GameState:
         copy.max_enemies_at_any_given_time = self.max_enemies_at_any_given_time
         copy.score = self.score
         copy.removed_agents = self.removed_agents
-
         #TODO NOTE does not copy bullet_agents, or current projectiles
 
         #copy agents over
@@ -419,23 +426,9 @@ class GameState:
             successor_state = self.deepCopy()
 
         current_agent: AgentInterface = successor_state.current_agents[agentIndex]
-        all_legal_agent_actions = successor_state.getAllLegalActions(agentIndex)\
+        all_legal_agent_actions = successor_state.getAllLegalActions(agentIndex)
 
-        if current_agent.isExpectimaxAgent():
-            if action in all_legal_agent_actions:
-                movedAgent = current_agent.take_action(action)
-                print("MOVED AGENT:", movedAgent)
-                successor_state.current_agents[agentIndex] = movedAgent
-                if action in self.fireActions:
-                    newBullet = SimpleAgentBullet(movedAgent, 1)
-                    newBullet.setHasMovedStatus(True)
-                    successor_state.current_projectiles.append(newBullet)
-                    current_agent: AgentInterface = successor_state.current_agents[agentIndex]
-                    current_agent.setHasMovedStatus(True)
-
-
-        # TODO: TEST THIS --> IF IS HEURISTIC AGENT --> IF IT SHOOTS AND MOVES THEN MOVE FIRST
-        #  UPDATE AGENT AND THEN PASS UPDATED AGENT TO THE BULLET
+        # TODO: SHOULD WE LET THE PLAYER FIRE AND MOVE?
 
         if current_agent.isHeuristicAgent():
             if action in all_legal_agent_actions:
@@ -447,16 +440,16 @@ class GameState:
                     current_agent: AgentInterface = successor_state.current_agents[agentIndex]
                     current_agent.setHasMovedStatus(True)
 
-        # elif current_agent.isExpectimaxAgent():
-        #     if action in all_legal_agent_actions:
-        #         movedAgent = current_agent.take_action(action)
-        #         successor_state.current_agents[agentIndex] = movedAgent
-                # if action in self.fireActions:
-                #     newBullet = SimpleAgentBullet(movedAgent, 2)
-                #     newBullet.setHasMovedStatus(True)
-                #     successor_state.current_projectiles.append(newBullet)
-                #     current_agent: AgentInterface = successor_state.current_agents[agentIndex]
-                #     current_agent.setHasMovedStatus(True)
+        elif current_agent.isExpectimaxAgent():
+            if action in all_legal_agent_actions:
+                movedAgent = current_agent.take_action(action)
+                successor_state.current_agents[agentIndex] = movedAgent
+                if action in self.fireActions:
+                    newBullet = SimpleAgentBullet(movedAgent, 2)
+                    newBullet.setHasMovedStatus(True)
+                    successor_state.current_projectiles.append(newBullet)
+                    current_agent: AgentInterface = successor_state.current_agents[agentIndex]
+                    current_agent.setHasMovedStatus(True)
 
         elif action in all_legal_agent_actions:
             if action == Actions.FIRE:

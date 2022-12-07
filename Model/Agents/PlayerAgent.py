@@ -57,3 +57,8 @@ class PlayerAgent(AgentSuperClass):
 
     def getPointValue(self) -> int:
         return -100
+
+    def getAgentType(self) -> int:
+        return 1
+    def __str__(self):
+        return f"PlayerAgent at col/x = {self.get_position()[1]}\t row/y = {self.get_position()[0]}"

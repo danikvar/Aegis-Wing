@@ -44,7 +44,7 @@ class BasicCounterAgent(AgentSuperClass):
         """
 
         if self.counter <= 0:
-            return Actions.FIRELEFT
+            return Actions.LEFT
 
         if self.ideal_y == self.lowest_row and self.ideal_x == self.least_col:
             self.counter -= 1
@@ -53,16 +53,16 @@ class BasicCounterAgent(AgentSuperClass):
         elif self.ideal_y == self.lowest_row:
 
             if self.least_col < self.ideal_x:
-                return Actions.FIRERIGHT
+                return Actions.RIGHT
 
             elif self.least_col > self.ideal_x:
-                return Actions.FIRELEFT
+                return Actions.LEFT
         else:
             if self.lowest_row < self.ideal_y:
-                return Actions.FIREUP
+                return Actions.UP
 
             elif self.lowest_row > self.ideal_y:
-                return Actions.FIREDOWN
+                return Actions.DOWN
 
     def getCount(self) -> int:
         return self.counter
@@ -83,3 +83,12 @@ class BasicCounterAgent(AgentSuperClass):
 
     def __str__(self):
         return f"BasicCounterAgent at col/x = {self.get_position()[1]}\t row/y = {self.get_position()[0]},\t count: {self.counter}"
+
+    def getPointValue(self) -> int:
+        return 15
+
+    def isCounterAgent(self) -> bool:
+        return True
+
+    def getAgentType(self) -> int:
+        return 5

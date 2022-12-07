@@ -121,3 +121,12 @@ class EnemyMoveFireHeuristicAgent(AgentSuperClass):
 
     def __str__(self):
         return f"HeuristicMoveFire at col/x = {self.get_position()[1]}\t row/y = {self.get_position()[0]},\t count: {self.counter}"
+
+    def isCounterAgent(self) -> bool:
+        if self.counter is not None:
+            return True
+        else:
+            return False
+
+    def getAgentType(self) -> int:
+        return 4

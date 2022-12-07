@@ -36,3 +36,5 @@ class EnemyAgentBasicFireAndMove(AgentSuperClass):
     def __str__(self):
         return f"BasicFireAndMove at col/x = {self.get_position()[1]}\t row/y = {self.get_position()[0]}"
 
+    def getAgentType(self) -> int:
+        return 3
