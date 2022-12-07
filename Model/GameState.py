@@ -376,6 +376,7 @@ class GameState:
         copy.max_enemies_at_any_given_time = self.max_enemies_at_any_given_time
         copy.score = self.score
         copy.removed_agents = self.removed_agents
+
         #TODO NOTE does not copy bullet_agents, or current projectiles
 
         #copy agents over
@@ -418,7 +419,20 @@ class GameState:
             successor_state = self.deepCopy()
 
         current_agent: AgentInterface = successor_state.current_agents[agentIndex]
-        all_legal_agent_actions = successor_state.getAllLegalActions(agentIndex)
+        all_legal_agent_actions = successor_state.getAllLegalActions(agentIndex)\
+
+        if current_agent.isExpectimaxAgent():
+            if action in all_legal_agent_actions:
+                movedAgent = current_agent.take_action(action)
+                print("MOVED AGENT:", movedAgent)
+                successor_state.current_agents[agentIndex] = movedAgent
+                if action in self.fireActions:
+                    newBullet = SimpleAgentBullet(movedAgent, 1)
+                    newBullet.setHasMovedStatus(True)
+                    successor_state.current_projectiles.append(newBullet)
+                    current_agent: AgentInterface = successor_state.current_agents[agentIndex]
+                    current_agent.setHasMovedStatus(True)
+
 
         # TODO: TEST THIS --> IF IS HEURISTIC AGENT --> IF IT SHOOTS AND MOVES THEN MOVE FIRST
         #  UPDATE AGENT AND THEN PASS UPDATED AGENT TO THE BULLET
@@ -433,16 +447,16 @@ class GameState:
                     current_agent: AgentInterface = successor_state.current_agents[agentIndex]
                     current_agent.setHasMovedStatus(True)
 
-        elif current_agent.isExpectimaxAgent():
-            if action in all_legal_agent_actions:
-                movedAgent = current_agent.take_action(action)
-                successor_state.current_agents[agentIndex] = movedAgent
-                if action in self.fireActions:
-                    newBullet = SimpleAgentBullet(movedAgent, 2)
-                    newBullet.setHasMovedStatus(True)
-                    successor_state.current_projectiles.append(newBullet)
-                    current_agent: AgentInterface = successor_state.current_agents[agentIndex]
-                    current_agent.setHasMovedStatus(True)
+        # elif current_agent.isExpectimaxAgent():
+        #     if action in all_legal_agent_actions:
+        #         movedAgent = current_agent.take_action(action)
+        #         successor_state.current_agents[agentIndex] = movedAgent
+                # if action in self.fireActions:
+                #     newBullet = SimpleAgentBullet(movedAgent, 2)
+                #     newBullet.setHasMovedStatus(True)
+                #     successor_state.current_projectiles.append(newBullet)
+                #     current_agent: AgentInterface = successor_state.current_agents[agentIndex]
+                #     current_agent.setHasMovedStatus(True)
 
         elif action in all_legal_agent_actions:
             if action == Actions.FIRE:

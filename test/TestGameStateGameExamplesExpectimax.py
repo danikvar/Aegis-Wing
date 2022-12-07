@@ -36,14 +36,14 @@ class TestGameStateGameExamples(unittest.TestCase):
         state = self.gamestateInit
         state.max_enemies_at_any_given_time = 2
         # set small turns
-        state.turns_left = 10
+        state.turns_left = 100
         # make a player and add it
         player = ExpectimaxAgent(1, 1, 0, 0)
         state.addAgent(player)
 
         enemy_1 = SimpleGoLeftAgent(3, 3)
         # row 1, col = 7
-        enemy_2 = EnemyMoveFireHeuristicAgent(9, 9)
+        enemy_2 = EnemyMoveFireHeuristicAgent(4, 4)
 
         # add agents
         state.addAgent(enemy_1)
