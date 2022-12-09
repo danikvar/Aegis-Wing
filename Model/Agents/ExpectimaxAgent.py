@@ -130,6 +130,7 @@ class ExpectimaxAgent(AgentSuperClass):
                 # print("ENEMY ", agentIndex, "MAXVAL", maxVal, enemyScoreDict[maxVal])
                 # print(agentIndex, averageValue, legalAction)
                 # print("ENEMY ", agentIndex, averageValue)
+
                 return averageValue, legalAction
 
 
@@ -161,7 +162,7 @@ class ExpectimaxAgent(AgentSuperClass):
             return bestValue, bestAction
 
         try:
-            bestScore, bestAction = expectiMaxFunction(stateCopy, depth + 1, 0)
+            bestScore, bestAction = expectiMaxFunction(stateCopy, 2, 0)
             print("PASS: ", bestScore, bestAction)
             print()
         except IndexError:
@@ -174,6 +175,8 @@ class ExpectimaxAgent(AgentSuperClass):
 
         # return random.choice(legalActions)
         return bestAction
+
+
 
     def isExpectimaxAgent(self) -> bool:
         '''
