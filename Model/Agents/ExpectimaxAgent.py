@@ -75,7 +75,7 @@ class ExpectimaxAgent(AgentSuperClass):
 
             """
             max = player
-            min = ghosts
+            min = enemyShip
             """
             if (agentIndex == 0):
                 agentType = max
@@ -86,8 +86,11 @@ class ExpectimaxAgent(AgentSuperClass):
                 bestValue = inf
 
             """
-            modulo to keep reverting back and forth between pacman and ghosts
+            modulo to keep reverting back and forth between ship and enemyShip
             """
+            #Let's ay you have 2 enemies
+            # index of player is 0 -> 0 + 1 % 3 = 1
+            # if you go to enemy index = 2 -> 2 + 1 = 3 % 3 = 0
             nextAgent = (agentIndex + 1) % len(state.current_agents)
 
             """
@@ -109,6 +112,8 @@ class ExpectimaxAgent(AgentSuperClass):
                 """
                 Loop - get all successor states and legal actions for enemy ships
                 """
+                # print("ENEMY AGENT: ", agentIndex)
+                enemyScoreDict = {}
                 for legalAction in legalActionsList:
                     successorState = state.generateSuccessorState(agentIndex, legalAction)
                     nodeValue, direction = expectiMaxFunction(successorState, nextDepth, nextAgent)
@@ -116,17 +121,28 @@ class ExpectimaxAgent(AgentSuperClass):
                     calculate for the average of all available nodes
                     """
                     averageValue += probability * nodeValue
+                    enemyScoreDict[legalAction] = averageValue
+                    # print(enemyScoreDict)
 
+                # print("ENEMY ", agentIndex, enemyScoreDict)
+
+                # maxVal = max(enemyScoreDict, key=enemyScoreDict.get)
+                # print("ENEMY ", agentIndex, "MAXVAL", maxVal, enemyScoreDict[maxVal])
                 # print(agentIndex, averageValue, legalAction)
+                # print("ENEMY ", agentIndex, averageValue)
                 return averageValue, legalAction
 
 
             """
             Loop - get all successor states and legal actions for pacman
             """
+            # print("PLAYER AGENT: ", agentIndex)
+            playerScoreDict = {}
             for legalAction in legalActionsList:
+                # print("PLAYER AGENT: ", agentIndex, legalAction)
                 successorState = state.generateSuccessorState(agentIndex, legalAction)
                 actionValue, direction = expectiMaxFunction(successorState, nextDepth, nextAgent)
+                playerScoreDict[legalAction] = actionValue
 
                 # print(actionValue, direction)
 
@@ -136,16 +152,22 @@ class ExpectimaxAgent(AgentSuperClass):
                 if (agentType(bestValue, actionValue) == actionValue):
                     bestValue = actionValue
                     bestAction = legalAction
-                    # print(agent, bestValue, bestAction)
+                    # print(agentIndex, bestValue, bestAction)
 
-            # if(agentIndex == 0):
-            #     print(agentIndex, bestValue, bestAction)
+            # print("PLAYER", agentIndex, playerScoreDict)
+            maxVal = max(playerScoreDict, key=playerScoreDict.get)
+            # print("PLAYER ", agentIndex, "MAXVAL", maxVal, playerScoreDict[maxVal])
 
             return bestValue, bestAction
 
-        bestScore, bestAction = expectiMaxFunction(stateCopy, depth + 1, 0)
-        print(bestScore, bestAction)
-        print()
+        try:
+            bestScore, bestAction = expectiMaxFunction(stateCopy, depth + 1, 0)
+            print("PASS: ", bestScore, bestAction)
+            print()
+        except IndexError:
+            print("EXCEPT: ")
+            print()
+            return Actions.STOP
 
         #if enemies are minimizer nodes, then you need to go from minimizer node -> minimizer node until all enemies have moved
         #then you can go the the next depth

@@ -5,6 +5,7 @@ from Model.Agents.AgentInterface import AgentInterface
 from Model.Agents.BasicCounterAgent import BasicCounterAgent
 from Model.Agents.EnemyAgentBasicFireAndMove import EnemyAgentBasicFireAndMove
 from Model.Agents.EnemyMoveFireHeuristicAgent import EnemyMoveFireHeuristicAgent
+from Model.Agents.ExpectimaxAgent import ExpectimaxAgent
 from Model.Agents.PlayerAgent import PlayerAgent
 from Model.Agents.SimpleGoLeftAgent import SimpleGoLeftAgent
 from Model.EnemyPicker import EnemyPicker
@@ -107,8 +108,8 @@ def main():
     # player will be of size 1 X 1
     #TODO NOTSKY YOU WILL HAVE TO MAKE YOUR OWN PLAYER EXPECTIMAX AGENT CLASS and overwrite auto pick action
     # so instead of PlayerAgent constructor use your Expectimax agent constructor
-    player_agent = PlayerAgent(1, 1, PLAYER_INITIAL_SPAWN_ROW_POSITION,
-                               PLAYER_INITIAL_SPAWN_COL_POSITION)
+    player_agent = ExpectimaxAgent(1, 1, PLAYER_INITIAL_SPAWN_ROW_POSITION,
+                               PLAYER_INITIAL_SPAWN_COL_POSITION, 2)
     player_agent.set_hp(PLAYER_HP)
 
     did_add_agent = starting_gamestate.addAgent(player_agent)
@@ -121,7 +122,7 @@ def main():
     end_line = "=" * 50
 
     if visualize_game:
-        print("Staring GameState")
+        print("Starting GameState")
         print_board(current_state)
         print_score_and_status(current_state)
         print(end_line,"\n")
@@ -148,11 +149,12 @@ def main():
                 else:
                     continue # move on to next agent
 
-            if each_agent.isPlayer():
+            if each_agent.isExpectimaxAgent():
                 #TODO Notsky have agent_action = each_agent.autoPickAction(current_state) when
                 # you have replaced player_agent with an expectimax agent
-                DEFAULT_ACTION = Actions.STOP
-                agent_action = DEFAULT_ACTION
+                # DEFAULT_ACTION = Actions.STOP
+                # agent_action = DEFAULT_ACTION
+                agent_action = each_agent.autoPickAction(current_state)
 
             elif each_agent.isHeuristicAgent():
                 agent_action = each_agent.autoPickAction(current_state)

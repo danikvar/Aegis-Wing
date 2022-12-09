@@ -445,7 +445,7 @@ class GameState:
                 movedAgent = current_agent.take_action(action)
                 successor_state.current_agents[agentIndex] = movedAgent
                 if action in self.fireActions:
-                    newBullet = SimpleAgentBullet(movedAgent, 2)
+                    newBullet = SimpleAgentBullet(movedAgent, 1)
                     newBullet.setHasMovedStatus(True)
                     successor_state.current_projectiles.append(newBullet)
                     current_agent: AgentInterface = successor_state.current_agents[agentIndex]
