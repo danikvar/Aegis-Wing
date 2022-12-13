@@ -1,5 +1,9 @@
 import unittest
 
+from Model.Agents.Actions import Actions
+from Model.Agents.BasicCounterAgent import BasicCounterAgent
+from Model.Agents.EnemyAgentBasicFireAndMove import EnemyAgentBasicFireAndMove
+from Model.Agents.EnemyMoveFireHeuristicAgent import EnemyMoveFireHeuristicAgent
 from Model.Agents.PlayerAgent import PlayerAgent
 from Model.Agents.SimpleGoLeftAgent import SimpleGoLeftAgent
 from Model.GameState import GameState
@@ -34,10 +38,49 @@ class TestExpectimax2(unittest.TestCase):
         1 BasicCounter
 
         Each will make a series of moves. No one else should move
-        while one is moving
+        while one is moving.
         :return:
         """
 
+        printBoard = True
+
         state = self.init_gameState
-        goLeftAgent = SimpleGoLeftAgent()
+        goLeftAgent = SimpleGoLeftAgent(0,BOARD_COLUMNS -1)
+        basicFireMoveAgent = EnemyAgentBasicFireAndMove(1,BOARD_COLUMNS - 2)
+        heuristicEnemyAgent = EnemyMoveFireHeuristicAgent(2,4)
+        turnSpanAgent = BasicCounterAgent(3,3,10,6,7)
+
+        state.addAgent(goLeftAgent)
+        state.addAgent(basicFireMoveAgent)
+        state.addAgent(heuristicEnemyAgent)
+        state.addAgent(turnSpanAgent)
+
+        state = state.getStateAfterAction(0, Actions.RIGHT)
+        state = state.getStateAfterAction(0, Actions.RIGHT)
+        state = state.getStateAfterAction(0, Actions.UP)
+
+        self.assertEquals((PLAYER_INITIAL_SPAWN_ROW_POSITION + 1, PLAYER_INITIAL_SPAWN_COL_POSITION + 2), state.current_agents[0].get_position())
+        self.assertEquals((0,BOARD_COLUMNS -1), goLeftAgent.get_position())
+
+
+        state = state.getStateAfterAction(0, Actions.LEFT)
+        state = state.getStateAfterAction(0,Actions.LEFT)
+        state = state.getStateAfterAction(0, Actions.FIRE)
+
+        state = state.getStateAfterAction(0, Actions.UP)
+        state = state.getStateAfterAction(0,Actions.UP)
+
+        self.assertEquals(1, len(state.current_projectiles))
+        self.assertEquals((5,1), state.current_projectiles[0].get_position())
+
+        state = state.getStateAfterAction(0, Actions.STOP,True)
+        self.assertEquals((5,2), state.current_projectiles[0].get_position())
+        state.print_board()
+
+
+def main():
+    unittest.main(verbosity=3)
+
+if __name__ == '__main__':
+    main()
 

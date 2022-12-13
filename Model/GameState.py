@@ -383,6 +383,7 @@ class GameState:
             each_agent: AgentInterface = each
             copy.addAgent(each_agent.deepcopy())
 
+        #copy bullets over
         for each_b in self.current_projectiles:
             each_bullet : ProjectileInterface = each_b
             copy.current_projectiles.append(each_bullet.deepcopy())
@@ -452,7 +453,63 @@ class GameState:
         else:
             raise RuntimeError(f"Agent at index {agentIndex} of type {type(current_agent)} cannot take action {action}")
 
+        successor_state.update_board()
+
         return successor_state
+
+    def getStateAtNextTurn(self,playerAction: Actions):
+        """
+        Returns the state at the next turn i.e. after all have moved/taken action
+        :param playerAction:
+        :return: GameState
+        """
+
+        #move all existing bullets
+        state_all_bullets_have_moved = self.moveAllProjectiles()
+
+        playerAliveFlag = False
+
+        if len(state_all_bullets_have_moved.current_agents) == 0: #no agents so no changes to be made
+            state_all_bullets_have_moved.turns_left -= 1
+            return state_all_bullets_have_moved
+
+        if state_all_bullets_have_moved.current_agents[0].isPlayer():
+            state_player_has_moved = state_all_bullets_have_moved.getStateAfterAction(0, playerAction)
+            playerAliveFlag = True
+
+        state_all_agents_have_moved = None
+
+        # if player is alive
+        if playerAliveFlag == True:
+
+            state_ready_to_move_agents = state_player_has_moved
+
+            #if there are existing enemy agents, we want to move just the enemies
+            if len(state_player_has_moved.current_agents) > 1:
+                #move each enemy
+                for i in range(1,len(state_ready_to_move_agents.current_agents)):
+                    each_agent : AgentSuperClass = state_ready_to_move_agents.current_agents[i]
+                    agent_action = each_agent.autoPickAction(state=state_ready_to_move_agents)
+                    state_ready_to_move_agents = state_ready_to_move_agents.getStateAfterAction(i,agent_action)
+
+        else:
+            #player is dead so we want to move everybody
+            state_ready_to_move_agents = state_all_bullets_have_moved
+
+            for i in range(len(state_ready_to_move_agents.current_agents)):
+                each_agent: AgentSuperClass = state_ready_to_move_agents.current_agents[i]
+                agent_action = each_agent.autoPickAction(state=state_ready_to_move_agents)
+                state_ready_to_move_agents = state_ready_to_move_agents.getStateAfterAction(i, agent_action)
+
+        state_all_agents_have_moved = state_ready_to_move_agents
+        state_all_agents_have_moved.update_board()
+
+        return state_all_agents_have_moved
+
+
+
+
+
 
     def generateSuccessorState(self, agentIndex: int, action: Actions):
         #check if player agent is an expetimax agent
@@ -528,7 +585,52 @@ class GameState:
         self.removed_agents = 0
 
 
+    def print_board(self):
+        print(self.gameBoard)
+
+    def print_score(self):
+        print(self.score)
+
+    def print_status(self):
+        if self.isWin():
+            print("Player WON! :D")
+        elif self.isLose():
+            print("Player LOST! :( ")
+        else:
+            return
+
+    def print_agent_locations(self):
+
+        if len(self.current_agents) == 0:
+            print("There are no Agents in the game")
+        else:
+            all_enemy_agents = []
+            if self.current_agents[0].isPlayer():
+                print(f"Player agent is at location: {self.current_agents[0].get_position()}")
+                all_enemy_agents = self.current_agents[1:]
+            else:
+                all_enemy_agents = self.current_agents
+
+            print(f"Total enemies on board: {len(all_enemy_agents)}")
+
+            all_enemy_agents = self.current_agents[1:]
+
+            for each_enemy_index in range(len(all_enemy_agents)):
+                print("\t" + str(each_enemy_index + 2) + ".) " + all_enemy_agents[each_enemy_index].__str__())
 
 
+    def print_projectile_locations(self):
+        all_projectiles = self.current_projectiles
+        all_player_projectiles = list(filter(lambda x: x.isPlayerBullet(), all_projectiles))
+        all_enemy_projectiles = list(filter(lambda x: x.isPlayerBullet() == False, all_projectiles))
 
+        if len(all_player_projectiles) > 0:
+            print(f"Total Player Projectiles on board: {len(all_player_projectiles)}")
+            for i in range(len(all_player_projectiles)):
+                print(f"\t{i}.) {all_player_projectiles[i]}")
 
+        if len(all_enemy_projectiles) > 0:
+            print(f"Total Enemy Projectiles on board: {len(all_enemy_projectiles)}")
+            for j in range(len(all_enemy_projectiles)):
+                if all_enemy_projectiles[j].get_position()[1] >= 0:
+                    print(f"\t{j}.) {all_enemy_projectiles[j]}")
