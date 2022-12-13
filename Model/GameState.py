@@ -187,10 +187,10 @@ class GameState:
                 bullets_to_remove.append(each_bullet)
 
         for bullet in bullets_to_remove:
-            each_bullet: ProjectileInterface = bullet
+            #each_bullet: ProjectileInterface = bullet
             #TODO delete print
             #print("removing bullets")
-            self.current_projectiles.remove(each_bullet)
+            self.current_projectiles.remove(bullet)
 
 
 
@@ -406,6 +406,53 @@ class GameState:
 
         return copy
 
+    def getStateAfterAction(self,agentIndex: int, action: Actions, moveBullets=False):
+        '''
+        Helper method for expectimax calculations. One individual agent will take an action,
+        and changes the gamestate (i.e. firing a bullet or moving).
+        Does not remove agents due to hp loss or change the score in anyway.
+        This is helpful to maintain len of current_agents list.
+        :param agentIndex: index of agent that will take the action
+        :param action: : {Actions} the action, the agent will take
+        :return: a GameState instance reflecting the change after an agent has taken an action
+        '''
+
+        if agentIndex > len(self.current_agents) - 1 or agentIndex < 0:
+            raise RuntimeError(f"There are no agents with index = {agentIndex}, min=0, max={len(self.current_agents) - 1}")
+
+        if moveBullets == True:
+            successor_state = self.moveAllProjectiles()
+        else:
+            successor_state = self.deepCopy()
+
+        current_agent: AgentInterface = successor_state.current_agents[agentIndex]
+        all_legal_agent_actions = successor_state.getAllLegalActions(agentIndex)
+
+
+        if action in all_legal_agent_actions: #is action legal?
+            if action in self.fireActions:
+                if current_agent.isHeuristicAgent():
+                    #heuristic agent bullet speed is 2
+                    newBullet = SimpleAgentBullet(current_agent, 2)
+                    newBullet.setHasMovedStatus(True) # bullet will not take an action this turn
+                    successor_state.current_projectiles.append(newBullet)
+                    movedAgent: AgentInterface = successor_state.current_agents[agentIndex]
+                else:
+                    newBullet = SimpleAgentBullet(current_agent)
+                    newBullet.setHasMovedStatus(True)
+                    successor_state.current_projectiles.append(newBullet)
+                    movedAgent: AgentInterface = successor_state.current_agents[agentIndex]
+                # Agent has made a move if they fire
+                movedAgent.setHasMovedStatus(True)
+            else:
+                #agent is just moving
+                movedAgent = current_agent.take_action(action)
+                movedAgent.setHasMovedStatus(True)
+                successor_state.current_agents[agentIndex] = movedAgent
+        else:
+            raise RuntimeError(f"Agent at index {agentIndex} of type {type(current_agent)} cannot take action {action}")
+
+        return successor_state
 
     def generateSuccessorState(self, agentIndex: int, action: Actions):
         #check if player agent is an expetimax agent
@@ -433,7 +480,7 @@ class GameState:
                     current_agent: AgentInterface = successor_state.current_agents[agentIndex]
                     current_agent.setHasMovedStatus(True)
 
-        elif current_agent.isExpectimaxAgent():
+        elif current_agent.isExpectimaxAgent(): #this check is not necessary
             if action in all_legal_agent_actions:
                 movedAgent = current_agent.take_action(action)
                 successor_state.current_agents[agentIndex] = movedAgent
