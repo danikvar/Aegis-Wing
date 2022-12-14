@@ -184,6 +184,9 @@ class AgentInterface:
     def getPointValue(self) -> int:
         raise NotImplementedError("No points have been assigned to this agent")
 
+    def isBasicCounter(self) -> bool:
+        return False
+
 
     def getAgentType(self) -> int:
         """

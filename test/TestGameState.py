@@ -180,6 +180,7 @@ class TestGameState(unittest.TestCase):
         gameState3.addAgent(valid_p2)
         p2_legal_actions = gameState3.getAllLegalActions(0)
         gameState3.getAllLegalActions(0)
+        print(p2_legal_actions)
         self.assertEquals(4,len(p2_legal_actions))
         self.assertEquals([Actions.LEFT, Actions.DOWN, Actions.STOP,Actions.FIRE],
                           p2_legal_actions)

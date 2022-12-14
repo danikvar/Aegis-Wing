@@ -101,12 +101,14 @@ def print_projectile_locations(gameState: GameState):
     if len(all_player_projectiles) > 0:
         print(f"Total Player Projectiles on board: {len(all_player_projectiles)}")
         for i in range(len(all_player_projectiles)):
-            print(f"\t{i}.) {all_player_projectiles[i]}")
+            if all_player_projectiles[i].get_position()[1] < BOARD_COLUMNS:
+                print(f"\t{i}.) {all_player_projectiles[i]}")
 
     if len(all_enemy_projectiles) > 0:
         print(f"Total Enemy Projectiles on board: {len(all_enemy_projectiles)}")
         for j in range(len(all_enemy_projectiles)):
-            print(f"\t{j}.) {all_enemy_projectiles[j]}")
+            if all_enemy_projectiles[j].get_position()[1] >= 0:
+                print(f"\t{j}.) {all_enemy_projectiles[j]}")
 
 
 def get_state(game: GameState):
@@ -197,10 +199,10 @@ def main():
 
     player_agent.set_hp(PLAYER_HP)
 
-    new_agent = SimpleGoLeftAgent(7, 6)
 
     did_add_agent = starting_gamestate.addAgent(player_agent)
 
+    new_agent = SimpleGoLeftAgent(7, 6)
     starting_gamestate.addAgent(new_agent)
 
 
@@ -214,6 +216,7 @@ def main():
     if visualize_game:
         print("Staring GameState")
         print_board(current_state)
+        print_score_and_status(current_state)
         print(end_line,"\n")
         state_arr = get_state(current_state)
         print(len(state_arr))
@@ -270,11 +273,11 @@ def main():
                 #print("BREAKING FOR LOOP")
                 break
 
-            if each_agent.hasMoved():
-                if each_index + 1 > len(current_state.current_agents) - 1:
-                    break
-                else:
-                    continue # move on to next agent
+            # if each_agent.hasMoved():
+            #     if each_index + 1 > len(current_state.current_agents) - 1:
+            #         break
+            #     else:
+            #         continue # move on to next agent
 
             if each_agent.isPlayer():
                 # TODO DAN YOU WILL HAVE TO MAKE YOUR OWN PLAYER AGENT CLASS and overwrite auto pick action

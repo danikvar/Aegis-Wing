@@ -43,6 +43,7 @@ class GameState:
         self.fireActions = [Actions.FIRE, Actions.FIRERIGHT, Actions.FIRELEFT,
                             Actions.FIREDOWN, Actions.FIREUP]
         self.score = 0 #TODO test
+        self.won_flag = False
 
         #Added late
         self.removed_agents = 0
@@ -139,9 +140,12 @@ class GameState:
         self.turns_left = turns_left
 
     def isWin(self) -> bool:
+
         #you win game if player still has lives and timer has reached 0
         if self.current_player_lives > 0 and self.isGameOver():
-            self.score += 10000
+            if self.won_flag == False:
+                self.score += 10000
+            self.won_flag = True
             return True
         return False
 
@@ -193,10 +197,10 @@ class GameState:
                 bullets_to_remove.append(each_bullet)
 
         for bullet in bullets_to_remove:
-            each_bullet: ProjectileInterface = bullet
+            #each_bullet: ProjectileInterface = bullet
             #TODO delete print
             #print("removing bullets")
-            self.current_projectiles.remove(each_bullet)
+            self.current_projectiles.remove(bullet)
 
 
 
@@ -263,7 +267,12 @@ class GameState:
         # COde below handles if player dies and can or does not respawn
         for each_index in agent_indexes_to_be_popped:
             value_to_pop = each_index - subtract_by
-            current_agent: AgentInterface = self.current_agents[value_to_pop]
+            try:
+                current_agent: AgentInterface = self.current_agents[value_to_pop]
+            except IndexError:
+                #print(f"Index error, list length = {len(self.current_agents)}")
+                #print(f"trying to pop: {value_to_pop}")
+                break
             # if player agent died
             if current_agent.isPlayer() == True: # if player agent was destroyed
                 if (current_agent.is_dead()):
@@ -338,7 +347,7 @@ class GameState:
         if isAgentPlayer:
             if (agent_min_x < board_min_x):
                 return False
-            elif (agent_max_x > board_max_x):
+            elif (agent_max_x - 1 > board_max_x): #may potentially cause bugged behavior
                 return False
             elif (agent_min_y < board_min_y):
                 return False
@@ -391,6 +400,7 @@ class GameState:
             each_agent: AgentInterface = each
             copy.addAgent(each_agent.deepcopy())
 
+        #copy bullets over
         for each_b in self.current_projectiles:
             each_bullet : ProjectileInterface = each_b
             copy.current_projectiles.append(each_bullet.deepcopy())
@@ -414,6 +424,131 @@ class GameState:
 
         return copy
 
+    def getStateAfterAction(self,agentIndex: int, action: Actions, moveBullets=False):
+        '''
+        Helper method for expectimax calculations. One individual agent will take an action,
+        and changes the gamestate (i.e. firing a bullet or moving).
+        Does not remove agents due to hp loss or change the score in anyway.
+        This is helpful to maintain len of current_agents list.
+        :param agentIndex: index of agent that will take the action
+        :param action: : {Actions} the action, the agent will take
+        :return: a GameState instance reflecting the change after an agent has taken an action
+        '''
+
+        if agentIndex > len(self.current_agents) - 1 or agentIndex < 0:
+            raise RuntimeError(f"There are no agents with index = {agentIndex}, min=0, max={len(self.current_agents) - 1}")
+
+        if moveBullets == True:
+            successor_state = self.moveAllProjectiles()
+        else:
+            successor_state = self.deepCopy()
+
+        if successor_state.current_agents[agentIndex].isExpectimaxAgent() == True:
+            current_agent = successor_state.current_agents[agentIndex]
+        else:
+            current_agent: AgentInterface = successor_state.current_agents[agentIndex]
+        all_legal_agent_actions = successor_state.getAllLegalActions(agentIndex)
+
+
+        if action in all_legal_agent_actions: #is action legal?
+            if action in self.fireActions:
+                if current_agent.isHeuristicAgent():
+                    #heuristic agent bullet speed is 2
+                    newBullet = SimpleAgentBullet(current_agent, 2)
+                    newBullet.setHasMovedStatus(True) # bullet will not take an action this turn
+                    successor_state.current_projectiles.append(newBullet)
+                    movedAgent: AgentInterface = current_agent.take_action(action)
+                    successor_state.current_agents[agentIndex] = movedAgent
+                elif current_agent.isExpectimaxAgent() or current_agent.isPlayer():
+                    newBullet = SimpleAgentBullet(current_agent)
+                    newBullet.setHasMovedStatus(True)
+                    successor_state.current_projectiles.append(newBullet)
+                    movedAgent: AgentInterface = successor_state.current_agents[agentIndex]
+                elif current_agent.isBasicCounter() == True:
+                    newBullet = SimpleAgentBullet(current_agent)
+                    newBullet.setHasMovedStatus(True)
+                    successor_state.current_projectiles.append(newBullet)
+                    movedAgent: AgentInterface = current_agent.take_action(action)
+                    successor_state.current_agents[agentIndex] = movedAgent
+                else:
+                    newBullet = SimpleAgentBullet(current_agent)
+                    newBullet.setHasMovedStatus(True)
+                    successor_state.current_projectiles.append(newBullet)
+                    movedAgent: AgentInterface = successor_state.current_agents[agentIndex]
+                # Agent has made a move if they fire
+                movedAgent.setHasMovedStatus(True)
+            else:
+                #agent is just moving
+                movedAgent = current_agent.take_action(action)
+                movedAgent.setHasMovedStatus(True)
+                successor_state.current_agents[agentIndex] = movedAgent
+        else:
+            successor_state.current_agents[agentIndex].setHasMovedStatus(True)
+            #raise RuntimeError(f"Agent at index {agentIndex} of type {type(current_agent)} cannot take action {action}")
+
+        successor_state.update_board()
+
+        return successor_state
+
+    def getStateAtNextTurn(self,playerAction: Actions):
+        """
+        Returns the state at the next turn i.e. after all have moved/taken action
+        :param playerAction:
+        :return: GameState
+        """
+
+        #move all existing bullets
+        state_all_bullets_have_moved = self.moveAllProjectiles()
+
+        playerAliveFlag = False
+
+        if len(state_all_bullets_have_moved.current_agents) == 0: #no agents so no changes to be made
+            state_all_bullets_have_moved.turns_left -= 1
+            return state_all_bullets_have_moved
+
+        if state_all_bullets_have_moved.current_agents[0].isPlayer():
+            state_player_has_moved = state_all_bullets_have_moved.getStateAfterAction(0, playerAction)
+            playerAliveFlag = True
+
+        state_all_agents_have_moved = None
+
+        # if player is alive
+        if playerAliveFlag == True:
+
+            state_ready_to_move_agents = state_player_has_moved
+
+            #if there are existing enemy agents, we want to move just the enemies
+            if len(state_player_has_moved.current_agents) > 1:
+                #move each enemy
+                for i in range(1,len(state_ready_to_move_agents.current_agents)):
+                    each_agent : AgentSuperClass = state_ready_to_move_agents.current_agents[i]
+                    agent_action = each_agent.autoPickAction(state=state_ready_to_move_agents)
+                    state_ready_to_move_agents = state_ready_to_move_agents.getStateAfterAction(i,agent_action)
+
+        else:
+            #player is dead so we want to move everybody
+            state_ready_to_move_agents = state_all_bullets_have_moved
+
+            for i in range(len(state_ready_to_move_agents.current_agents)):
+                each_agent: AgentSuperClass = state_ready_to_move_agents.current_agents[i]
+                agent_action = each_agent.autoPickAction(state=state_ready_to_move_agents)
+                state_ready_to_move_agents = state_ready_to_move_agents.getStateAfterAction(i, agent_action)
+
+        state_all_agents_have_moved = state_ready_to_move_agents
+        state_all_agents_have_moved.checkBulletAgentClashes()
+        state_all_agents_have_moved.removeBullets()
+        state_all_agents_have_moved.checkPlayerAgentClashes()
+        state_all_agents_have_moved.updateAgentsList()
+        state_all_agents_have_moved.update_board()
+        state_all_agents_have_moved.reset_agents_move_status()
+        state_all_agents_have_moved.decrement_turn()
+
+        return state_all_agents_have_moved
+
+
+
+
+
 
     def generateSuccessorState(self, agentIndex: int, action: Actions):
         #check if player agent is an expetimax agent
@@ -428,7 +563,8 @@ class GameState:
         current_agent: AgentInterface = successor_state.current_agents[agentIndex]
         all_legal_agent_actions = successor_state.getAllLegalActions(agentIndex)
 
-        # TODO: SHOULD WE LET THE PLAYER FIRE AND MOVE?
+        # TODO: TEST THIS --> IF IS HEURISTIC AGENT --> IF IT SHOOTS AND MOVES THEN MOVE FIRST
+        #  UPDATE AGENT AND THEN PASS UPDATED AGENT TO THE BULLET
 
         if current_agent.isHeuristicAgent():
             if action in all_legal_agent_actions:
@@ -440,7 +576,7 @@ class GameState:
                     current_agent: AgentInterface = successor_state.current_agents[agentIndex]
                     current_agent.setHasMovedStatus(True)
 
-        elif current_agent.isExpectimaxAgent():
+        elif current_agent.isExpectimaxAgent(): #this check is not necessary
             if action in all_legal_agent_actions:
                 movedAgent = current_agent.take_action(action)
                 successor_state.current_agents[agentIndex] = movedAgent
@@ -488,7 +624,53 @@ class GameState:
         self.removed_agents = 0
 
 
+    def print_board(self):
+        print(self.gameBoard)
+
+    def print_score(self):
+        print("Score: ", self.score)
+
+    def print_status(self):
+        print(f"Turns Left: {self.turns_left}")
+        if self.isWin():
+            print("Player WON! :D")
+        elif self.isLose():
+            print("Player LOST! :( ")
+        else:
+            return
+
+    def print_agent_locations(self):
+
+        if len(self.current_agents) == 0:
+            print("There are no Agents in the game")
+        else:
+            all_enemy_agents = []
+            if self.current_agents[0].isPlayer():
+                print(f"Player agent is at location: {self.current_agents[0].get_position()}")
+                all_enemy_agents = self.current_agents[1:]
+            else:
+                all_enemy_agents = self.current_agents
+
+            print(f"Total enemies on board: {len(all_enemy_agents)}")
+
+            all_enemy_agents = self.current_agents[1:]
+
+            for each_enemy_index in range(len(all_enemy_agents)):
+                print("\t" + str(each_enemy_index + 2) + ".) " + all_enemy_agents[each_enemy_index].__str__())
 
 
+    def print_projectile_locations(self):
+        all_projectiles = self.current_projectiles
+        all_player_projectiles = list(filter(lambda x: x.isPlayerBullet(), all_projectiles))
+        all_enemy_projectiles = list(filter(lambda x: x.isPlayerBullet() == False, all_projectiles))
 
+        if len(all_player_projectiles) > 0:
+            print(f"Total Player Projectiles on board: {len(all_player_projectiles)}")
+            for i in range(len(all_player_projectiles)):
+                print(f"\t{i}.) {all_player_projectiles[i]}")
 
+        if len(all_enemy_projectiles) > 0:
+            print(f"Total Enemy Projectiles on board: {len(all_enemy_projectiles)}")
+            for j in range(len(all_enemy_projectiles)):
+                if all_enemy_projectiles[j].get_position()[1] >= 0:
+                    print(f"\t{j}.) {all_enemy_projectiles[j]}")

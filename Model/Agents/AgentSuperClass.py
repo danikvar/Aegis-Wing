@@ -129,7 +129,9 @@ class AgentSuperClass(AgentInterface):
         if self.agent_height == 1:
             return self.lowest_row
         else:
+            #TODO RAMZI CORNER BUG FIX HERE?
             return self.lowest_row + self.agent_height - 1
+            #return self.lowest_row - 1
 
     def get_row_boundaries(self) -> tuple:
         return (self.lowest_row, self.get_max_row_boundary())
