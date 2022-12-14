@@ -33,7 +33,7 @@ PLAYER_INITIAL_SPAWN_COL_POSITION = 0  # spawn player at furthest left position
 PLAYER_LIVES = 1
 PLAYER_HP = 3
 EXPECTIMAX_DEPTH = 1
-TOTAL_GAME_RUNS = 3
+TOTAL_GAME_RUNS = 25
 
 ########## Specific Enemy Spawn Rate Configuration ##########
 # if enemy does get spawned then this is the probability they get chosen
