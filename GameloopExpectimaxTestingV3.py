@@ -120,8 +120,6 @@ def main():
                                        player_lives=PLAYER_LIVES)
 
         # player will be of size 1 X 1
-        #TODO NOTSKY YOU WILL HAVE TO MAKE YOUR OWN PLAYER EXPECTIMAX AGENT CLASS and overwrite auto pick action
-        # so instead of PlayerAgent constructor use your Expectimax agent constructor
         expectimax_agent = ExpectimaxPlayerAgent3(1, 1, PLAYER_INITIAL_SPAWN_ROW_POSITION,
                                    PLAYER_INITIAL_SPAWN_COL_POSITION,expectimax_depth=EXPECTIMAX_DEPTH)
         expectimax_agent.set_hp(PLAYER_HP)
