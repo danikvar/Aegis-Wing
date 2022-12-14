@@ -1,10 +1,13 @@
+import csv
 import random
+from datetime import datetime
 
 from Model.Agents.Actions import Actions
 from Model.Agents.AgentInterface import AgentInterface
 from Model.Agents.BasicCounterAgent import BasicCounterAgent
 from Model.Agents.EnemyAgentBasicFireAndMove import EnemyAgentBasicFireAndMove
 from Model.Agents.EnemyMoveFireHeuristicAgent import EnemyMoveFireHeuristicAgent
+from Model.Agents.ExpectimaxPlayerAgent3 import ExpectimaxPlayerAgent3
 from Model.Agents.PlayerAgent import PlayerAgent
 from Model.Agents.SimpleGoLeftAgent import SimpleGoLeftAgent
 from Model.EnemyPicker import EnemyPicker
@@ -20,11 +23,12 @@ BOARD_ROWS = 8
 BOARD_COLUMNS = 7
 MAX_ENEMIES_AT_ANY_TIME = 5
 GENERAL_SPAWN_RATE = 50  # represents 50% general spawn rate
-TURNS_UNTIL_GAME_FINISHED = 300
+TURNS_UNTIL_GAME_FINISHED = 6
 PLAYER_INITIAL_SPAWN_ROW_POSITION = BOARD_ROWS // 2  # spawn in middle of board rows
 PLAYER_INITIAL_SPAWN_COL_POSITION = 0  # spawn player at furthest left position
 PLAYER_LIVES = 1
 PLAYER_HP = 3
+EXPECTIMAX_DEPTH = 2
 
 ########## Specific Enemy Spawn Rate Configuration ##########
 # if enemy does get spawned then this is the probability they get chosen
@@ -97,7 +101,7 @@ def print_projectile_locations(gameState: GameState):
 def main():
 
     #set to false to turn off print statements
-    visualize_game = True
+    visualize_game = False
 
     starting_gamestate = GameState(board_len=BOARD_COLUMNS, board_height=BOARD_ROWS,
                                    max_enemies_at_one_time=MAX_ENEMIES_AT_ANY_TIME,
@@ -107,11 +111,11 @@ def main():
     # player will be of size 1 X 1
     #TODO NOTSKY YOU WILL HAVE TO MAKE YOUR OWN PLAYER EXPECTIMAX AGENT CLASS and overwrite auto pick action
     # so instead of PlayerAgent constructor use your Expectimax agent constructor
-    player_agent = PlayerAgent(1, 1, PLAYER_INITIAL_SPAWN_ROW_POSITION,
-                               PLAYER_INITIAL_SPAWN_COL_POSITION)
-    player_agent.set_hp(PLAYER_HP)
+    expectimax_agent = ExpectimaxPlayerAgent3(1, 1, PLAYER_INITIAL_SPAWN_ROW_POSITION,
+                               PLAYER_INITIAL_SPAWN_COL_POSITION,expectimax_depth=EXPECTIMAX_DEPTH)
+    expectimax_agent.set_hp(PLAYER_HP)
 
-    did_add_agent = starting_gamestate.addAgent(player_agent)
+    did_add_agent = starting_gamestate.addAgent(expectimax_agent)
 
     if (did_add_agent == False):
         raise RuntimeError("Could not add player agent")
@@ -126,51 +130,17 @@ def main():
         print_score_and_status(current_state)
         print(end_line,"\n")
 
+    field_titles = ["Game#", "Enemies_Killed", "HP_Lost", "End_Status", "Turns_Survived", "Score"]
+    list_values = []
+    game_counter = 1
+
+    t1 = datetime.now()
+
     # game loop
     while current_state.isWin() == False and current_state.isLose() == False:
-        #have each agent take an action
-        for each_index in range(0,len(current_state.current_agents)):
-            # print(f"Highest valid index is {len(current_state.current_agents)-1}")
-            # print(f"Current index is {each_index}")
-            # print(f"updating index -> {each_index} - {current_state.removed_agents} = {each_index - current_state.removed_agents}")
-            each_index = each_index - current_state.removed_agents
-            #print(f"updated index is {each_index}")
-
-            try:
-                each_agent : AgentInterface = current_state.current_agents[each_index]
-            except IndexError:
-                #print("BREAKING FOR LOOP")
-                break
-
-            if each_agent.hasMoved():
-                if each_index + 1 > len(current_state.current_agents) - 1:
-                    break
-                else:
-                    continue # move on to next agent
-
-            if each_agent.isPlayer():
-                #TODO Notsky have agent_action = each_agent.autoPickAction(current_state) when
-                # you have replaced player_agent with an expectimax agent
-                DEFAULT_ACTION = Actions.STOP
-                agent_action = DEFAULT_ACTION
-
-            elif each_agent.isHeuristicAgent():
-                agent_action = each_agent.autoPickAction(current_state)
-            else:
-                agent_action = each_agent.autoPickAction()
-
-            try:
-                current_state = current_state.generateSuccessorState(each_index, agent_action)
-            except IndexError:
-                break
-
-
-        #once all agents have taken an action decrement the turn
-        current_state.decrement_turn()
-        # Reset move status of agents after everyone has moved
-        current_state.reset_agents_move_status()
-
-        #print(end_line)
+        agent: ExpectimaxPlayerAgent3 = current_state.current_agents[0]
+        expectimaxAgentAction = agent.autoPickAction(current_state)
+        current_state = current_state.getStateAtNextTurn(expectimaxAgentAction)
 
         # spawn enemies at the start of new turn
         if len(current_state.current_agents) - 1 < current_state.max_enemies_at_any_given_time:
@@ -192,6 +162,33 @@ def main():
                 print("PLAYER HP: 0")
             print_score_and_status(current_state)
             print(end_line)
+
+    if current_state.isLose() == True:
+        lost_hp = 0
+        endStatus = "Lose"
+    else:
+        lost_hp = 3 - current_state.current_agents[0].get_hp()
+        endStatus = "Win"
+    turns_survived = 300 - current_state.turns_left
+    entry = [game_counter, current_state.removed_agents, lost_hp, endStatus, turns_survived, current_state.score]
+    list_values.append(entry)
+    game_counter += 1
+
+    t2 = datetime.now()
+
+    diff = t2 - t1
+    print(f"Game took {diff.min} minutes to complete")
+
+    with open('expectimaxStats.csv', 'w', encoding='UTF8', newline='') as f:
+        writer = csv.writer(f)
+
+        # write the header
+        writer.writerow(field_titles)
+
+        # write multiple rows
+        writer.writerows(list_values)
+
+    print("File complete")
 
 
 if __name__ == "__main__":

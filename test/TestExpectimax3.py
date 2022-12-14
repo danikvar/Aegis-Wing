@@ -1,3 +1,4 @@
+import csv
 import unittest
 
 from Model.Agents.Actions import Actions
@@ -438,6 +439,65 @@ class TestExpectimax2(unittest.TestCase):
         state.print_score()
 
         self.assertTrue(state.score > 10000)
+
+    def test_writing_data(self):
+        print_board=False
+        state = self.init_gameState
+        state.turns_left = 5
+        # replace player agent with expectimax agent
+        state.current_agents[0] = ExpectimaxPlayerAgent3(
+            lowest_row=PLAYER_INITIAL_SPAWN_ROW_POSITION,
+            least_col=PLAYER_INITIAL_SPAWN_COL_POSITION,
+            expectimax_depth=3)
+        state.current_agents[0].set_hp(3)
+
+        goLeftEnemy = SimpleGoLeftAgent(4, 6)
+        state.addAgent(goLeftEnemy)
+        state.update_board()
+        if print_board == True:
+            print("initial state")
+            state.print_board()
+
+        field_titles = ["Game#","Enemies_Killed", "HP_Lost", "End_Status", "Turns_Survived", "Score"]
+        list_values = []
+        game_counter = 1
+
+        for i in range(2):
+
+            while state.isWin() == False and state.isLose() == False:
+                agent: ExpectimaxPlayerAgent3 = state.current_agents[0]
+                expectimaxAgentAction = agent.autoPickAction(state)
+                state = state.getStateAtNextTurn(expectimaxAgentAction)
+                if print_board == True:
+                    state.print_status()
+                    state.print_projectile_locations()
+                    state.print_board()
+                    state.print_score()
+                    print("==========================\n")
+
+            if state.isLose() == True:
+                lost_hp = 0
+                endStatus = "Lose"
+            else:
+                lost_hp = 3-state.current_agents[0].get_hp()
+                endStatus = "Win"
+            turns_survived = 300 - state.turns_left
+            entry = [game_counter, state.removed_agents,lost_hp, endStatus,turns_survived, state.score]
+            list_values.append(entry)
+            game_counter += 1
+
+        with open('expectimaxStats.csv', 'w', encoding='UTF8', newline='') as f:
+            writer = csv.writer(f)
+
+            # write the header
+            writer.writerow(field_titles)
+
+            # write multiple rows
+            writer.writerows(list_values)
+
+        print("File complete")
+
+
 
 
 def main():

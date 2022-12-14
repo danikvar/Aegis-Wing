@@ -79,8 +79,8 @@ class ExpectimaxPlayerAgent3(PlayerAgent):
 
 
         #TODO DELETE
-        print("==========END OF PLAYER TURN==============")
-        print(f"tied states at turn={state.turns_left}\n{tied_states}")
+        #print("==========END OF PLAYER TURN==============")
+        #print(f"tied states at turn={state.turns_left}\n{tied_states}")
 
         return best_action
 
