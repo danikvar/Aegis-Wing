@@ -340,6 +340,50 @@ class TestExpectimax2(unittest.TestCase):
 
         self.assertTrue(state.score > 10000)
 
+    def test_expectimaxV3_5(self):
+        '''
+        1 Player
+        1 Heuristic Agent
+        Expectimax Depth = 3, To run faster
+        Player should be taking actions to destroy or avoid enemy and win
+        Player may randomly choose to fire though
+        Play at max for 4 turns
+        Player should want to fire at least for the first turn
+        :return:
+        '''
+        print_board = True
+        turns_survival = 7
+        state = self.init_gameState
+        state.turns_left = turns_survival
+        # replace player agent with expectimax agent
+        state.current_agents[0] = ExpectimaxPlayerAgent3(
+            lowest_row=PLAYER_INITIAL_SPAWN_ROW_POSITION,
+            least_col=PLAYER_INITIAL_SPAWN_COL_POSITION,
+            expectimax_depth=2)
+
+        HeuristicAgent = EnemyMoveFireHeuristicAgent(4,6)
+        state.addAgent(HeuristicAgent)
+        state.update_board()
+
+        while state.isWin() == False and state.isLose() == False:
+            agent: ExpectimaxPlayerAgent3 = state.current_agents[0]
+            expectimaxAgentAction = agent.autoPickAction(state)
+            state = state.getStateAtNextTurn(expectimaxAgentAction)
+            if print_board == True:
+                state.print_status()
+                state.print_projectile_locations()
+                state.print_board()
+                state.print_score()
+                print("==========================\n")
+
+        print("Final State")
+        state.print_status()
+        state.print_projectile_locations()
+        state.print_board()
+        state.print_score()
+
+        self.assertTrue(state.score > 10000)
+
 
 def main():
     unittest.main(verbosity=3)

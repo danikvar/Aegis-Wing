@@ -29,6 +29,9 @@ class BasicCounterAgent(AgentSuperClass):
     def isPlayer(self):
         return False
 
+    def isBasicCounter(self) -> bool:
+        return True
+
 
     def deepcopy(self):
         copy = BasicCounterAgent(self.lowest_row, self.least_col, self.counter, self.ideal_x, self.ideal_y)

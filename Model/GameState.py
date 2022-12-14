@@ -445,7 +445,19 @@ class GameState:
                     newBullet = SimpleAgentBullet(current_agent, 2)
                     newBullet.setHasMovedStatus(True) # bullet will not take an action this turn
                     successor_state.current_projectiles.append(newBullet)
+                    movedAgent: AgentInterface = current_agent.take_action(action)
+                    successor_state.current_agents[agentIndex] = movedAgent
+                elif current_agent.isExpectimaxAgent() or current_agent.isPlayer():
+                    newBullet = SimpleAgentBullet(current_agent)
+                    newBullet.setHasMovedStatus(True)
+                    successor_state.current_projectiles.append(newBullet)
                     movedAgent: AgentInterface = successor_state.current_agents[agentIndex]
+                elif current_agent.isBasicCounter() == True:
+                    newBullet = SimpleAgentBullet(current_agent)
+                    newBullet.setHasMovedStatus(True)
+                    successor_state.current_projectiles.append(newBullet)
+                    movedAgent: AgentInterface = current_agent.take_action(action)
+                    successor_state.current_agents[agentIndex] = movedAgent
                 else:
                     newBullet = SimpleAgentBullet(current_agent)
                     newBullet.setHasMovedStatus(True)
