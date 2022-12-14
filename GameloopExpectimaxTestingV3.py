@@ -33,6 +33,7 @@ PLAYER_INITIAL_SPAWN_COL_POSITION = 0  # spawn player at furthest left position
 PLAYER_LIVES = 1
 PLAYER_HP = 3
 EXPECTIMAX_DEPTH = 1
+TOTAL_GAME_RUNS = 20
 
 ########## Specific Enemy Spawn Rate Configuration ##########
 # if enemy does get spawned then this is the probability they get chosen
@@ -111,7 +112,7 @@ def main():
     list_values = []
     game_counter = 1
 
-    for i in range(20):
+    for i in range(TOTAL_GAME_RUNS):
 
         starting_gamestate = GameState(board_len=BOARD_COLUMNS, board_height=BOARD_ROWS,
                                        max_enemies_at_one_time=MAX_ENEMIES_AT_ANY_TIME,
