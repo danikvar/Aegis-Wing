@@ -171,6 +171,8 @@ class GameState:
 
                     if each_agent.isPlayer(): #if agent that got hit was the player then reduce score
                         self.score -= 100
+                    else:
+                        self.removed_agents += 1
 
     def haveAllAgentsMoved(self) -> bool:
         for each in self.current_agents:
@@ -284,7 +286,7 @@ class GameState:
                 subtract_by = 1
                 #TODO Delete print
                 #print("Removing Player Agent")
-                self.removed_agents += 1
+                #self.removed_agents += 1
             elif value_to_pop == 0 and self.current_player_lives >= 1:
                 continue
             else:
@@ -293,7 +295,7 @@ class GameState:
                 subtract_by = each_index
                 #TODO Delete print
                 #print("Removing Agent")
-                self.removed_agents += 1
+                #self.removed_agents += 1
 
 
     def update_board(self):
