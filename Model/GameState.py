@@ -335,7 +335,7 @@ class GameState:
         if isAgentPlayer:
             if (agent_min_x < board_min_x):
                 return False
-            elif (agent_max_x - 1 > board_max_x):
+            elif (agent_max_x - 1 > board_max_x): #may potentially cause bugged behavior
                 return False
             elif (agent_min_y < board_min_y):
                 return False
@@ -431,7 +431,10 @@ class GameState:
         else:
             successor_state = self.deepCopy()
 
-        current_agent: AgentInterface = successor_state.current_agents[agentIndex]
+        if successor_state.current_agents[agentIndex].isExpectimaxAgent() == True:
+            current_agent = successor_state.current_agents[agentIndex]
+        else:
+            current_agent: AgentInterface = successor_state.current_agents[agentIndex]
         all_legal_agent_actions = successor_state.getAllLegalActions(agentIndex)
 
 
@@ -456,7 +459,8 @@ class GameState:
                 movedAgent.setHasMovedStatus(True)
                 successor_state.current_agents[agentIndex] = movedAgent
         else:
-            raise RuntimeError(f"Agent at index {agentIndex} of type {type(current_agent)} cannot take action {action}")
+            successor_state.current_agents[agentIndex].setHasMovedStatus(True)
+            #raise RuntimeError(f"Agent at index {agentIndex} of type {type(current_agent)} cannot take action {action}")
 
         successor_state.update_board()
 

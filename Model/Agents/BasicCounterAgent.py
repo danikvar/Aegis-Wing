@@ -29,6 +29,7 @@ class BasicCounterAgent(AgentSuperClass):
     def isPlayer(self):
         return False
 
+
     def deepcopy(self):
         copy = BasicCounterAgent(self.lowest_row, self.least_col, self.counter, self.ideal_x, self.ideal_y)
         copy.hasAlreadyMoved = self.hasAlreadyMoved

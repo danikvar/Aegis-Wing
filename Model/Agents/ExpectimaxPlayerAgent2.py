@@ -65,6 +65,9 @@ class ExpectimaxPlayerAgent2(PlayerAgent):
         if len(tied_states) > 1:
             best_action = random.choice(tied_states)[0]
 
+        #TODO DELETE
+        print(f"tied states at turn={state.turns_left}\n{tied_states}")
+
         return best_action
 
 
@@ -104,6 +107,15 @@ class ExpectimaxPlayerAgent2(PlayerAgent):
             #maximizer node
             if agentIndex == 0 and state.current_agents[0].isPlayer() == True:
                 stateAfterAction = state.getStateAfterAction(agentIndex,each_action,True)
+            elif state.current_agents[0].isPlayer() == False:
+                state.checkBulletAgentClashes()
+                state.removeBullets()
+                state.checkPlayerAgentClashes()
+                state.updateAgentsList()
+                state.update_board()
+                state.reset_agents_move_status()
+                state.decrement_turn()
+                return state.score
             else:
                 #minimizer nodes
                 stateAfterAction = state.getStateAfterAction(agentIndex,each_action)
