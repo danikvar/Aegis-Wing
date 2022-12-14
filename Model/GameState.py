@@ -614,8 +614,6 @@ class GameState:
             each_bullet: ProjectileInterface = self.current_projectiles[each_index]
             each_bullet.resetMoveStatus()
 
-        self.removed_agents = 0
-
 
     def print_board(self):
         print(self.gameBoard)

@@ -33,7 +33,7 @@ PLAYER_INITIAL_SPAWN_COL_POSITION = 0  # spawn player at furthest left position
 PLAYER_LIVES = 1
 PLAYER_HP = 3
 EXPECTIMAX_DEPTH = 1
-TOTAL_GAME_RUNS = 20
+TOTAL_GAME_RUNS = 2
 
 ########## Specific Enemy Spawn Rate Configuration ##########
 # if enemy does get spawned then this is the probability they get chosen
@@ -145,7 +145,7 @@ def main():
         print(f"Starting Simulation for Game {game_counter} at {datetime.today().strftime('%H:%M %p')} with depth = {EXPECTIMAX_DEPTH}")
         # game loop
         while current_state.isWin() == False and current_state.isLose() == False:
-            #print(f"Starting turn {current_state.turns_left},\t#agents = {len(current_state.current_agents)},\t#Bullets = {len(current_state.current_projectiles)}")
+            #print(f"Starting turn {current_state.turns_left},\t#agents = {len(current_state.current_agents)},\t#Bullets = {len(current_state.current_projectiles)} at {datetime.today().strftime('%H:%M %p')}")
             agent: ExpectimaxPlayerAgent3 = current_state.current_agents[0]
             expectimaxAgentAction = agent.autoPickAction(current_state)
             current_state = current_state.getStateAtNextTurn(expectimaxAgentAction)
