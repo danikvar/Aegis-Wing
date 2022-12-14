@@ -260,7 +260,12 @@ class GameState:
         # COde below handles if player dies and can or does not respawn
         for each_index in agent_indexes_to_be_popped:
             value_to_pop = each_index - subtract_by
-            current_agent: AgentInterface = self.current_agents[value_to_pop]
+            try:
+                current_agent: AgentInterface = self.current_agents[value_to_pop]
+            except IndexError:
+                #print(f"Index error, list length = {len(self.current_agents)}")
+                #print(f"trying to pop: {value_to_pop}")
+                break
             # if player agent died
             if current_agent.isPlayer() == True: # if player agent was destroyed
                 if (current_agent.is_dead()):

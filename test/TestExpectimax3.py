@@ -384,6 +384,61 @@ class TestExpectimax2(unittest.TestCase):
 
         self.assertTrue(state.score > 10000)
 
+    def test_expectimaxV3_6(self):
+        '''
+        1 Player
+        3 Fire and Move Agents
+        Must not move in order to survive first turn
+        Expectimax Depth = 3, To run faster
+        Player should be taking actions to destroy or avoid enemy and win
+        Player may randomly choose to fire though
+        Play at max for 4 turns
+        Player should want to fire at least for the first turn
+        :return:
+        '''
+        print_board = True
+        turns_survival = 2
+        state = self.init_gameState
+        state.max_enemies_at_any_given_time=5
+        state.turns_left = turns_survival
+        # replace player agent with expectimax agent
+        state.current_agents[0] = ExpectimaxPlayerAgent3(
+            lowest_row=PLAYER_INITIAL_SPAWN_ROW_POSITION,
+            least_col=PLAYER_INITIAL_SPAWN_COL_POSITION,
+            expectimax_depth=2)
+
+        B1 = EnemyAgentBasicFireAndMove(4,3)
+        B2 = EnemyAgentBasicFireAndMove(5, 2)
+        B3 = EnemyAgentBasicFireAndMove(3, 2)
+        state.addAgent(B1)
+        state.addAgent(B2)
+        state.addAgent(B3)
+
+        state.getStateAfterAction(1,Actions.FIRE)
+        state.getStateAfterAction(2, Actions.FIRE)
+        state.getStateAfterAction(3, Actions.FIRE)
+
+        state.update_board()
+
+        while state.isWin() == False and state.isLose() == False:
+            agent: ExpectimaxPlayerAgent3 = state.current_agents[0]
+            expectimaxAgentAction = agent.autoPickAction(state)
+            state = state.getStateAtNextTurn(expectimaxAgentAction)
+            if print_board == True:
+                state.print_status()
+                state.print_projectile_locations()
+                state.print_board()
+                state.print_score()
+                print("==========================\n")
+
+        print("Final State")
+        state.print_status()
+        state.print_projectile_locations()
+        state.print_board()
+        state.print_score()
+
+        self.assertTrue(state.score > 10000)
+
 
 def main():
     unittest.main(verbosity=3)
