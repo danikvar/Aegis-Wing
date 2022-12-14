@@ -17,18 +17,22 @@ from Model.GameState import GameState
 """
 This game loop will be used to train a reinforcement model
 """
+#10 sec per turn at max enemies=4 if depth = 2
+# means 50 min to complete one game
 
+#5 sec per turn at max enemies=4 if depth = 1
+# means 25 min to complete one game
 ########## Basic Game Configuration ##########
 BOARD_ROWS = 8
 BOARD_COLUMNS = 7
-MAX_ENEMIES_AT_ANY_TIME = 5
+MAX_ENEMIES_AT_ANY_TIME = 4
 GENERAL_SPAWN_RATE = 50  # represents 50% general spawn rate
-TURNS_UNTIL_GAME_FINISHED = 6
+TURNS_UNTIL_GAME_FINISHED = 300
 PLAYER_INITIAL_SPAWN_ROW_POSITION = BOARD_ROWS // 2  # spawn in middle of board rows
 PLAYER_INITIAL_SPAWN_COL_POSITION = 0  # spawn player at furthest left position
 PLAYER_LIVES = 1
 PLAYER_HP = 3
-EXPECTIMAX_DEPTH = 2
+EXPECTIMAX_DEPTH = 1
 
 ########## Specific Enemy Spawn Rate Configuration ##########
 # if enemy does get spawned then this is the probability they get chosen
@@ -63,7 +67,6 @@ def print_enemies_status(gameState: GameState ):
     all_enemy_agents = gameState.current_agents[1:]
 
     if len(all_enemy_agents) > 0:
-
 
         print(f"Total enemies on board: {len(all_enemy_agents)}")
 
@@ -103,81 +106,86 @@ def main():
     #set to false to turn off print statements
     visualize_game = False
 
-    starting_gamestate = GameState(board_len=BOARD_COLUMNS, board_height=BOARD_ROWS,
-                                   max_enemies_at_one_time=MAX_ENEMIES_AT_ANY_TIME,
-                                   turns_left=TURNS_UNTIL_GAME_FINISHED,
-                                   player_lives=PLAYER_LIVES)
-
-    # player will be of size 1 X 1
-    #TODO NOTSKY YOU WILL HAVE TO MAKE YOUR OWN PLAYER EXPECTIMAX AGENT CLASS and overwrite auto pick action
-    # so instead of PlayerAgent constructor use your Expectimax agent constructor
-    expectimax_agent = ExpectimaxPlayerAgent3(1, 1, PLAYER_INITIAL_SPAWN_ROW_POSITION,
-                               PLAYER_INITIAL_SPAWN_COL_POSITION,expectimax_depth=EXPECTIMAX_DEPTH)
-    expectimax_agent.set_hp(PLAYER_HP)
-
-    did_add_agent = starting_gamestate.addAgent(expectimax_agent)
-
-    if (did_add_agent == False):
-        raise RuntimeError("Could not add player agent")
-
-    current_state = starting_gamestate
-
-    end_line = "=" * 50
-
-    if visualize_game:
-        print("Staring GameState")
-        print_board(current_state)
-        print_score_and_status(current_state)
-        print(end_line,"\n")
-
-    field_titles = ["Game#", "Enemies_Killed", "HP_Lost", "End_Status", "Turns_Survived", "Score"]
+    field_titles = ["Game#", "Enemies_Killed", "HP_Lost", "End_Status", "Turns_Survived", "Score",
+                    "Time at End of Simulation"]
     list_values = []
     game_counter = 1
 
-    t1 = datetime.now()
+    for i in range(20):
 
-    # game loop
-    while current_state.isWin() == False and current_state.isLose() == False:
-        agent: ExpectimaxPlayerAgent3 = current_state.current_agents[0]
-        expectimaxAgentAction = agent.autoPickAction(current_state)
-        current_state = current_state.getStateAtNextTurn(expectimaxAgentAction)
+        starting_gamestate = GameState(board_len=BOARD_COLUMNS, board_height=BOARD_ROWS,
+                                       max_enemies_at_one_time=MAX_ENEMIES_AT_ANY_TIME,
+                                       turns_left=TURNS_UNTIL_GAME_FINISHED,
+                                       player_lives=PLAYER_LIVES)
 
-        # spawn enemies at the start of new turn
-        if len(current_state.current_agents) - 1 < current_state.max_enemies_at_any_given_time:
-            # spawn enemy based on spawn rate
-            probability_to_spawn = random.randint(0, 100)
-            if probability_to_spawn <= ENEMY_SPAWNER.spawn_rate:
-                # pick an enemy
-                enemy_to_spawn = ENEMY_SPAWNER.choose_enemy()
-                current_state.addAgent(enemy_to_spawn)
+        # player will be of size 1 X 1
+        #TODO NOTSKY YOU WILL HAVE TO MAKE YOUR OWN PLAYER EXPECTIMAX AGENT CLASS and overwrite auto pick action
+        # so instead of PlayerAgent constructor use your Expectimax agent constructor
+        expectimax_agent = ExpectimaxPlayerAgent3(1, 1, PLAYER_INITIAL_SPAWN_ROW_POSITION,
+                                   PLAYER_INITIAL_SPAWN_COL_POSITION,expectimax_depth=EXPECTIMAX_DEPTH)
+        expectimax_agent.set_hp(PLAYER_HP)
 
-        #Optional board visualization
+        did_add_agent = starting_gamestate.addAgent(expectimax_agent)
+
+        if (did_add_agent == False):
+            raise RuntimeError("Could not add player agent")
+
+        current_state = starting_gamestate
+
+        end_line = "=" * 50
+
         if visualize_game:
-            print_projectile_locations(current_state)
-            print_enemies_status(current_state)
+            print("Staring GameState")
             print_board(current_state)
-            if current_state.current_agents[0].isPlayer():
-                print(f"PLAYER HP: {current_state.current_agents[0].get_hp()}")
-            else:
-                print("PLAYER HP: 0")
             print_score_and_status(current_state)
-            print(end_line)
+            print(end_line,"\n")
 
-    if current_state.isLose() == True:
-        lost_hp = 0
-        endStatus = "Lose"
-    else:
-        lost_hp = 3 - current_state.current_agents[0].get_hp()
-        endStatus = "Win"
-    turns_survived = 300 - current_state.turns_left
-    entry = [game_counter, current_state.removed_agents, lost_hp, endStatus, turns_survived, current_state.score]
-    list_values.append(entry)
-    game_counter += 1
 
-    t2 = datetime.now()
+        print(f"Starting Simulation for Game {game_counter} at {datetime.today().strftime('%H:%M %p')} with depth = {EXPECTIMAX_DEPTH}")
+        # game loop
+        while current_state.isWin() == False and current_state.isLose() == False:
+            #print(f"Starting turn {current_state.turns_left},\t#agents = {len(current_state.current_agents)},\t#Bullets = {len(current_state.current_projectiles)}")
+            agent: ExpectimaxPlayerAgent3 = current_state.current_agents[0]
+            expectimaxAgentAction = agent.autoPickAction(current_state)
+            current_state = current_state.getStateAtNextTurn(expectimaxAgentAction)
 
-    diff = t2 - t1
-    print(f"Game took {diff.min} minutes to complete")
+            # spawn enemies at the start of new turn
+            if len(current_state.current_agents) - 1 < current_state.max_enemies_at_any_given_time:
+                # spawn enemy based on spawn rate
+                probability_to_spawn = random.randint(0, 100)
+                if probability_to_spawn <= ENEMY_SPAWNER.spawn_rate:
+                    # pick an enemy
+                    enemy_to_spawn = ENEMY_SPAWNER.choose_enemy()
+                    current_state.addAgent(enemy_to_spawn)
+
+            if current_state.turns_left % 25 == 0:
+                print(f"Completed up to {300 - current_state.turns_left} turns of Game: {game_counter} at {datetime.today().strftime('%H:%M %p')}")
+
+            #Optional board visualization
+            if visualize_game:
+                print_projectile_locations(current_state)
+                print_enemies_status(current_state)
+                print_board(current_state)
+                if current_state.current_agents[0].isPlayer():
+                    print(f"PLAYER HP: {current_state.current_agents[0].get_hp()}")
+                else:
+                    print("PLAYER HP: 0")
+                print_score_and_status(current_state)
+                print(end_line)
+
+        if current_state.isLose() == True:
+            lost_hp = 3
+            endStatus = "Lose"
+        else:
+            lost_hp = 3 - current_state.current_agents[0].get_hp()
+            endStatus = "Win"
+        turns_survived = 300 - current_state.turns_left
+        entry = [game_counter, current_state.removed_agents, lost_hp, endStatus, turns_survived, current_state.score,datetime.today().strftime('%H:%M %p')]
+        list_values.append(entry)
+
+        print(f"Game# {game_counter} Completed at {datetime.today().strftime('%H:%M %p')}")
+
+        game_counter += 1
 
     with open('expectimaxStats.csv', 'w', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
