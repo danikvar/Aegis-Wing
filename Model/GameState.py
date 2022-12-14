@@ -43,6 +43,7 @@ class GameState:
         self.fireActions = [Actions.FIRE, Actions.FIRERIGHT, Actions.FIRELEFT,
                             Actions.FIREDOWN, Actions.FIREUP]
         self.score = 0 #TODO test
+        self.won_flag = False
 
         #Added late
         self.removed_agents = 0
@@ -124,9 +125,10 @@ class GameState:
 
     def decrement_turn(self):
             self.turns_left -= 1
-            #only add survival point if player is still in the game
-            if self.current_agents[0].isPlayer() and self.current_agents[0].get_hp() > 0:
-                self.score += 1
+            if len(self.current_agents) > 0:
+                #only add survival point if player is still in the game
+                if self.current_agents[0].isPlayer() and self.current_agents[0].get_hp() > 0:
+                    self.score += 1
 
     def set_turn(self, turns_left: int) -> None:
         if turns_left < 0:
@@ -134,9 +136,12 @@ class GameState:
         self.turns_left = turns_left
 
     def isWin(self) -> bool:
+
         #you win game if player still has lives and timer has reached 0
         if self.current_player_lives > 0 and self.isGameOver():
-            self.score += 10000
+            if self.won_flag == False:
+                self.score += 10000
+            self.won_flag = True
             return True
         return False
 
@@ -502,7 +507,13 @@ class GameState:
                 state_ready_to_move_agents = state_ready_to_move_agents.getStateAfterAction(i, agent_action)
 
         state_all_agents_have_moved = state_ready_to_move_agents
+        state_all_agents_have_moved.checkBulletAgentClashes()
+        state_all_agents_have_moved.removeBullets()
+        state_all_agents_have_moved.checkPlayerAgentClashes()
+        state_all_agents_have_moved.updateAgentsList()
         state_all_agents_have_moved.update_board()
+        state_all_agents_have_moved.reset_agents_move_status()
+        state_all_agents_have_moved.decrement_turn()
 
         return state_all_agents_have_moved
 
@@ -589,9 +600,10 @@ class GameState:
         print(self.gameBoard)
 
     def print_score(self):
-        print(self.score)
+        print("Score: ", self.score)
 
     def print_status(self):
+        print(f"Turns Left: {self.turns_left}")
         if self.isWin():
             print("Player WON! :D")
         elif self.isLose():
