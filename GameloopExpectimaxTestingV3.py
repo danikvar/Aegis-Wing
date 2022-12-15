@@ -32,15 +32,15 @@ PLAYER_INITIAL_SPAWN_ROW_POSITION = BOARD_ROWS // 2  # spawn in middle of board 
 PLAYER_INITIAL_SPAWN_COL_POSITION = 0  # spawn player at furthest left position
 PLAYER_LIVES = 1
 PLAYER_HP = 3
-EXPECTIMAX_DEPTH = 1
-TOTAL_GAME_RUNS = 25
+EXPECTIMAX_DEPTH = 3
+TOTAL_GAME_RUNS = 50
 
 ########## Specific Enemy Spawn Rate Configuration ##########
 # if enemy does get spawned then this is the probability they get chosen
-HEURISTIC_SR = 15
-TURN_SPAN_SR = 20  # a.k.a counter agent
-BASIC_FIRE_AND_MOVE_SR = 20
-SIMPLE_GO_LEFT_SR = 45
+HEURISTIC_SR = 0
+TURN_SPAN_SR = 0  # a.k.a counter agent
+BASIC_FIRE_AND_MOVE_SR = 0
+SIMPLE_GO_LEFT_SR = 100
 
 ########## Counter 'type' Enemy Configuration ##########
 TURNS_UNTIL_LEAVE_BOARD = 5
@@ -157,7 +157,7 @@ def main():
                     enemy_to_spawn = ENEMY_SPAWNER.choose_enemy()
                     current_state.addAgent(enemy_to_spawn)
 
-            if current_state.turns_left % 25 == 0:
+            if current_state.turns_left % 50 == 0:
                 print(f"Completed up to {300 - current_state.turns_left} turns of Game: {game_counter} at {datetime.today().strftime('%H:%M %p')}")
 
             #Optional board visualization
@@ -186,7 +186,7 @@ def main():
 
         game_counter += 1
 
-    with open('expectimaxStats.csv', 'w', encoding='UTF8', newline='') as f:
+    with open('expectimaxStats-D3-SGL.csv', 'w', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
 
         # write the header

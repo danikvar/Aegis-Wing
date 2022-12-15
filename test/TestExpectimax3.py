@@ -5,7 +5,6 @@ from Model.Agents.Actions import Actions
 from Model.Agents.BasicCounterAgent import BasicCounterAgent
 from Model.Agents.EnemyAgentBasicFireAndMove import EnemyAgentBasicFireAndMove
 from Model.Agents.EnemyMoveFireHeuristicAgent import EnemyMoveFireHeuristicAgent
-from Model.Agents.ExpectimaxPlayerAgent2 import ExpectimaxPlayerAgent2
 from Model.Agents.ExpectimaxPlayerAgent3 import ExpectimaxPlayerAgent3
 from Model.Agents.PlayerAgent import PlayerAgent
 from Model.Agents.SimpleGoLeftAgent import SimpleGoLeftAgent
@@ -22,7 +21,7 @@ MAX_ENEMIES_AT_ANY_TIME = 5
 
 
 
-class TestExpectimax2(unittest.TestCase):
+class TestExpectimax3(unittest.TestCase):
 
     def setUp(self) -> None:
         self.init_gameState = GameState(board_len= BOARD_COLUMNS, board_height= BOARD_ROWS,
@@ -32,6 +31,119 @@ class TestExpectimax2(unittest.TestCase):
         self.player_agent.set_hp(3)
         self.init_gameState.addAgent(self.player_agent)
 
+    def test_getStateNextTurn(self):
+        '''
+        Only player in the gamestate
+        :return:
+        '''
+        state = self.init_gameState
+        state = state.getStateAfterAction(0, Actions.RIGHT)
+
+        self.assertEquals(300, state.turns_left)
+        self.assertEquals((PLAYER_INITIAL_SPAWN_ROW_POSITION, PLAYER_INITIAL_SPAWN_COL_POSITION + 1),
+                          state.current_agents[0].get_position())
+        state.print_board()
+
+    def test_getStateNextTurn2(self):
+        '''
+        All enemy types and player on board:
+        1 player agent, moves right, up, down, left
+        1 SimpleGoLeftAgent
+        1 BasicFireAndMove
+        1 EnemyMoveFire
+        1 BasicCounter
+        :return:
+        '''
+        state = self.init_gameState
+
+        state = self.init_gameState
+        goLeftAgent = SimpleGoLeftAgent(0, BOARD_COLUMNS - 1)
+        basicFireMoveAgent = EnemyAgentBasicFireAndMove(1, BOARD_COLUMNS - 2)
+        heuristicEnemyAgent = EnemyMoveFireHeuristicAgent(2, 4)
+        turnSpanAgent = BasicCounterAgent(3, 3, 10, 6, 7)
+
+        state.addAgent(goLeftAgent)
+        state.addAgent(basicFireMoveAgent)
+        state.addAgent(heuristicEnemyAgent)
+        state.addAgent(turnSpanAgent)
+
+        print("initial board")
+        state.print_board()
+
+        state = state.getStateAtNextTurn(Actions.STOP)
+
+        self.assertEquals((0, 5), state.current_agents[1].get_position())
+
+        print("All agents take an action,"
+              "SimpleGoLeft moves, and other agents autopick their action")
+        state.print_agent_locations()
+        state.print_board()
+
+    def test_getStateNextTurnForSlideShow(self):
+        '''
+        All enemy types and player on board:
+        1 player agent, moves right, up, down, left
+        1 SimpleGoLeftAgent
+        1 BasicFireAndMove
+        1 EnemyMoveFire
+        1 BasicCounter
+        :return:
+        '''
+        state = self.init_gameState
+
+        state = self.init_gameState
+        goLeftAgent = SimpleGoLeftAgent(0, BOARD_COLUMNS - 1)
+        basicFireMoveAgent = EnemyAgentBasicFireAndMove(1, BOARD_COLUMNS - 2)
+        heuristicEnemyAgent = EnemyMoveFireHeuristicAgent(2, 4)
+        turnSpanAgent = BasicCounterAgent(3, 3, 10, 6, 7)
+
+        state.addAgent(goLeftAgent)
+        state.addAgent(basicFireMoveAgent)
+        state.addAgent(heuristicEnemyAgent)
+        state.addAgent(turnSpanAgent)
+        state = state.getStateAfterAction(0,Actions.FIRE)
+        state = state.getStateAfterAction(2, Actions.FIRE)
+
+        state.update_board()
+        state.print_board()
+        state.print_agent_locations()
+
+        print("initial board")
+        state.print_board()
+
+        state = state.getStateAtNextTurn(Actions.STOP)
+
+        self.assertEquals((0, 5), state.current_agents[1].get_position())
+
+        print("All agents take an action,"
+              "SimpleGoLeft moves, and other agents autopick their action")
+        state.print_agent_locations()
+        state.print_board()
+
+    def test_getStateNextTurn3(self):
+        '''
+        Checking bullets removed correctly
+        :return:
+        '''
+
+        state = self.init_gameState
+        basicFireMoveAgent = EnemyAgentBasicFireAndMove(1, BOARD_COLUMNS - 1)
+        state.addAgent(basicFireMoveAgent)
+
+        state = state.getStateAfterAction(0, Actions.FIRE)
+        state = state.getStateAfterAction(1, Actions.FIRE)
+        counter = 0
+
+        print("Initial Board")
+
+        state.print_board()
+        for i in range(6):
+            state = state.getStateAfterAction(0, Actions.STOP, True)
+            print(f"turn: {counter}")
+            state.print_board()
+            counter += 1
+
+        state.print_projectile_locations()
 
     def test_expectimaxV3_1_1(self):
         '''

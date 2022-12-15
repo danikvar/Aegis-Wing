@@ -43,8 +43,8 @@ class EnemyPicker():
         if enemy.isPlayer() == True:
             raise ValueError("Cannot add player to enemy list")
 
-        if weight <= 0:
-            raise ValueError("An enemy agent cannot have a weight <= 0 ")
+        if weight < 0:
+            raise ValueError("An enemy agent cannot have a weight < 0 ")
 
         self.enemy_spawn_list.append(enemy)
         self.enemy_weights.append(weight)
