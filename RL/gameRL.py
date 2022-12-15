@@ -1,22 +1,21 @@
-import os
 import argparse
-import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-from DQN import DQNAgent
-from random import randint
-import random
-import statistics
-import torch.optim as optim
-import torch
-from GPyOpt.methods import BayesianOptimization
+import csv
 # from bayesOpt import *
 import datetime
-import distutils.util
-
 # Imports for game loop
 import random
+import statistics
+import sys
+from datetime import datetime
+from random import randint
 
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+import torch
+import torch.optim as optim
+
+from DQN import DQNAgent
 from Model.Agents.Actions import Actions
 from Model.Agents.AgentInterface import AgentInterface
 from Model.Agents.BasicCounterAgent import BasicCounterAgent
@@ -31,7 +30,7 @@ from Model.GameState import GameState
 # Constant for training
 
 DEVICE = 'cpu'  # 'cuda' if torch.cuda.is_available() else 'cpu'
-
+LOGGING = True
 # Constants for our Game Loop
 ########## Basic Game Configuration ##########
 BOARD_ROWS = 8
@@ -83,9 +82,11 @@ FIRST_ACTION = Actions.FIRE
 ####################################
 
 def print_player_status(gameState: GameState):
-    player_agent = gameState.current_agents[0]
 
-    print("\n" + "PLAYER AGENT:" + player_agent.__str__())
+    if len(gameState.current_agents) > 0 and gameState.current_agents[0].isPlayer():
+        player_agent = gameState.current_agents[0]
+
+        print("\n" + "PLAYER AGENT:" + player_agent.__str__())
 
 
 def print_score(gameState: GameState):
@@ -96,7 +97,7 @@ def print_score(gameState: GameState):
 def print_enemies_status(gameState: GameState):
     all_enemy_agents = gameState.current_agents[1:]
 
-    if len(all_enemy_agents) > 0:
+    if len(gameState.current_agents) > 2 and len(all_enemy_agents) > 0:
 
         print(f"Total enemies on board: {len(all_enemy_agents)}")
 
@@ -135,28 +136,7 @@ def print_projectile_locations(gameState: GameState):
                 print(f"\t{j}.) {all_enemy_projectiles[j]}")
 
 
-#################################
-#   Define parameters manually  #
-#################################
-def define_parameters():
-    params = dict()
-    # Neural Network
-    params['epsilon_decay_linear'] = 1 / 100
-    params['learning_rate'] = 0.00013629
-    params['first_layer_size'] = 200  # neurons in the first layer
-    params['second_layer_size'] = 100  # neurons in the second layer
-    params['third_layer_size'] = 50  # neurons in the third layer
-    params['episodes'] = 2
-    params['memory_size'] = 2500
-    params['batch_size'] = 1000
-    # Settings
-    params['weights_path'] = 'weights/weights.h5'
-    params['train'] = True
-    params["test"] = False
-    params['plot_score'] = True
-    params['log_path'] = 'logs/scores_' + str(datetime.datetime.now().strftime("%Y%m%d%H%M%S")) + '.txt'
-    params['turns'] = TURNS_UNTIL_GAME_FINISHED
-    return params
+
 
 
 def plot_seaborn(array_counter, array_score, train):
@@ -246,6 +226,15 @@ def run(params):
     counter_plot = []
     record = 0
     total_score = 0
+
+
+    if params['test']:
+        field_titles = ["Game#", "Enemies_Killed", "Enemy Types Killed", "HP_Lost", "End_Status", "Turns_Survived", "Score",
+                    "Time at End of Simulation"]
+
+        list_values = []
+    game_counter = 1
+
     while counter_games < params['episodes']:
         # Initialize classes
         starting_gamestate = GameState(board_len=BOARD_COLUMNS, board_height=BOARD_ROWS,
@@ -313,8 +302,22 @@ def run(params):
         if params['train']:
             agent.replay_new(agent.memory, params['batch_size'])
         counter_games += 1
+        print(f"Game# {counter_games} Completed at {datetime.today().strftime('%H:%M %p')}")
         total_score += current_state.score
         print(f'Game {counter_games}      Score: {current_state.score}')
+
+        if params['test']:
+            if current_state.isLose() == True:
+                lost_hp = 3
+                endStatus = "Lose"
+            else:
+                lost_hp = 3 - current_state.current_agents[0].get_hp()
+                endStatus = "Win"
+            turns_survived = 300 - current_state.turns_left
+            entry = [counter_games, current_state.removed_agents, current_state.removed_types, lost_hp,
+                     endStatus, turns_survived,
+                     current_state.score,datetime.today().strftime('%H:%M %p')]
+            list_values.append(entry)
         score_plot.append(current_state.score)
         counter_plot.append(counter_games)
 
@@ -322,6 +325,17 @@ def run(params):
     if params['train']:
         model_weights = agent.state_dict()
         torch.save(model_weights, params["weights_path"])
+    if params['test']:
+        with open(LOG_CSV, 'w', encoding='UTF8', newline='') as f:
+            writer = csv.writer(f)
+
+            # write the header
+            writer.writerow(field_titles)
+
+            # write multiple rows
+            writer.writerows(list_values)
+
+        print("File complete")
     if params['plot_score']:
         plot_seaborn(counter_plot, score_plot, params['train'])
     return total_score, mean, stdev
@@ -433,6 +447,35 @@ def run_game_loop(current_state: GameState, visualize_game, visualize_heuristics
         return current_state
     else:
         return current_state, final_move
+
+
+#################################
+#   Define parameters manually  #
+#################################
+LOADED_TRAINING = '3000'
+LOG_CSV = 'logs/RLStats_' + LOADED_TRAINING + '_2' + '.csv'
+LOG_NAME = 'logs/logfile_' + LOADED_TRAINING + '_2' + '.txt'
+if LOGGING:
+    sys.stdout = open(LOG_NAME, 'w')
+def define_parameters():
+    params = dict()
+    # Neural Network
+    params['epsilon_decay_linear'] = 1 / 100
+    params['learning_rate'] = 0.00013629
+    params['first_layer_size'] = 200  # neurons in the first layer
+    params['second_layer_size'] = 100  # neurons in the second layer
+    params['third_layer_size'] = 50  # neurons in the third layer
+    params['episodes'] = 10
+    params['memory_size'] = 2500
+    params['batch_size'] = 1000
+    # Settings
+    params['weights_path'] = 'weights/weights' + LOADED_TRAINING + '.h5'
+    params['train'] = False
+    params["test"] = True
+    params['plot_score'] = True
+    params['log_path'] = 'logs/scores_' + str(datetime.now().strftime("%Y%m%d%H%M%S")) + "_" + LOADED_TRAINING + '.txt'
+    params['turns'] = TURNS_UNTIL_GAME_FINISHED
+    return params
 
 if __name__ == '__main__':
     # Set options to activate or deactivate the game view, and its speed

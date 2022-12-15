@@ -88,9 +88,6 @@ class BasicCounterAgent(AgentSuperClass):
     def __str__(self):
         return f"BasicCounterAgent at col/x = {self.get_position()[1]}\t row/y = {self.get_position()[0]},\t count: {self.counter}"
 
-    def getPointValue(self) -> int:
-        return 15
-
     def isCounterAgent(self) -> bool:
         return True
 

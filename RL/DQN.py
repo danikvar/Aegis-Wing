@@ -141,7 +141,7 @@ class DQNAgent(torch.nn.Module):
         # reward for killing an agent = points for that agent
         # -10 points for each agent in the surround check up/down & left/right
         # -5 points for each surrounding bullet
-        # reward for surviving - .2 point for each turn survived (Every 5 turns is one point)
+        # reward for surviving - .5 point for each turn survived (Every 5 turns is one point)
 
         # TODO: Check reworking scores
         # check for score
@@ -159,7 +159,7 @@ class DQNAgent(torch.nn.Module):
         if game.lostLife:
             self.reward += REWARD_LOSE_LIFE
 
-        self.reward += (self.totalTurns - game.turns_left) / 5
+        self.reward += (self.totalTurns - game.turns_left) / 2
         self.reward += self.check_enemy_neighbors_up_down(game)
         self.reward += self.check_enemy_neighbors_left_right(game)
         self.reward += self.check_Bullet_Paths(game)

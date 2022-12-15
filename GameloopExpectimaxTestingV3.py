@@ -109,6 +109,7 @@ def main():
 
     field_titles = ["Game#", "Enemies_Killed", "HP_Lost", "End_Status", "Turns_Survived", "Score",
                     "Time at End of Simulation"]
+
     list_values = []
     game_counter = 1
 

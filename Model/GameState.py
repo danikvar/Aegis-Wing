@@ -47,6 +47,7 @@ class GameState:
 
         #Added late
         self.removed_agents = 0
+        self.removed_types = ""
 
         #Added for DQN model
         self.lastHit = 0
@@ -176,6 +177,9 @@ class GameState:
                     if each_agent.isPlayer(): #if agent that got hit was the player then reduce score
                         self.score -= 100
                         self.lostLife = True
+                    else:
+                        self.removed_types += "_" + str(each_agent.getAgentType())
+                        self.removed_agents += 1
 
     def haveAllAgentsMoved(self) -> bool:
         for each in self.current_agents:
@@ -292,6 +296,7 @@ class GameState:
                 #TODO Delete print
                 #print("Removing Player Agent")
                 self.removed_agents += 1
+
             elif value_to_pop == 0 and self.current_player_lives >= 1:
                 continue
             else:
@@ -300,7 +305,6 @@ class GameState:
                 subtract_by = each_index
                 #TODO Delete print
                 #print("Removing Agent")
-                self.removed_agents += 1
 
 
     def update_board(self):
@@ -345,22 +349,34 @@ class GameState:
         # if it is a player agent
         # cannot go beyond any boundaries
         if isAgentPlayer:
-            if (agent_min_x < board_min_x):
+            if (agent_min_x + 1 < board_min_x):
                 return False
             elif (agent_max_x - 1 > board_max_x): #may potentially cause bugged behavior
                 return False
             elif (agent_min_y < board_min_y):
                 return False
-            elif (agent_max_y > board_max_y):
+            elif (agent_max_y - 1 > board_max_y):
                 return False
             else:
                 return True
         # enemies are allowed to go beyond left boundary (beyond board min col/y)
         # and come in from right boundary (beyond board max col/y)
         if isAgentPlayer == False:
-            if agent_min_x < board_min_x:
+            if agent_min_x + 1 < board_min_x:
+                print("agent min x")
+                print(agent_min_x)
+                print("board min x")
+                print(board_min_x)
+                print(agent.getAgentType())
+                print("shit 5")
                 return False
             if agent_max_x - 1 > board_max_x:
+                print("agent max x")
+                print(agent_max_x)
+                print("board max x")
+                print(board_max_x)
+                print(agent.getAgentType())
+                print("shit 6")
                 return False
             else:
                 return True
@@ -393,6 +409,7 @@ class GameState:
         copy.max_enemies_at_any_given_time = self.max_enemies_at_any_given_time
         copy.score = self.score
         copy.removed_agents = self.removed_agents
+        copy.removed_types = self.removed_types
         #TODO NOTE does not copy bullet_agents, or current projectiles
 
         #copy agents over
@@ -620,8 +637,6 @@ class GameState:
         for each_index in range(len(self.current_projectiles)):
             each_bullet: ProjectileInterface = self.current_projectiles[each_index]
             each_bullet.resetMoveStatus()
-
-        self.removed_agents = 0
 
 
     def print_board(self):
