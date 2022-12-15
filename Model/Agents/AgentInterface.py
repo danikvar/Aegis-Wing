@@ -168,6 +168,9 @@ class AgentInterface:
     def isHeuristicAgent(self) -> bool:
         raise NotImplementedError
 
+    def isCounterAgent(self) -> bool:
+        raise NotImplementedError
+
     def isExpectimaxAgent(self) -> bool:
         raise NotImplementedError
 
@@ -183,3 +186,14 @@ class AgentInterface:
 
     def isBasicCounter(self) -> bool:
         return False
+
+
+    def getAgentType(self) -> int:
+        """
+        Get a unique ID for each type of agent.
+        Should be 1 for player, 2 for simple go left, 3 for basic fire and move,
+        4 for  heuristic, and 5 for basic counter
+        Returns: The agent type as an integer
+
+        """
+        raise NotImplementedError("No type assigned")

@@ -232,3 +232,6 @@ class AgentSuperClass(AgentInterface):
 
     def isHeuristicAgent(self) -> bool:
         return False
+
+    def isCounterAgent(self) -> bool:
+        return False

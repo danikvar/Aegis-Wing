@@ -42,3 +42,9 @@ class ProjectileInterface(AgentInterface):
         :return:
         """
         raise NotImplementedError
+
+    def getType(self) -> float:
+        """
+        Returns the variable type (-0.1) for player bullet
+        (-0.2) for enemy bullet
+        """

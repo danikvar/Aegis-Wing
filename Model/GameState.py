@@ -47,6 +47,11 @@ class GameState:
 
         #Added late
         self.removed_agents = 0
+        self.removed_types = ""
+
+        #Added for DQN model
+        self.lastHit = 0
+        self.lostLife = False
 
 
     def addAgent(self, agent: AgentSuperClass) -> bool:
@@ -171,7 +176,9 @@ class GameState:
 
                     if each_agent.isPlayer(): #if agent that got hit was the player then reduce score
                         self.score -= 100
+                        self.lostLife = True
                     else:
+                        self.removed_types += "_" + str(each_agent.getAgentType())
                         self.removed_agents += 1
 
     def haveAllAgentsMoved(self) -> bool:
@@ -220,6 +227,7 @@ class GameState:
             #TODO maybe just have them blow up instead of subtracting health? Already happens since player hp = 1
             if (player_agent.is_overlapping_other_agent(enemy_agent)):
                 player_agent.set_hp(player_agent.get_hp() - 1)
+                self.lostLife = True
                 #TODO Test
                 self.score += player_agent.getPointValue() #returns negative so adding is subtracting
                 enemy_agent.set_hp(enemy_agent.get_hp() - 1)
@@ -246,6 +254,7 @@ class GameState:
                 already_popped = True
                 if each_agent.isPlayer() == False:
                     self.score += each_agent.getPointValue() #represents destruction of enemy ship
+                    self.lastHit += each_agent.getPointValue()
 
             if already_popped == True:
                 # will go to next agent if agent is dead
@@ -286,7 +295,8 @@ class GameState:
                 subtract_by = 1
                 #TODO Delete print
                 #print("Removing Player Agent")
-                #self.removed_agents += 1
+                self.removed_agents += 1
+
             elif value_to_pop == 0 and self.current_player_lives >= 1:
                 continue
             else:
@@ -295,7 +305,7 @@ class GameState:
                 subtract_by = each_index
                 #TODO Delete print
                 #print("Removing Agent")
-                #self.removed_agents += 1
+                self.removed_agents += 1
 
 
     def update_board(self):
@@ -388,6 +398,7 @@ class GameState:
         copy.max_enemies_at_any_given_time = self.max_enemies_at_any_given_time
         copy.score = self.score
         copy.removed_agents = self.removed_agents
+        copy.removed_types = self.removed_types
         #TODO NOTE does not copy bullet_agents, or current projectiles
 
         #copy agents over
@@ -615,6 +626,8 @@ class GameState:
         for each_index in range(len(self.current_projectiles)):
             each_bullet: ProjectileInterface = self.current_projectiles[each_index]
             each_bullet.resetMoveStatus()
+
+        self.removed_agents = 0
 
 
     def print_board(self):
