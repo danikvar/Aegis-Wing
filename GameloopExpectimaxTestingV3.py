@@ -17,12 +17,6 @@ from Model.GameState import GameState
 """
 This game loop will be used to train a reinforcement model
 """
-#10 sec per turn at max enemies=4 if depth = 2
-# means 50 min to complete one game
-
-#5 sec per turn at max enemies=4 if depth = 1
-# means 25 min to complete one game
-########## Basic Game Configuration ##########
 BOARD_ROWS = 8
 BOARD_COLUMNS = 7
 MAX_ENEMIES_AT_ANY_TIME = 4
@@ -32,15 +26,15 @@ PLAYER_INITIAL_SPAWN_ROW_POSITION = BOARD_ROWS // 2  # spawn in middle of board 
 PLAYER_INITIAL_SPAWN_COL_POSITION = 0  # spawn player at furthest left position
 PLAYER_LIVES = 1
 PLAYER_HP = 3
-EXPECTIMAX_DEPTH = 3
+EXPECTIMAX_DEPTH = 1
 TOTAL_GAME_RUNS = 50
 
 ########## Specific Enemy Spawn Rate Configuration ##########
 # if enemy does get spawned then this is the probability they get chosen
-HEURISTIC_SR = 0
-TURN_SPAN_SR = 0  # a.k.a counter agent
-BASIC_FIRE_AND_MOVE_SR = 0
-SIMPLE_GO_LEFT_SR = 100
+HEURISTIC_SR = 15
+TURN_SPAN_SR = 20  # a.k.a counter agent
+BASIC_FIRE_AND_MOVE_SR = 20
+SIMPLE_GO_LEFT_SR = 45
 
 ########## Counter 'type' Enemy Configuration ##########
 TURNS_UNTIL_LEAVE_BOARD = 5
