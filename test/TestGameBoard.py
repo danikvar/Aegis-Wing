@@ -125,7 +125,7 @@ class TestGameBoard(unittest.TestCase):
         self.assertEqual(3, self.board.board_array[3][4])
 
 
-
+        #Merged Dan_DQN_branch
         #TODO write test with enemies with largers lengths, heights
         #TODO write test where enemy is beyond col boundaries, should be allowed
         #TODO: ask team where are the other tests
