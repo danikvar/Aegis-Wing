@@ -1,6 +1,6 @@
 This codebase is meant to be run with Python v 3.6
 
-This code base required the following modules:
+This code base requires the following python modules:
 matplotlib
 numpy
 scipy
@@ -19,8 +19,8 @@ Jose Lou              https://github.com/notsky23
 
 Contributions:
 Ramzi Adil: 
- - Overall Game Model Development and Testing
- - Expectimax Implementation and Testing
+ - Model design, development, and testing
+ - Expectimax implementation and Testing
  - Reinforcement Learning Debugging
 
 Daniel Varivoda
