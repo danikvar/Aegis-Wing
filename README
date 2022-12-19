@@ -10,3 +10,23 @@ tensorflow-estimator
 tensorpack
 pytorch
 tkinter
+
+Contributors:
+Name                  Github Links
+Ramzi Adil            https://github.com/radil708
+Daniel Varivoda       https://github.com/danikvar
+Jose Lou              https://github.com/notsky23
+
+Contributions:
+Ramzi Adil: 
+ - Overall Game Model Development and Testing
+ - Expectimax Implementation and Testing
+ - Reinforcement Learning Debugging
+
+Daniel Varivoda
+- Reinforcement Learning Implementation and Debugging
+- 2 agents (EnemyMoveFireHeuristicAgent.py and BasicCounterAgent.py)
+- Projectile Design and Initial Development
+
+Jose Lou
+- tkinter view
